@@ -23,7 +23,7 @@ set $menu dmenu_path | dmenu | xargs swaymsg exec --
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg /usr/share/backgrounds/default.png fill
+# output * bg /usr/share/backgrounds/default.png fill
 #
 # Example configuration:
 #
@@ -57,6 +57,13 @@ output * bg /usr/share/backgrounds/default.png fill
 #
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
+
+input "1739:30382:DLL0704:01_06CB:76AE_Touchpad" {
+    dwt enabled
+    tap enabled
+    natural_scroll enabled
+    middle_emulation enabled
+}
 
 ### Key bindings
 #
@@ -200,18 +207,21 @@ bindsym $mod+r mode "resize"
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
-bar {
-    position top
+# bar {
+#     position top
 
-    # When the status_command prints a new line to stdout, swaybar updates.
-    # The default just shows the current date and time.
-    status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
+#     # When the status_command prints a new line to stdout, swaybar updates.
+#     # The default just shows the current date and time.
+#     status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
 
-    colors {
-        statusline #ffffff
-        background #323232
-        inactive_workspace #32323200 #32323200 #5c5c5c
-    }
-}
+#     colors {
+#         statusline #ffffff
+#         background #323232
+#         inactive_workspace #32323200 #32323200 #5c5c5c
+#     }
+# }
+
+# Use Waybar instead of sway-bar
+bar swaybar_command waybar
 
 include /etc/sway/config.d/*
