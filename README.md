@@ -15,5 +15,14 @@ sudo dnf install gcc-c++                 # nodejs build dependencies (https://gi
 sudo dnf install i3 polybar sway waybar  # window managers: i3/sway + polybar/waybar
 ```
 
-Run install script via curl
-`sh -c "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/install.sh)"`
+# Remove old config files
+
+```sh
+rm -rf ~/.zshrc ~/.tmux.conf ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.config/i3 ~/.config/nvim ~/.config/polybar ~/.config/powerlevel10k ~/.config/sway ~/.config/waybar
+```
+
+# Run install script via curl
+
+```sh
+sh -c "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/install.sh)"
+```
