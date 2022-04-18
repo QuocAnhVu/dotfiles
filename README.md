@@ -24,5 +24,5 @@ rm -rf ~/.zshrc ~/.tmux.conf ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.confi
 # Run install script via curl
 
 ```sh
-sh -c "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/install.sh)"
+zsh -c "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/install.sh)"
 ```
