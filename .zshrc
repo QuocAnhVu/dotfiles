@@ -52,7 +52,8 @@ plugins=(git asdf)
 source $ZSH/oh-my-zsh.sh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+POWERLEVEL9K_CONFIG_FILE=$HOME/.config/powerlevel10k/config.zsh
+[[ ! -f $HOME/.config/powerlevel10k/config.zsh ]] || source $HOME/.config/powerlevel10k/config.zsh
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
