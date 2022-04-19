@@ -43,7 +43,6 @@ export ZSH="/home/quocanh/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 HIST_STAMPS="yyyy-mm-dd"
 
-alias code="flatpak run com.visualstudio.code"
 alias vim=nvim
 alias exa="exa --header --extended --all --classify --color-scale --long --git --icons --tree --level=1" 
 

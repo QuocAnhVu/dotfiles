@@ -21,7 +21,8 @@ run 'ln -s $HOME/.config/dotfiles/.tmux.conf $HOME/.config/dotfiles/.zshrc $HOME
 
 # https://asdf-vm.com/guide/getting-started.html
 context 'Installing asdf, nodejs, python'
-run 'sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+run 'git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.9.0'
+run 'source ~/.zshrc'
 # https://github.com/danhper/asdf-python
 run 'asdf plugin-add python'
 run 'asdf install python latest'
@@ -41,7 +42,7 @@ run 'mkdir -p $HOME/ws/3p'
 
 context 'Installing font: UbuntuMono Nerd Font'
 # https://github.com/ryanoasis/nerd-fonts#option-6-ad-hoc-curl-download
-run 'git clone --filter=blob:none --sparse git@github.com:ryanoasis/nerd-fonts'
+run 'git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git $HOME/ws/3p/nerd-fonts'
 # https://github.com/ryanoasis/nerd-fonts#option-3-install-script
 run 'pushd $HOME/ws/3p/nerd-fonts'
 run 'git sparse-checkout add patched-fonts/UbuntuMono'
