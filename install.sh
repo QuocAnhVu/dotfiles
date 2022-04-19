@@ -38,6 +38,10 @@ run 'sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/ins
 # https://github.com/romkatv/powerlevel10k#oh-my-zsh
 run 'git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k'
 
+context 'Installing vim customizations: vim-plug'
+run "sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'"
+
 run 'mkdir -p $HOME/ws/3p'
 
 context 'Installing font: UbuntuMono Nerd Font'
