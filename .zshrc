@@ -23,15 +23,15 @@ export EDITOR=nvim
 . $HOME/.asdf/asdf.sh
 
 # Rust
-export RUSTC_WRAPPER=/home/quocanh/.cargo/bin/sccache
-export PATH=/home/quocanh/.cargo/bin:$PATH
+export RUSTC_WRAPPER=$HOME/.cargo/bin/sccache
+export PATH=$HOME/.cargo/bin:$PATH
 
 # # Deno
-# export DENO_INSTALL="/home/quocanh/.deno"
+# export DENO_INSTALL="$HOME/.deno"
 # export PATH="$DENO_INSTALL/bin:$PATH"
 
 # Haskell
-export PATH=/home/quocanh/.ghcup/bin:$PATH
+export PATH=$HOME/.ghcup/bin:$PATH
 
 # External Cache
 export TRANSFORMERS_CACHE="/mnt/d/.cache/huggingface/"
@@ -39,7 +39,7 @@ export TRANSFORMERS_CACHE="/mnt/d/.cache/huggingface/"
 # Go
 export PATH=$PATH:/usr/local/go/bin
 
-export ZSH="/home/quocanh/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 HIST_STAMPS="yyyy-mm-dd"
 
