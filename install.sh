@@ -14,7 +14,7 @@ function run() {
 run 'mkdir -p $HOME/.config'
 
 context 'Installing dotfiles'
-run 'git clone git@github.com:QuocAnhVu/dotfiles.git $HOME/.config/dotfiles'
+run 'git clone https://github.com/QuocAnhVu/dotfiles.git $HOME/.config/dotfiles'
 context 'Symlinking config files'
 run 'ln -s $HOME/.config/dotfiles/.config/* $HOME/.config/'
 run 'ln -s $HOME/.config/dotfiles/.tmux.conf $HOME/.config/dotfiles/.zshrc $HOME/.config/dotfiles/.profile $HOME/'
