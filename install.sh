@@ -33,10 +33,10 @@ run 'asdf install nodejs latest'
 run 'asdf global nodejs latest'
 
 context 'Installing shell customizations: oh-my-zsh and powerlevel10k'
-# https://ohmyz.sh/#install
-run 'sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+# https://github.com/ohmyzsh/ohmyzsh#advanced-installation
+run 'git clone https://github.com/ohmyzsh/ohmyzsh.git $HOME/.config/.oh-my-zsh'
 # https://github.com/romkatv/powerlevel10k#oh-my-zsh
-run 'git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k'
+run 'git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.config/.oh-my-zsh/custom}/themes/powerlevel10k'
 
 context 'Installing vim customizations: vim-plug'
 run "sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
