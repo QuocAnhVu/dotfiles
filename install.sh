@@ -32,8 +32,6 @@ context 'Installing vim customizations: vim-plug'
 run "sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'"
 
-run 'mkdir -p $HOME/ws/3p'
-
 # https://asdf-vm.com/guide/getting-started.html
 context 'Installing asdf, nodejs, python'
 run 'git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.9.0'
@@ -44,7 +42,7 @@ if ! asdf current python ; then
     run 'asdf install python latest'
     run 'asdf global python latest'
 else
-    message 'Skipping python - already installed.'
+    message 'asdf python detected - no installation needed.'
 fi
 # https://github.com/asdf-vm/asdf-nodejs
 if ! asdf current nodejs ; then
@@ -52,14 +50,19 @@ if ! asdf current nodejs ; then
     run 'asdf install nodejs latest'
     run 'asdf global nodejs latest'
 else
-    message 'Skipping nodejs - already installed.' 
+    message 'asdf nodejs detected - no installation needed.' 
 fi
 
 context 'Installing font: UbuntuMono Nerd Font'
-# https://github.com/ryanoasis/nerd-fonts#option-6-ad-hoc-curl-download
-run 'git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git $HOME/ws/3p/nerd-fonts'
-# https://github.com/ryanoasis/nerd-fonts#option-3-install-script
-run 'pushd $HOME/ws/3p/nerd-fonts'
-run 'git sparse-checkout add patched-fonts/UbuntuMono'
-run './install.sh UbuntuMono'
-run 'popd'
+if ! fc-list | grep 'UbuntuMono Nerd Font' > /dev/null ; then
+    # https://github.com/ryanoasis/nerd-fonts#option-6-ad-hoc-curl-download
+    run 'git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git $HOME/nerd-fonts'
+    # https://github.com/ryanoasis/nerd-fonts#option-3-install-script
+    run 'pushd $HOME/ws/3p/nerd-fonts'
+    run 'git sparse-checkout add patched-fonts/UbuntuMono'
+    run './install.sh UbuntuMono'
+    run 'popd'
+    run 'rm -rf $HOME/nerd-fonts'
+else
+    message 'UbuntuMono Nerd Font detected - no installation needed.'
+fi
