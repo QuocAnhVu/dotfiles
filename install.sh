@@ -1,4 +1,4 @@
-#! /bin/zsh
+#! /usr/bin/zsh
 
 ORANGE='\033[0;33m'
 CYAN='\033[0;36m'

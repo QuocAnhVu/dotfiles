@@ -1,6 +1,6 @@
-https://stribika.github.io/2015/01/04/secure-secure-shell.html
+#! /usr/bin/zsh
+# https://stribika.github.io/2015/01/04/secure-secure-shell.html
 
-```sh
 # Run this first
 DOTFILES=$HOME/.config/dotfiles
 
@@ -44,4 +44,3 @@ ssh-keygen -t rsa -b 4096 -o -a 100
 # Start sshd
 sudo systemctl enable sshd
 sudo systemctl start sshd
-```
