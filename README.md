@@ -18,7 +18,7 @@ sudo dnf install -y i3 polybar sway waybar  # window managers: i3/sway + polybar
 # Set default shell to ZSH
 
 ```sh
-sudo lchsh  # set to /usr/bin/zsh
+sudo lchsh $USER  # set to /usr/bin/zsh
 ```
 
 # Remove old config files

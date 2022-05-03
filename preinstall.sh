@@ -14,7 +14,7 @@ sudo dnf install -y gcc-c++                 # nodejs build dependencies (https:/
 #sudo dnf install -y i3 polybar sway waybar  # window managers: i3/sway + polybar/waybar
 
 # Set default shell to ZSH
-sudo lchsh  # set to /usr/bin/zsh
+sudo lchsh $USER  # set to /usr/bin/zsh
 
 # Remove old config files
 rm -rf ~/.zshrc ~/.tmux.conf ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.config/i3 ~/.config/nvim ~/.config/polybar ~/.config/powerlevel10k ~/.config/sway ~/.config/waybar
