@@ -58,7 +58,7 @@ if ! fc-list | grep 'UbuntuMono Nerd Font' > /dev/null ; then
     # https://github.com/ryanoasis/nerd-fonts#option-6-ad-hoc-curl-download
     run 'git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git $HOME/nerd-fonts'
     # https://github.com/ryanoasis/nerd-fonts#option-3-install-script
-    run 'pushd $HOME/ws/3p/nerd-fonts'
+    run 'pushd $HOME/nerd-fonts'
     run 'git sparse-checkout add patched-fonts/UbuntuMono'
     run './install.sh UbuntuMono'
     run 'popd'
