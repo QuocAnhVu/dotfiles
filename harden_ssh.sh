@@ -26,13 +26,14 @@ sudo cp $DOTFILES/.ssh/sshd_config.default /etc/ssh/sshd_config
 # Unnecessary in at least Fedora 35+
 awk '$5 > 2000' /etc/ssh/moduli > "${HOME}/moduli"
 wc -l "${HOME}/moduli" # make sure there is something left
-mv "${HOME}/moduli" /etc/ssh/moduli
+sudo mv "${HOME}/moduli" /etc/ssh/moduli
+rm $HOME/moduli
 
 # Harden host keys
 popd /etc/ssh
-rm ssh_host_*key*
-ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N "" < /dev/null
-ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N "" < /dev/null
+sudo rm ssh_host_*key*
+sudo ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N "" < /dev/null
+sudo ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N "" < /dev/null
 pushd
 
 # SSH access is restricted to only the ssh-user group
