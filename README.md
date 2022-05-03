@@ -32,3 +32,7 @@ rm -rf ~/.zshrc ~/.tmux.conf ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.confi
 ```sh
 zsh -c "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/install.sh)"
 ```
+
+# SSH Hardening
+
+After running install script, see [SSH.md](SSH.md) for commands to harden ssh and sshd.
