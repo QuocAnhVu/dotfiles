@@ -3,6 +3,8 @@
 
 # Run this first
 DOTFILES=$HOME/.config/dotfiles
+mkdir -p $HOME/.ssh
+chmod 700 $HOME/.ssh
 
 # Install sshd
 sudo dnf install -y openssh-server
