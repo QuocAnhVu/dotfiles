@@ -17,4 +17,4 @@ sudo dnf install -y gcc-c++                 # nodejs build dependencies (https:/
 sudo lchsh $USER  # set to /usr/bin/zsh
 
 # Remove old config files
-rm -rf ~/.zshrc ~/.tmux.conf ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.config/i3 ~/.config/nvim ~/.config/polybar ~/.config/powerlevel10k ~/.config/sway ~/.config/waybar
+rm -rf ~/.zshrc ~/.tmux.conf ~/.config/tmux ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.config/i3 ~/.config/nvim ~/.config/polybar ~/.config/powerlevel10k ~/.config/sway ~/.config/waybar
