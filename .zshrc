@@ -48,6 +48,7 @@ alias exa="exa --header --extended --all --classify --color-scale --long --git -
 
 plugins=(git asdf)
 
+export ZSH_COMPDUMP=$HOME/.cache/oh-my-zsh/zcompdump-$HOST
 source $ZSH/oh-my-zsh.sh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
