@@ -14,6 +14,12 @@ export PATH
 
 export EDITOR=nvim
 
+# XDG Basedir
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
 # CUDA
 # export PATH=/usr/local/cuda-11.6/bin${PATH:+:${PATH}}
 # export LD_LIBRARY_PATH=/usr/local/cuda-11.6/lib64\
