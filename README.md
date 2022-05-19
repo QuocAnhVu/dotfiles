@@ -1,9 +1,9 @@
 # Install packages
 
 ```sh
-sudo dnf install -y curl git                # dotfiles dependency
+sudo dnf install -y curl wget git                # dotfiles dependency
 
-sudo dnf install -y zsh neovim ripgrep      # Shell + text editor
+sudo dnf install -y tmux zsh neovim vim ripgrep  # Shell + text editor
 
 # python build dependencies (https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
 sudo dnf install -y make gcc zlib-devel bzip2 bzip2-devel \

@@ -37,7 +37,7 @@ export PATH=$HOME/.ghcup/bin:$PATH
 export TRANSFORMERS_CACHE="/mnt/d/.cache/huggingface/"
 
 # Go
-export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
 
 export ZSH="$HOME/.config/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
