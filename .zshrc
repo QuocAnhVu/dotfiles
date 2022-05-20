@@ -26,9 +26,9 @@ alias exa="exa --header --extended --all --classify --color-scale --long --git -
 export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME/aws/credentials"
 export AWS_CONFIG_FILE="$XDG_CONFIG_HOME/aws/config"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
-export LESSHISTFILE="$XDG_CACHE_HOME/less/history"
-export NODE_REPL_HISTORY="$XDG_DATA_HOME/node_repl_history"
-alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts" 
+export LESSHISTFILE="$XDG_STATE_HOME/less/history"
+export NODE_REPL_HISTORY="$XDG_STATE_HOME/node_repl_history"
+alias wget=wget --hsts-file="$XDG_STATE_HOME/wget-hsts" 
 
 # CUDA
 # export PATH=/usr/local/cuda-11.6/bin${PATH:+:${PATH}}
