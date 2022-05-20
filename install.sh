@@ -24,7 +24,7 @@ run 'ln -s $HOME/.config/dotfiles/.zshrc $HOME/'
 
 context 'Installing shell customizations: oh-my-zsh and powerlevel10k'
 # https://github.com/ohmyzsh/ohmyzsh#advanced-installation
-run 'git clone https://github.com/ohmyzsh/ohmyzsh.git $HOME/.config/.oh-my-zsh'
+run 'git clone https://github.com/ohmyzsh/ohmyzsh.git $HOME/.config/oh-my-zsh'
 # https://github.com/romkatv/powerlevel10k#oh-my-zsh
 run 'git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.config/.oh-my-zsh/custom}/themes/powerlevel10k'
 
