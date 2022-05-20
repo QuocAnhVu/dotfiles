@@ -19,6 +19,12 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
+# XDG Extra
+export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME/aws/credentials"
+export AWS_CONFIG_FILE="$XDG_CONFIG_HOME/aws/config"
+export GNUPGHOME="$XDG_DATA_HOME/gnupg"
+export LESSHISTFILE="$XDG_CACHE_HOME/less/history"
+export NODE_REPL_HISTORY="$XDG_DATA_HOME/node_repl_history"
 
 # CUDA
 # export PATH=/usr/local/cuda-11.6/bin${PATH:+:${PATH}}
@@ -27,10 +33,14 @@ export XDG_STATE_HOME="$HOME/.local/state"
 
 # asdf
 . $HOME/.asdf/asdf.sh
+export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
 
 # Rust
 export RUSTC_WRAPPER=$HOME/.cargo/bin/sccache
 export PATH=$HOME/.cargo/bin:$PATH
+export CARGO_HOME="$XDG_DATA_HOME/cargo"
+export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
+alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts" 
 
 # # Deno
 # export DENO_INSTALL="$HOME/.deno"
@@ -44,6 +54,7 @@ export TRANSFORMERS_CACHE="/mnt/d/.cache/huggingface/"
 
 # Go
 export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
+export GOPATH="$XDG_DATA_HOME/go"
 
 export ZSH="$HOME/.config/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
