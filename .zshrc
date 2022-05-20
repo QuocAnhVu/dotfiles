@@ -60,7 +60,7 @@ export GOPATH="$XDG_DATA_HOME/go"
 export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 
 # Zsh
-export ZSH="$XDG_CONFIG_HOME/oh-my-zsh"
+export ZSH="$XDG_DATA_HOME/oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 HIST_STAMPS="yyyy-mm-dd"
 export ZSH_COMPDUMP=$XDG_CACHE_HOME/oh-my-zsh/zcompdump-$HOST

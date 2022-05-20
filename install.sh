@@ -13,6 +13,10 @@ function run() {
     echo "${CYAN}${1}${NC}"
     eval $1
 }
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
 
 run 'mkdir -p $HOME/.config'
 
@@ -21,11 +25,10 @@ run 'git clone https://github.com/QuocAnhVu/dotfiles.git $HOME/.config/dotfiles'
 context 'Symlinking config files'
 run 'ln -s $HOME/.config/dotfiles/.config/* $HOME/.config/'
 run 'ln -s $HOME/.config/dotfiles/.zshrc $HOME/'
-run 'source ~/.zshrc'
 
 context 'Installing shell customizations: oh-my-zsh and powerlevel10k'
 # https://github.com/ohmyzsh/ohmyzsh#advanced-installation
-run 'git clone https://github.com/ohmyzsh/ohmyzsh.git $HOME/.config/oh-my-zsh'
+run 'git clone https://github.com/ohmyzsh/ohmyzsh.git $XDG_DATA_HOME/oh-my-zsh'
 # https://github.com/romkatv/powerlevel10k#oh-my-zsh
 run 'git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.config/.oh-my-zsh/custom}/themes/powerlevel10k'
 
@@ -35,7 +38,7 @@ run "sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/
 
 # https://asdf-vm.com/guide/getting-started.html
 context 'Installing asdf, nodejs, python'
-run 'git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.9.0'
+run 'git clone https://github.com/asdf-vm/asdf.git $XDG_DATA_HOME/asdf --branch v0.9.0'
 run 'source ~/.zshrc'
 # https://github.com/danhper/asdf-python
 if ! asdf current python ; then
@@ -57,13 +60,13 @@ fi
 context 'Installing font: UbuntuMono Nerd Font'
 if ! fc-list | grep 'UbuntuMono Nerd Font' > /dev/null ; then
     # https://github.com/ryanoasis/nerd-fonts#option-6-ad-hoc-curl-download
-    run 'git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git $HOME/nerd-fonts'
+    run 'git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git $XDG_CACHE_HOME/nerd-fonts'
     # https://github.com/ryanoasis/nerd-fonts#option-3-install-script
-    run 'pushd $HOME/nerd-fonts'
+    run 'pushd $XDG_CACHE_HOME/nerd-fonts'
     run 'git sparse-checkout add patched-fonts/UbuntuMono'
     run './install.sh UbuntuMono'
     run 'popd'
-    run 'rm -rf $HOME/nerd-fonts'
+    run 'rm -rf $XDG_CACHE_HOME/nerd-fonts'
 else
     message 'UbuntuMono Nerd Font detected - no installation needed.'
 fi
