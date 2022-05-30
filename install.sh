@@ -30,7 +30,7 @@ context 'Installing shell customizations: oh-my-zsh and powerlevel10k'
 # https://github.com/ohmyzsh/ohmyzsh#advanced-installation
 run 'git clone https://github.com/ohmyzsh/ohmyzsh.git $XDG_DATA_HOME/oh-my-zsh'
 # https://github.com/romkatv/powerlevel10k#oh-my-zsh
-run 'git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.config/.oh-my-zsh/custom}/themes/powerlevel10k'
+run 'git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $XDG_DATA_HOME/oh-my-zsh/custom/themes/powerlevel10k'
 
 context 'Installing vim customizations: vim-plug'
 run "sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
