@@ -7,7 +7,14 @@ mkdir -p $HOME/.ssh
 chmod 700 $HOME/.ssh
 
 # Install sshd
-sudo dnf install -y openssh-server
+if command -v apt &> /dev/null; then
+    sudo apt update; sudo apt install openssh-server
+elif command -v dnf &> /dev/null; then
+    sudo dnf install -y openssh-server
+else
+    echo "Distro's package manager is not supported."
+    exit
+fi
 
 # Allow access from BAWK
 cat $DOTFILES/.ssh/authorized_keys >> $HOME/.ssh/authorized_keys
