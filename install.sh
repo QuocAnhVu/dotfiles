@@ -46,8 +46,8 @@ run 'source ~/.zshrc'
 # https://github.com/danhper/asdf-python
 if ! asdf current python ; then
     run 'asdf plugin-add python'
-    run 'asdf install python 3.9'
-    run 'asdf global python 3.9'
+    run 'asdf install python latest'
+    run 'asdf global python latest'
 else
     message 'asdf python detected - no installation needed.'
 fi
