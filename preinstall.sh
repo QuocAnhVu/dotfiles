@@ -10,10 +10,8 @@ else
 fi
 
 sudo $PKG update
-
-sudo $PKG install -y curl git                # dotfiles dependency
-
-sudo $PKG install -y zsh tmux neovim ripgrep # Shell + text editor
+sudo $PKG install -y curl git zsh tmux neovim ripgrep
+/usr/bin/pip3 install neovim
 
 # python build dependencies (https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
 if command -v apt &> /dev/null; then

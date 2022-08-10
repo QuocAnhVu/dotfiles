@@ -8,9 +8,9 @@ chmod 700 $HOME/.ssh
 
 # Install sshd
 if command -v apt &> /dev/null; then
-    sudo apt update; sudo apt install openssh-server
+    sudo apt update; sudo apt -y install openssh-server mosh
 elif command -v dnf &> /dev/null; then
-    sudo dnf install -y openssh-server
+    sudo dnf install -y openssh-server mosh
 else
     echo "Distro's package manager is not supported."
     exit

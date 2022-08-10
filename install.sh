@@ -46,16 +46,16 @@ run 'source ~/.zshrc'
 # https://github.com/danhper/asdf-python
 if ! asdf current python ; then
     run 'asdf plugin-add python'
-    run 'asdf install python latest'
-    run 'asdf global python latest'
+    run 'asdf install python 3.9'
+    run 'asdf global python 3.9'
 else
     message 'asdf python detected - no installation needed.'
 fi
 # https://github.com/asdf-vm/asdf-nodejs
 if ! asdf current nodejs ; then
     run 'asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git'
-    run 'asdf install nodejs latest'
-    run 'asdf global nodejs latest'
+    run 'asdf install nodejs lts'
+    run 'asdf global nodejs lts'
 else
     message 'asdf nodejs detected - no installation needed.' 
 fi
