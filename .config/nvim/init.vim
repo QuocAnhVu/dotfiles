@@ -24,9 +24,6 @@ call plug#begin('~/.local/share/nvim/plugged')
     " Theme: Gruvbox Material
     Plug 'sainnhe/gruvbox-material'
 
-    " coc.nvim
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
     " powerline/airline
     Plug 'vim-airline/vim-airline'
         let g:airline_powerline_fonts = 1
@@ -97,10 +94,15 @@ call plug#begin('~/.local/share/nvim/plugged')
     " Use gcc to comment out a line (takes a count), gc to comment out the target of a motion (for example, gcap to comment out a paragraph), gc in visual mode to comment out the selection, and gc in operator pending mode to target a comment. You can also use it as a command, either with a range like :7,17Commentary, or as part of a :global invocation like with :g/TODO/Commentary.
     Plug 'tpope/vim-commentary'
 
-    " TSX Syntax highlighting
+    " Web programming languages
     Plug 'leafgarland/typescript-vim'
     Plug 'peitalin/vim-jsx-typescript'
+    Plug 'pangloss/vim-javascript'
+    Plug 'evanleck/vim-svelte'
 
+    " coc.nvim
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    Plug 'codechips/coc-svelte', {'do': 'npm install'}
 call plug#end()
 
 "------------------------------------------------------------
@@ -230,7 +232,7 @@ set pastetoggle=<F11>
 " Indentation settings according to personal preference.
 
 " Indentation settings for using 4 spaces instead of tabs.
-" Do not change 'tabstop' from its default value of 8 with this setup.
+set tabstop=4
 set shiftwidth=4
 set softtabstop=4
 set expandtab
