@@ -75,14 +75,14 @@ call plug#begin('~/.local/share/nvim/plugged')
         let g:EasyMotion_do_mapping = 0 " Disable default mappings
         " Jump to anywhere you want with minimal keystrokes, with just one key binding.
         " `s{char}{char}{label}`
-        nmap s <Plug>(easymotion-overwin-f2)
+        nmap ss <Plug>(easymotion-overwin-f2)
         " Turn on case-insensitive feature
         let g:EasyMotion_smartcase = 1
         " HJKL motions: Line motions
-        map <Leader>h <Plug>(easymotion-linebackward)
-        map <Leader>j <Plug>(easymotion-j)
-        map <Leader>k <Plug>(easymotion-k)
-        map <Leader>l <Plug>(easymotion-lineforward)
+        map sh <Plug>(easymotion-linebackward)
+        map sj <Plug>(easymotion-j)
+        map sk <Plug>(easymotion-k)
+        map sl <Plug>(easymotion-lineforward)
 
     " IndentLine
     Plug 'Yggdroot/indentLine'
