@@ -5,9 +5,6 @@
 "              If you're a more advanced user, building your own .vimrc based
 "              on this file is still a good idea.
 
-" Set leader to comma, ','
-let mapleader=","
-
 "------------------------------------------------------------
 " Plugins
 
@@ -49,6 +46,26 @@ call plug#begin('~/.local/share/nvim/plugged')
         let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
         let g:ctrlp_working_path_mode = 'ra'
         let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
+
+    " ack.vim
+    Plug 'mileszs/ack.vim'
+        " Use ripgrep for searching ⚡️
+        " Options include:
+        " --vimgrep -> Needed to parse the rg response properly for ack.vim
+        " --type-not sql -> Avoid huge sql file dumps as it slows down the search
+        " --smart-case -> Search case insensitive if all lowercase pattern, Search case sensitively otherwise
+        let g:ackprg = 'rg --vimgrep --type-not sql --smart-case'
+        " Auto close the Quickfix list after pressing '<enter>' on a list item
+        let g:ack_autoclose = 1
+        " Any empty ack search will search for the work the cursor is on
+        let g:ack_use_cword_for_empty_search = 1
+        " Don't jump to first match
+        cnoreabbrev Ack Ack!
+        " Maps <leader>/ so we're ready to type the search keyword
+        nnoremap <Leader>/ :Ack!<Space>
+        " Navigate quickfix list with ease
+        nnoremap <silent> [q :cprevious<CR>
+        nnoremap <silent> ]q :cnext<CR>
 
     " vim-signify
     Plug 'mhinz/vim-signify'
@@ -94,15 +111,11 @@ call plug#begin('~/.local/share/nvim/plugged')
     " Use gcc to comment out a line (takes a count), gc to comment out the target of a motion (for example, gcap to comment out a paragraph), gc in visual mode to comment out the selection, and gc in operator pending mode to target a comment. You can also use it as a command, either with a range like :7,17Commentary, or as part of a :global invocation like with :g/TODO/Commentary.
     Plug 'tpope/vim-commentary'
 
-    " Web programming languages
-    Plug 'leafgarland/typescript-vim'
-    Plug 'peitalin/vim-jsx-typescript'
-    Plug 'pangloss/vim-javascript'
-    Plug 'evanleck/vim-svelte'
-
-    " coc.nvim
+    " Autocompletion
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    Plug 'codechips/coc-svelte', {'do': 'npm install'}
+
+    " Syntax hghlighting
+    Plug 'sheerun/vim-polyglot'
 call plug#end()
 
 "------------------------------------------------------------
