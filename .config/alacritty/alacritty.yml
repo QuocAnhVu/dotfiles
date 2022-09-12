@@ -3,7 +3,7 @@ shell:
   args:
     - -l
     - -c
-    - "tmux attach || tmux"
+    - "tmux new -A -s bare"
 window:
   padding:
     x: 4
