@@ -114,8 +114,12 @@ call plug#begin('~/.local/share/nvim/plugged')
     " Autocompletion
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-    " Syntax hghlighting
+    " Syntax highlighting
     Plug 'sheerun/vim-polyglot'
+
+    " Writing mode
+    Plug 'QuocAnhVu/write.vim'
+        let g:write_auto=['markdown', 'help', 'text!']
 call plug#end()
 
 "------------------------------------------------------------
