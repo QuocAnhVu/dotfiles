@@ -18,6 +18,9 @@ then
 fi
 export PATH
 
+# Aliases
+alias sprunge="curl -F 'sprunge=<-' http://sprunge.us"
+
 export EDITOR=nvim
 alias vim=nvim
 alias exa="exa --header --extended --all --classify --color-scale --long --git --icons --tree --level=1" 
