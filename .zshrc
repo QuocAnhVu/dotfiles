@@ -34,9 +34,8 @@ export NODE_REPL_HISTORY="$XDG_STATE_HOME/node_repl_history"
 alias wget=wget --hsts-file="$XDG_STATE_HOME/wget-hsts" 
 
 # CUDA
-# export PATH=/usr/local/cuda-11.6/bin${PATH:+:${PATH}}
-# export LD_LIBRARY_PATH=/usr/local/cuda-11.6/lib64\
-#                          ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+#export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
+#export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
 # asdf
 export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
@@ -54,9 +53,6 @@ export RUSTC_WRAPPER="$CARGO_HOME/bin/sccache"
 
 # Haskell
 export PATH=$HOME/.ghcup/bin:$PATH
-
-# External Cache
-export TRANSFORMERS_CACHE="/mnt/d/.cache/huggingface/"
 
 # Go
 export GOPATH="$XDG_DATA_HOME/go"
