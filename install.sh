@@ -36,6 +36,10 @@ run 'git clone https://github.com/ohmyzsh/ohmyzsh.git $XDG_DATA_HOME/oh-my-zsh'
 run 'git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $XDG_DATA_HOME/oh-my-zsh/custom/themes/powerlevel10k'
 
 context 'Installing vim customizations: vim-plug'
+message 'Run <prefix>-I in tmux to install plugins!'
+run "git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm"
+
+context 'Installing tmux customizations: tpm'
 run "sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'"
 
