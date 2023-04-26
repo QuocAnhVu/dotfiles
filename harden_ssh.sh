@@ -31,6 +31,8 @@ case "$response" in
         if [ ! -f $HOME/.ssh/authorized_keys ]; then
             run touch $HOME/.ssh/authorized_keys
             run chmod 644 $HOME/.ssh/authorized_keys
+        else
+            message 'Authorized keys file detected'
         fi
         while read key; do
             if ! grep -qF "$key" $HOME/.ssh/authorized_keys; then
