@@ -121,9 +121,16 @@ fi
 run sudo cp $DOTFILES/.ssh/sshd_config.default /etc/ssh/sshd_config
 
 context 'Generating custom moduli... this may take a while'
+function cleanup {
+    if [ -f moduli-2048.candidates ]; then
+        run rm -f moduli-2048.candidates
+    fi
+}
+trap 'cleanup; exit' SIGINT
 run ssh-keygen -M generate -O bits=2048 moduli-2048.candidates
 run ssh-keygen -M screen -f moduli-2048.candidates moduli-2048
 run sudo mv moduli-2048 /etc/ssh/moduli
+trap - SIGINT
 
 context 'Starting sshd service'
 run sudo systemctl enable sshd
