@@ -65,7 +65,7 @@ if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
 else
     message 'Skipping ssh_host_ed25519_key generation'
 fi
-if [ ! -f /etc/ssh/ssh_host_rsa_key ] || [ $(ssh-keygen -lf /etc/ssh/ssh_host_rsa_key | awk '{print $1}') -ne 4096 ]; then
+if [ ! -f /etc/ssh/ssh_host_rsa_key ] || [ $(sudo ssh-keygen -lf /etc/ssh/ssh_host_rsa_key | awk '{print $1}') -ne 4096 ]; then
     run 'sudo ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N "" < /dev/null'
 else
     message 'Skipping ssh_host_rsa_key generation'
