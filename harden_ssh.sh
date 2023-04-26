@@ -39,7 +39,7 @@ case "$response" in
             if ! grep -qF "$key" $HOME/.ssh/authorized_keys; then
                 run 'echo "$key" >> $HOME/.ssh/authorized_keys'
             else
-                message 'Authorized key detected: $key'
+                message 'Authorized key detected' $key
             fi
         done < $DOTFILES/.ssh/authorized_keys
         ;;
