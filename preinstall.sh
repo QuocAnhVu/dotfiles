@@ -1,6 +1,7 @@
 #! /usr/bin/bash
 ORANGE='\033[0;33m'
 CYAN='\033[0;36m'
+GREEN_BOLD='\033[1;32m'
 NC='\033[0m'
 function context() {
     echo -e "\n${ORANGE}${@:1}${NC}"
@@ -11,6 +12,11 @@ function message() {
 function run() {
     (echo -e "${CYAN}${@:1}${NC}") >&2
     eval ${@:1}
+}
+function prompt() {
+    echo -e -n "${GREEN_BOLD}${@:1}${NC}" >&2
+    read response
+    echo "$response"
 }
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"

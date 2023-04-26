@@ -3,6 +3,7 @@
 
 ORANGE='\033[0;33m'
 CYAN='\033[0;36m'
+GREEN_BOLD='\033[1;32m'
 NC='\033[0m'
 function context() {
     echo "\n${ORANGE}${@:1}${NC}"
@@ -13,6 +14,11 @@ function message() {
 function run() {
     (echo "${CYAN}${@:1}${NC}") >&2
     eval ${@:1}
+}
+function prompt() {
+    echo -n "${GREEN_BOLD}${@:1}${NC}" >&2
+    read response
+    echo "$response"
 }
 XDG_CONFIG_HOME="$HOME/.config"
 XDG_CACHE_HOME="$HOME/.cache"
@@ -25,8 +31,7 @@ run mkdir -p $HOME/.ssh
 run chmod 700 $HOME/.ssh
 
 context 'Allowing SSH access from 🐔BAWK'
-message 'Would you like to allow access from 🐔BAWK? (yes/no): '
-read response
+response=$(prompt 'Would you like to allow access from 🐔BAWK? (yes/no): ')
 case "$response" in
     [Yy]|[Yy][Ee][Ss])
         if [ ! -f $HOME/.ssh/authorized_keys ]; then
@@ -50,8 +55,7 @@ esac
 
 context 'Hardening host keys'
 pushd /etc/ssh
-message 'Would you like to remove any existing host SSH keys? (yes/no): '
-read response
+response=$(prompt 'Would you like to remove any existing host SSH keys? (yes/no): ')
 case "$response" in
     [Yy]|[Yy][Ee][Ss])
         run sudo rm ssh_host_*key*
@@ -73,8 +77,7 @@ fi
 popd
 
 context 'Hardening client keys'
-message 'Would you like to remove any existing client SSH keys? (yes/no): '
-read response
+response=$(prompt 'Would you like to remove any existing client SSH keys? (yes/no): ')
 case "$response" in
     [Yy]|[Yy][Ee][Ss])
         run rm $HOME/.ssh/id_ed25519 $HOME/.ssh/id_rsa
