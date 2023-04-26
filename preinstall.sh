@@ -3,13 +3,13 @@ ORANGE='\033[0;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 function context() {
-    echo "\n${ORANGE}${@:1}${NC}"
+    echo -e "\n${ORANGE}${@:1}${NC}"
 }
 function message() {
-    echo "${ORANGE}${@:1}${NC}"
+    echo -e "${ORANGE}${@:1}${NC}"
 }
 function run() {
-    echo "${CYAN}${@:1}${NC}"
+    echo -e "${CYAN}${@:1}${NC}"
     eval ${@:1}
 }
 export XDG_CONFIG_HOME="$HOME/.config"

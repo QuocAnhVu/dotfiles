@@ -1,7 +1,7 @@
 # Run install script via curl
 
 ```sh
-bash -c "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/preinstall.sh)"
+bash -ci "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/preinstall.sh)"
 zsh -c "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/install.sh)"
 ```
 
