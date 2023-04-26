@@ -37,7 +37,7 @@ run git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $XDG_DATA_H
 
 context 'Installing vim customizations: vim-plug'
 message 'Run <prefix>-I in tmux to install plugins!'
-run "git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm"
+run "git clone https://github.com/tmux-plugins/tpm $XDG_DATA_HOME/tmux/plugins/tpm"
 
 context 'Installing tmux customizations: tpm'
 run "sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
