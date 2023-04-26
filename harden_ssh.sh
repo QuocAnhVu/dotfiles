@@ -55,15 +55,17 @@ esac
 
 context 'Hardening host keys'
 pushd /etc/ssh
-response=$(prompt 'Would you like to remove any existing host SSH keys? (yes/no): ')
-case "$response" in
-    [Yy]|[Yy][Ee][Ss])
-        run sudo rm ssh_host_*key*
-        ;;
-    *)
-        message 'Skipping removal of host SSH keys'
-        ;;
-esac
+if [ ! -f /etc/ssh/ssh_host_*key* ]; then
+    response=$(prompt 'Would you like to remove any existing host SSH keys? (yes/no): ')
+    case "$response" in
+        [Yy]|[Yy][Ee][Ss])
+            run sudo rm ssh_host_*key*
+            ;;
+        *)
+            message 'Skipping removal of host SSH keys'
+            ;;
+    esac
+fi
 if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
     run 'sudo ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N "" < /dev/null'
 else
