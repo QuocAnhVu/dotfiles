@@ -17,6 +17,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
+DOTFILES="$HOME/ws/dotfiles"
 run mkdir -p $XDG_CONFIG_HOME
 run mkdir -p $XDG_CACHE_HOME
 run mkdir -p $XDG_DATA_HOME
