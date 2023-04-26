@@ -37,7 +37,7 @@ case "$response" in
         fi
         while read key; do
             if ! grep -qF "$key" $HOME/.ssh/authorized_keys; then
-                run echo "$key" >> $HOME/.ssh/authorized_keys
+                run 'echo "$key" >> $HOME/.ssh/authorized_keys'
             fi
         done < $DOTFILES/.ssh/authorized_keys
         ;;
@@ -73,21 +73,30 @@ fi
 run sudo cp $DOTFILES/.ssh/sshd_config.default /etc/ssh/sshd_config
 
 context 'Removing weak prime numbers/generators'
-run awk '$5 > 2000' /etc/ssh/moduli > "${HOME}/moduli"
+run 'awk '$5 > 2000' /etc/ssh/moduli > "${HOME}/moduli"'
 run wc -l "${HOME}/moduli" # make sure there is something left
 run sudo mv "${HOME}/moduli" /etc/ssh/moduli
 run rm $HOME/moduli
 
 context 'Hardening host keys'
 pushd /etc/ssh
-run sudo rm ssh_host_*key*
+message 'Do you want to remove the host SSH keys? (yes/no): '
+read response
+case "$response" in
+    [Yy]|[Yy][Ee][Ss])
+        run sudo rm ssh_host_*key*
+        ;;
+    *)
+        message 'Skipping removal of host SSH keys'
+        ;;
+esac
 if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
-    run sudo ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N "" < /dev/null
+    run 'sudo ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N "" < /dev/null'
 else
     message 'Skipping ssh_host_ed25519_key generation'
 fi
 if [ ! -f /etc/ssh/ssh_host_rsa_key ] || [ $(ssh-keygen -lf /etc/ssh/ssh_host_rsa_key | awk '{print $1}') -ne 4096 ]; then
-    run sudo ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N "" < /dev/null
+    run 'sudo ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N "" < /dev/null'
 else
     message 'Skipping ssh_host_rsa_key generation'
 fi
