@@ -48,6 +48,52 @@ case "$response" in
         ;;
 esac
 
+context 'Hardening host keys'
+pushd /etc/ssh
+message 'Would you like to remove any existing host SSH keys? (yes/no): '
+read response
+case "$response" in
+    [Yy]|[Yy][Ee][Ss])
+        run sudo rm ssh_host_*key*
+        ;;
+    *)
+        message 'Skipping removal of host SSH keys'
+        ;;
+esac
+if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
+    run 'sudo ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N "" < /dev/null'
+else
+    message 'Skipping ssh_host_ed25519_key generation'
+fi
+if [ ! -f /etc/ssh/ssh_host_rsa_key ] || [ $(ssh-keygen -lf /etc/ssh/ssh_host_rsa_key | awk '{print $1}') -ne 4096 ]; then
+    run 'sudo ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N "" < /dev/null'
+else
+    message 'Skipping ssh_host_rsa_key generation'
+fi
+popd
+
+context 'Hardening client keys'
+message 'Would you like to remove any existing client SSH keys? (yes/no): '
+read response
+case "$response" in
+    [Yy]|[Yy][Ee][Ss])
+        run rm $HOME/.ssh/id_ed25519 $HOME/.ssh/id_rsa
+        ;;
+    *)
+        message 'Skipping removal of existing client SSH keys'
+        ;;
+esac
+if [ ! -f $HOME/.ssh/id_ed25519 ]; then
+    run ssh-keygen -t ed25519 -o -a 100 -f $HOME/.ssh/id_ed25519
+else
+    message 'Skipping id_ed25519 key generation'
+fi
+if [ ! -f $HOME/.ssh/id_rsa ] || [ $(ssh-keygen -lf $HOME/.ssh/id_rsa | awk '{print $1}') -ne 4096 ]; then
+    run ssh-keygen -t rsa -b 4096 -o -a 100 -f $HOME/.ssh/id_rsa
+else
+    message 'Skipping id_rsa key generation'
+fi
+
 context 'Installing sshd and mosh'
 if command -v apt &> /dev/null; then
     run sudo apt update; run sudo apt -y install openssh-server mosh
@@ -78,42 +124,6 @@ context 'Generating custom moduli... this may take a while'
 run ssh-keygen -M generate -O bits=2048 moduli-2048.candidates
 run ssh-keygen -M screen -f moduli-2048.candidates moduli-2048
 run sudo mv moduli-2048 /etc/ssh/moduli
-
-context 'Hardening host keys'
-pushd /etc/ssh
-message 'Do you want to remove the host SSH keys? (yes/no): '
-read response
-case "$response" in
-    [Yy]|[Yy][Ee][Ss])
-        run sudo rm ssh_host_*key*
-        ;;
-    *)
-        message 'Skipping removal of host SSH keys'
-        ;;
-esac
-if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
-    run 'sudo ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N "" < /dev/null'
-else
-    message 'Skipping ssh_host_ed25519_key generation'
-fi
-if [ ! -f /etc/ssh/ssh_host_rsa_key ] || [ $(ssh-keygen -lf /etc/ssh/ssh_host_rsa_key | awk '{print $1}') -ne 4096 ]; then
-    run 'sudo ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N "" < /dev/null'
-else
-    message 'Skipping ssh_host_rsa_key generation'
-fi
-popd
-
-context 'Generating client keys'
-if [ ! -f $HOME/.ssh/id_ed25519 ]; then
-    run ssh-keygen -t ed25519 -o -a 100 -f $HOME/.ssh/id_ed25519
-else
-    message 'Skipping id_ed25519 key generation'
-fi
-if [ ! -f $HOME/.ssh/id_rsa ] || [ $(ssh-keygen -lf $HOME/.ssh/id_rsa | awk '{print $1}') -ne 4096 ]; then
-    run ssh-keygen -t rsa -b 4096 -o -a 100 -f $HOME/.ssh/id_rsa
-else
-    message 'Skipping id_rsa key generation'
-fi
 
 context 'Starting sshd service'
 run sudo systemctl enable sshd
