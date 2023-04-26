@@ -126,6 +126,7 @@ run sudo cp $DOTFILES/.ssh/sshd_config.default /etc/ssh/sshd_config
 context 'Generating custom moduli... this may take a while'
 function cleanup {
     if [ -f moduli-2048.candidates ]; then
+        echo ""
         run rm -f moduli-2048.candidates
     fi
 }
