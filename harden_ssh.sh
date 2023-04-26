@@ -23,6 +23,26 @@ context 'Setting up dotfiles directory'
 run mkdir -p $HOME/.ssh
 run chmod 700 $HOME/.ssh
 
+context 'Allowing access from 🐔BAWK'
+message 'Would you like to allow access from 🐔BAWK? (yes/no): '
+read response
+case "$response" in
+    [Yy]|[Yy][Ee][Ss])
+        if [ ! -f $HOME/.ssh/authorized_keys ]; then
+            run touch $HOME/.ssh/authorized_keys
+            run chmod 644 $HOME/.ssh/authorized_keys
+        fi
+        while read key; do
+            if ! grep -qF "$key" $HOME/.ssh/authorized_keys; then
+                run echo "$key" >> $HOME/.ssh/authorized_keys
+            fi
+        done < $DOTFILES/.ssh/authorized_keys
+        ;;
+    *)
+        message 'Skipping access from 🐔BAWK'
+        ;;
+esac
+
 context 'Installing sshd and mosh'
 if command -v apt &> /dev/null; then
     run sudo apt update; run sudo apt -y install openssh-server mosh
@@ -33,16 +53,6 @@ else
     exit
 fi
 
-context 'Allowing access from BAWK'
-if [ ! -f $HOME/.ssh/authorized_keys ]; then
-    run touch $HOME/.ssh/authorized_keys
-    run chmod 644 $HOME/.ssh/authorized_keys
-fi
-while read key; do
-    if ! grep -qF "$key" $HOME/.ssh/authorized_keys; then
-        run echo "$key" >> $HOME/.ssh/authorized_keys
-    fi
-done < $DOTFILES/.ssh/authorized_keys
 context 'Restricting SSH access to ssh-user group'
 run sudo groupadd ssh-user
 run sudo usermod -a -G ssh-user $USER
