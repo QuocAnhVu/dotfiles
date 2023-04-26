@@ -24,7 +24,7 @@ context 'Setting up dotfiles directory'
 run mkdir -p $HOME/.ssh
 run chmod 700 $HOME/.ssh
 
-context 'Allowing access from 🐔BAWK'
+context 'Allowing SSH access from 🐔BAWK'
 message 'Would you like to allow access from 🐔BAWK? (yes/no): '
 read response
 case "$response" in
@@ -42,7 +42,7 @@ case "$response" in
         done < $DOTFILES/.ssh/authorized_keys
         ;;
     *)
-        message 'Skipping access from 🐔BAWK'
+        message 'Skipping access grant to 🐔BAWK'
         ;;
 esac
 
@@ -72,11 +72,10 @@ if [ -f /etc/ssh/sshd_config ]; then
 fi
 run sudo cp $DOTFILES/.ssh/sshd_config.default /etc/ssh/sshd_config
 
-context 'Removing weak prime numbers/generators'
-run 'awk '$5 > 2000' /etc/ssh/moduli > "${HOME}/moduli"'
-run wc -l "${HOME}/moduli" # make sure there is something left
-run sudo mv "${HOME}/moduli" /etc/ssh/moduli
-run rm $HOME/moduli
+context 'Generating custom moduli... this may take a while'
+run ssh-keygen -M generate -O bits=2048 moduli-2048.candidates
+run ssh-keygen -M screen -f moduli-2048.candidates moduli-2048
+run sudo mv moduli-2048 /etc/ssh/moduli
 
 context 'Hardening host keys'
 pushd /etc/ssh
