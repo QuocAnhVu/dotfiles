@@ -10,7 +10,7 @@ function message() {
     echo "${ORANGE}${@:1}${NC}"
 }
 function run() {
-    echo "${CYAN}${@:1}${NC}"
+    (echo "${CYAN}${@:1}${NC}") >&2
     eval ${@:1}
 }
 export XDG_CONFIG_HOME="$HOME/.config"
