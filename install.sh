@@ -24,10 +24,11 @@ run 'mkdir -p $XDG_DATA_HOME'
 run 'mkdir -p $XDG_STATE_HOME'
 
 context 'Installing dotfiles'
-run 'git clone https://github.com/QuocAnhVu/dotfiles.git $HOME/.config/dotfiles'
+run 'mkdir -p $HOME/ws'
+run 'git clone https://github.com/QuocAnhVu/dotfiles.git $HOME/ws/dotfiles'
 context 'Symlinking config files'
-run 'ln -s $HOME/.config/dotfiles/.config/* $HOME/.config/'
-run 'ln -s $HOME/.config/dotfiles/.zshrc $HOME/'
+run 'ln -s $HOME/ws/dotfiles/.config/* $HOME/.config/'
+run 'ln -s $HOME/ws/dotfiles/.zshrc $HOME/'
 
 context 'Installing shell customizations: oh-my-zsh and powerlevel10k'
 # https://github.com/ohmyzsh/ohmyzsh#advanced-installation
