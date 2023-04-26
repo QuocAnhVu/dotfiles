@@ -17,15 +17,16 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
-DOTFILES="$HOME/ws/dotfiles"
 run mkdir -p $XDG_CONFIG_HOME
 run mkdir -p $XDG_CACHE_HOME
 run mkdir -p $XDG_DATA_HOME
 run mkdir -p $XDG_STATE_HOME
+DOTFILES="$HOME/ws/dotfiles"
+run mkdir -p $HOME/ws
 
 context 'Installing dotfiles'
 run mkdir -p $HOME/ws
-run git clone https://github.com/QuocAnhVu/dotfiles.git $HOME/ws/dotfiles
+run git clone https://github.com/QuocAnhVu/dotfiles.git $DOTFILES
 context 'Symlinking config files'
 run ln -s $HOME/ws/dotfiles/.config/* $HOME/.config/
 run ln -s $HOME/ws/dotfiles/.zshrc $HOME/
