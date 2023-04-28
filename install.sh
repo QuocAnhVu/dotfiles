@@ -36,6 +36,7 @@ run git clone https://github.com/QuocAnhVu/dotfiles.git $DOTFILES
 context 'Symlinking config files'
 run ln -s $HOME/ws/dotfiles/.config/* $HOME/.config/
 run ln -s $HOME/ws/dotfiles/.zshrc $HOME/
+run ln -s $HOME/ws/dotfiles/.profile $HOME/
 
 context 'Installing shell customizations: oh-my-zsh and powerlevel10k'
 # https://github.com/ohmyzsh/ohmyzsh#advanced-installation
