@@ -1,8 +1,20 @@
-# Check the display server type
-if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
-    # If using Wayland, set the "caps:swapescape" option using gsettings
-    gsettings set org.gnome.desktop.input-sources xkb-options "['caps:swapescape']"
-elif [ "$XDG_SESSION_TYPE" = "x11" ]; then
-    # If using X11, set the "caps:swapescape" option using setxkbmap
-    setxkbmap -option caps:swapescape
+# Detect the current desktop environment
+DESKTOP_SESSION=$(env | grep DESKTOP_SESSION= | cut -d '=' -f 2)
+
+# Swap Caps Lock and Escape keys for each desktop environment
+if [ "$DESKTOP_SESSION" == "gnome" ]; then
+  gsettings set org.gnome.desktop.input-sources xkb-options "['caps:swapescape']"
+elif [ "$DESKTOP_SESSION" == "kde-plasma" ]; then
+  kwriteconfig5 --file ~/.config/kxkbrc --group "Layout" --key "CapsLock" --type "string" "Escape"
+elif [ "$DESKTOP_SESSION" == "xfce" ]; then
+  setxkbmap -option "caps:swapescape"
+elif [ "$DESKTOP_SESSION" == "cinnamon" ]; then
+  gsettings set org.cinnamon.desktop.input-sources xkb-options "['caps:swapescape']"
+elif [ "$DESKTOP_SESSION" == "mate" ]; then
+  setxkbmap -option "caps:swapescape"
+elif [ "$DESKTOP_SESSION" == "unity" ]; then
+  dconf write /org/gnome/desktop/input-sources/xkb-options "['caps:swapescape']"
+elif [ "$DESKTOP_SESSION" == "lxde" ]; then
+  setxkbmap -option "caps:swapescape"
 fi
+
