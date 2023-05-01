@@ -136,6 +136,7 @@ trap 'cleanup; exit' SIGINT
 run ssh-keygen -M generate -O bits=2048 moduli-2048.candidates
 run ssh-keygen -M screen -f moduli-2048.candidates moduli-2048
 run sudo mv moduli-2048 /etc/ssh/moduli
+run rm -f moduli-2048.candidates
 trap - SIGINT
 
 context 'Starting sshd service'

@@ -20,9 +20,7 @@ export PATH
 
 # Aliases
 alias sprunge="curl -F 'sprunge=<-' http://sprunge.us"
-
 export EDITOR=nvim
-alias vim=nvim
 alias exa="exa --header --extended --all --classify --color-scale --long --git --icons --tree --level=1" 
 
 # XDG Extra
@@ -63,6 +61,7 @@ export ZSH="$XDG_DATA_HOME/oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 HIST_STAMPS="yyyy-mm-dd"
 export ZSH_COMPDUMP=$XDG_CACHE_HOME/oh-my-zsh/zcompdump-$HOST
+export HISTFILE="$XDG_STATE_HOME/zsh/history"
 
 plugins=(git asdf)
 
