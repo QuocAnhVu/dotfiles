@@ -83,8 +83,14 @@ fi
 
 # Disto-specific
 if grep -q "Ubuntu" /etc/os-release; then
-    context ' Installing Ubuntu specific packages'
+    context 'Installing Ubuntu specific packages'
     run sudo apt install -y fontconfig
+fi
+if grep -q "Fedora" /etc/os-release; then
+    context 'Enabling automatic updates'
+    run sudo dnf install -y dnf-automatic
+    run sudo sed -i 's/apply_updates = no/apply_updates = yes/' /etc/dnf/automatic.conf
+    run sudo systemctl enable --now dnf-automatic.timer
 fi
 
 # Remove old config files
