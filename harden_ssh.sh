@@ -142,3 +142,9 @@ trap - SIGINT
 context 'Starting sshd service'
 run sudo systemctl enable sshd
 run sudo systemctl start sshd
+
+if grep -q "Fedora" /etc/os-release; then
+    context 'Whitelist mosh ports in firewall'
+    run sudo firewall-cmd --add-service=mosh --permanent
+    run sudo firewall-cmd --reload
+fi
