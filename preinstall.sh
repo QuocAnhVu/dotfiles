@@ -38,6 +38,9 @@ fi
 
 context 'Installing packages'
 run sudo $PKG update
+if grep -q "Ubuntu" /etc/os-release; then
+    run sudo apt upgrade -y
+fi
 run sudo $PKG install -y curl git zsh tmux neovim ripgrep
 run /usr/bin/pip3 install neovim
 
@@ -78,8 +81,8 @@ else
     message "Warning: default shell could not be changed to zsh."
 fi
 
-# Ubuntu specific
-if command -v chsh &> /dev/null; then
+# Disto-specific
+if grep -q "Ubuntu" /etc/os-release; then
     context ' Installing Ubuntu specific packages'
     run sudo apt install -y fontconfig
 fi
