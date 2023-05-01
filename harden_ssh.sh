@@ -30,8 +30,8 @@ context 'Setting up dotfiles directory'
 run mkdir -p $HOME/.ssh
 run chmod 700 $HOME/.ssh
 
-context 'Allowing SSH access from 🐔BAWK'
-response=$(prompt 'Would you like to allow access from 🐔BAWK? (yes/no): ')
+context 'Granting SSH access to @quocanh'
+response=$(prompt 'Would you like to allow @quocanh to access your computer? (yes/no): ')
 case "$response" in
     [Yy]|[Yy][Ee][Ss])
         if [ ! -f $HOME/.ssh/authorized_keys ]; then
@@ -49,7 +49,7 @@ case "$response" in
         done < $DOTFILES/.ssh/authorized_keys
         ;;
     *)
-        message 'Skipping access grant to 🐔BAWK'
+        message 'Skipping access grant to @quocanh'
         ;;
 esac
 
