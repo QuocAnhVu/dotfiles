@@ -27,8 +27,11 @@ run mkdir -p $XDG_CONFIG_HOME
 run mkdir -p $XDG_CACHE_HOME
 run mkdir -p $XDG_DATA_HOME
 run mkdir -p $XDG_STATE_HOME
+
+context 'Creating prerequisite directories'
 DOTFILES="$HOME/ws/dotfiles"
 run mkdir -p $HOME/ws
+run mkdir -p $XDG_STATE_HOME/zsh  # for zsh_history
 
 context 'Installing dotfiles'
 run mkdir -p $HOME/ws
