@@ -32,8 +32,8 @@ export NODE_REPL_HISTORY="$XDG_STATE_HOME/node_repl_history"
 alias wget=wget --hsts-file="$XDG_STATE_HOME/wget-hsts" 
 
 # CUDA
-#export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
-#export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
 # asdf
 export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
@@ -62,6 +62,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 HIST_STAMPS="yyyy-mm-dd"
 export ZSH_COMPDUMP=$XDG_CACHE_HOME/oh-my-zsh/zcompdump-$HOST
 export HISTFILE="$XDG_STATE_HOME/zsh/history"
+export HISTSIZE=65536
 
 plugins=(git asdf)
 
