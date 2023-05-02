@@ -18,6 +18,8 @@ then
 fi
 export PATH
 
+export LANG=en_US.UTF-8
+
 # Aliases
 alias sprunge="curl -F 'sprunge=<-' http://sprunge.us"
 export EDITOR=nvim
