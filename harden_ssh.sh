@@ -55,11 +55,11 @@ esac
 
 context 'Hardening host keys'
 pushd /etc/ssh
-if [ ! -f /etc/ssh/ssh_host_*key* ]; then
+if [[ ! -n /etc/ssh/ssh_host_*key*(#qN) ]]; then
     response=$(prompt 'Would you like to remove any existing host SSH keys? (yes/no): ')
     case "$response" in
         [Yy]|[Yy][Ee][Ss])
-            run sudo rm ssh_host_*key*
+            run sudo rm -f ssh_host_*key*
             ;;
         *)
             message 'Skipping removal of host SSH keys'
@@ -82,7 +82,7 @@ context 'Hardening client keys'
 response=$(prompt 'Would you like to remove any existing client SSH keys? (yes/no): ')
 case "$response" in
     [Yy]|[Yy][Ee][Ss])
-        run rm $HOME/.ssh/id_ed25519 $HOME/.ssh/id_rsa
+        run rm -f $HOME/.ssh/id_ed25519 $HOME/.ssh/id_rsa
         ;;
     *)
         message 'Skipping removal of existing client SSH keys'
