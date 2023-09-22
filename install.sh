@@ -29,17 +29,17 @@ run mkdir -p $XDG_DATA_HOME
 run mkdir -p $XDG_STATE_HOME
 
 context 'Creating prerequisite directories'
-DOTFILES="$HOME/ws/dotfiles"
 run mkdir -p $HOME/ws
 run mkdir -p $XDG_STATE_HOME/zsh  # for zsh_history
+DOTFILES="$XDG_DATA_HOME/dotfiles"
 
 context 'Installing dotfiles'
 run mkdir -p $HOME/ws
 run git clone https://github.com/QuocAnhVu/dotfiles.git $DOTFILES
 context 'Symlinking config files'
-run ln -s $HOME/ws/dotfiles/.config/* $HOME/.config/
-run ln -s $HOME/ws/dotfiles/.zshrc $HOME/
-run ln -s $HOME/ws/dotfiles/.profile $HOME/
+run ln -s $DOTFILES/.config/* $HOME/.config/
+run ln -s $DOTFILES/.zshrc $HOME/
+run ln -s $DOTFILES/.profile $HOME/
 
 context 'Installing shell customizations: oh-my-zsh and powerlevel10k'
 # https://github.com/ohmyzsh/ohmyzsh#advanced-installation
