@@ -71,15 +71,15 @@ fi
 # window managers: i3/sway + polybar/waybar
 #sudo $PKG install -y i3 polybar sway waybar
 
-# Set default shell to ZSH
-context 'Changing default shell to zsh'
-if command -v chsh &> /dev/null; then
-    run sudo chsh -s $(which zsh)
-elif command -v lchsh &> /dev/null; then
-    run sudo lchsh $USER  # set to /usr/bin/zsh
-else
-    message "Warning: default shell could not be changed to zsh."
-fi
+# # Set default shell to ZSH
+# context 'Changing default shell to zsh'
+# if command -v lchsh &> /dev/null; then
+#     run sudo lchsh $USER  # set to /usr/bin/zsh
+# elif command -v chsh &> /dev/null; then
+#     run chsh -s $(which zsh)
+# else
+#     message "Warning: default shell could not be changed to zsh."
+# fi
 
 # Disto-specific
 if grep -q "Ubuntu" /etc/os-release; then
