@@ -70,8 +70,8 @@ fi
 # https://github.com/asdf-vm/asdf-nodejs
 if ! asdf current nodejs ; then
     run asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
-    run asdf install nodejs lts
-    run asdf global nodejs lts
+    run asdf install nodejs latest
+    run asdf global nodejs latest
 else
     message 'asdf nodejs detected - no installation needed.' 
 fi
