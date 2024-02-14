@@ -444,3 +444,5 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
+" Set correct python3
+let g:python3_host_prog = expand('$HOME/.local/share/asdf/shims/python3')
