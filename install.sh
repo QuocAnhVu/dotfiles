@@ -43,7 +43,7 @@ run ln -s $DOTFILES/.profile $HOME/
 
 # https://asdf-vm.com/guide/getting-started.html
 context 'Installing asdf, nodejs, python'
-run git clone https://github.com/asdf-vm/asdf.git $XDG_DATA_HOME/asdf --branch v0.13.1
+run git clone https://github.com/asdf-vm/asdf.git $XDG_DATA_HOME/asdf --branch v0.14.0
 run source ~/.zshrc
 # https://github.com/danhper/asdf-python
 if ! asdf current python ; then
