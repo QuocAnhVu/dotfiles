@@ -45,7 +45,6 @@ export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 export PATH="$CARGO_HOME/bin":$PATH
-export RUSTC_WRAPPER="$CARGO_HOME/bin/sccache"
 
 # # Deno
 # export DENO_INSTALL="$HOME/.deno"
@@ -73,22 +72,6 @@ source $ZSH/oh-my-zsh.sh
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 POWERLEVEL9K_CONFIG_FILE=$XDG_CONFIG_HOME/powerlevel10k/config.zsh
 [[ ! -f $XDG_CONFIG_HOME/powerlevel10k/config.zsh ]] || source $XDG_CONFIG_HOME/powerlevel10k/config.zsh
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-# __conda_setup="$('/usr/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-# if [ $? -eq 0 ]; then
-#     eval "$__conda_setup"
-# else
-#     if [ -f "/usr/etc/profile.d/conda.sh" ]; then
-#         . "/usr/etc/profile.d/conda.sh"
-#     else
-#         export PATH="/usr/bin:$PATH"
-#     fi
-# fi
-# unset __conda_setup
-# <<< conda initialize <<<
-
 
 # export WASMTIME_HOME="$HOME/.wasmtime"
 
