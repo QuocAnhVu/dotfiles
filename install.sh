@@ -77,16 +77,16 @@ context 'Installing tmux customizations: tpm'
 run "sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'"
 
-context 'Installing font: UbuntuMono Nerd Font'
-if ! fc-list | grep 'UbuntuMono Nerd Font' > /dev/null ; then
-    # https://github.com/ryanoasis/nerd-fonts#option-6-ad-hoc-curl-download
-    run git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git $XDG_CACHE_HOME/nerd-fonts
-    # https://github.com/ryanoasis/nerd-fonts#option-3-install-script
-    run pushd $XDG_CACHE_HOME/nerd-fonts
-    run git sparse-checkout add patched-fonts/UbuntuMono
-    run ./install.sh UbuntuMono
-    run popd
-    run rm -rf $XDG_CACHE_HOME/nerd-fonts
-else
-    message 'UbuntuMono Nerd Font detected - no installation needed.'
-fi
+# context 'Installing font: UbuntuMono Nerd Font'
+# if ! fc-list | grep 'UbuntuMono Nerd Font' > /dev/null ; then
+#     # https://github.com/ryanoasis/nerd-fonts#option-6-ad-hoc-curl-download
+#     run git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git $XDG_CACHE_HOME/nerd-fonts
+#     # https://github.com/ryanoasis/nerd-fonts#option-3-install-script
+#     run pushd $XDG_CACHE_HOME/nerd-fonts
+#     run git sparse-checkout add patched-fonts/UbuntuMono
+#     run ./install.sh UbuntuMono
+#     run popd
+#     run rm -rf $XDG_CACHE_HOME/nerd-fonts
+# else
+#     message 'UbuntuMono Nerd Font detected - no installation needed.'
+# fi
