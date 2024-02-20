@@ -1,12 +1,8 @@
 # Run install script via curl
 
 ```sh
-bash -ci "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/preinstall.sh)"
-zsh -c "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/install.sh)"
-cd ~/.local/share/dotfiles
-./harden_ssh.sh
+sudo apt update
+sudo apt upgrade -y
+sudo apt install -y curl
+bash -ci "$(curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/do_all.sh)"
 ```
-
-# SSH Hardening
-
-After running install script, see [harden_ssh.sh](harden_ssh.sh) for commands to harden ssh and sshd.
