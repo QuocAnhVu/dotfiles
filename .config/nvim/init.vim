@@ -38,7 +38,43 @@ call plug#begin('~/.local/share/nvim/plugged')
         " endif
         let g:airline_theme = 'gruvbox_material'
 
-    " CtrlP + ripgrep
+    " Syntax highlighting
+    " A collection of language packs for Vim syntax highlighting.
+    Plug 'sheerun/vim-polyglot'
+
+    " Indent line
+    " This plugin adds indentation guides to Neovim. It uses Neovim's virtual text feature and no conceal
+    Plug 'lukas-reineke/indent-blankline.nvim'
+
+    " Code context
+    " A Vim plugin that shows the context of the currently visible buffer contents.
+    Plug 'wellle/context.vim'
+
+    " Git gutter
+    " Signify (or just Sy) uses the sign column to indicate added, modified and removed lines in a file that is managed by a version control system (VCS).
+    Plug 'mhinz/vim-signify'
+        " default updatetime 4000ms is not good for async update
+        set updatetime=100
+
+    " Comment automation
+    " Use gcc to comment out a line (takes a count), gc to comment out the target of a motion (for example, gcap to comment out a paragraph), gc in visual mode to comment out the selection, and gc in operator pending mode to target a comment. You can also use it as a command, either with a range like :7,17Commentary, or as part of a :global invocation like with :g/TODO/Commentary.
+    Plug 'tpope/vim-commentary'
+
+    " Traverse file
+    Plug 'easymotion/vim-easymotion'
+        let g:EasyMotion_do_mapping = 0 " Disable default mappings
+        " Jump to anywhere you want with minimal keystrokes, with just one key binding.
+        " `s{char}{char}{label}`
+        nmap ss <Plug>(easymotion-overwin-f2)
+        " Turn on case-insensitive feature
+        let g:EasyMotion_smartcase = 1
+        " HJKL motions: Line motions
+        map sh <Plug>(easymotion-linebackward)
+        map sj <Plug>(easymotion-j)
+        map sk <Plug>(easymotion-k)
+        map sl <Plug>(easymotion-lineforward)
+
+    " Open files
     Plug 'ctrlpvim/ctrlp.vim'
         if executable('rg')
             set grepprg=rg\ --color=never
@@ -51,7 +87,7 @@ call plug#begin('~/.local/share/nvim/plugged')
         let g:ctrlp_working_path_mode = 'ra'
         let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
 
-    " ack.vim
+    " Search in files
     Plug 'mileszs/ack.vim'
         " Use ripgrep for searching ⚡️
         " Options include:
@@ -70,201 +106,6 @@ call plug#begin('~/.local/share/nvim/plugged')
         " Navigate quickfix list with ease
         nnoremap <silent> [q :cprevious<CR>
         nnoremap <silent> ]q :cnext<CR>
-
-    " vim-signify
-    Plug 'mhinz/vim-signify'
-        " default updatetime 4000ms is not good for async update
-        set updatetime=100
-
-    " context.vim
-    Plug 'wellle/context.vim'
-
-    " UltiSnips
-    " Track the engine.
-    Plug 'SirVer/ultisnips'
-    " Snippets are separated from the engine. Add this if you want them:
-    Plug 'honza/vim-snippets'
-        " Trigger configuration. You need to change this to something other than <tab> if you use one of the following:
-        " - https://github.com/Valloric/YouCompleteMe
-        " - https://github.com/nvim-lua/completion-nvim
-        let g:UltiSnipsExpandTrigger="<C-L>"
-        let g:UltiSnipsJumpForwardTrigger="<C-J>"
-        let g:UltiSnipsJumpBackwardTrigger="<C-K>"
-
-    " vim-easymotion
-    Plug 'easymotion/vim-easymotion'
-        let g:EasyMotion_do_mapping = 0 " Disable default mappings
-        " Jump to anywhere you want with minimal keystrokes, with just one key binding.
-        " `s{char}{char}{label}`
-        nmap ss <Plug>(easymotion-overwin-f2)
-        " Turn on case-insensitive feature
-        let g:EasyMotion_smartcase = 1
-        " HJKL motions: Line motions
-        map sh <Plug>(easymotion-linebackward)
-        map sj <Plug>(easymotion-j)
-        map sk <Plug>(easymotion-k)
-        map sl <Plug>(easymotion-lineforward)
-
-    " IndentLine
-    Plug 'Yggdroot/indentLine'
-
-    " Fugitive
-    Plug 'tpope/vim-fugitive'
-
-    " Commentary.vim
-    " Use gcc to comment out a line (takes a count), gc to comment out the target of a motion (for example, gcap to comment out a paragraph), gc in visual mode to comment out the selection, and gc in operator pending mode to target a comment. You can also use it as a command, either with a range like :7,17Commentary, or as part of a :global invocation like with :g/TODO/Commentary.
-    Plug 'tpope/vim-commentary'
-
-    " Autocompletion
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
-        " TextEdit might fail if hidden is not set.
-        set hidden
-
-        " Some servers have issues with backup files, see #649.
-        set nobackup
-        set nowritebackup
-
-        " Give more space for displaying messages.
-        set cmdheight=2
-
-        " Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
-        " delays and poor user experience.
-        set updatetime=300
-
-        " Don't pass messages to |ins-completion-menu|.
-        set shortmess+=c
-
-        " Always show the signcolumn, otherwise it would shift the text each time
-        " diagnostics appear/become resolved.
-        if has("patch-8.1.1564")
-            " Recently vim can merge signcolumn and number column into one
-            set signcolumn=number
-        else
-            set signcolumn=yes
-        endif
-
-        " Use tab for trigger completion with characters ahead and navigate.
-        " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
-        " other plugin before putting this into your config.
-        "  inoremap <silent><expr> <TAB>
-        "              \ pumvisible() ? "\<C-n>" :
-        "              \ <SID>check_back_space() ? "\<TAB>" :
-        "              \ coc#refresh()
-        inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-        " use <tab> for trigger completion and navigate to the next complete item
-        inoremap <expr> <Tab> coc#pum#visible() ? coc#pum#next(1) : "\<Tab>"
-        inoremap <expr> <S-Tab> coc#pum#visible() ? coc#pum#prev(1) : "\<S-Tab>"
-        " then <cr> to confirm completion
-        inoremap <silent><expr> <cr> coc#pum#visible() && coc#pum#info()['index'] != -1 ? coc#pum#confirm() : "\<C-g>u\<CR>"
-
-        " Use `[g` and `]g` to navigate diagnostics
-        " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
-        nmap <silent> [g <Plug>(coc-diagnostic-prev)
-        nmap <silent> ]g <Plug>(coc-diagnostic-next)
-
-        " GoTo code navigation.
-        nmap <silent> gd <Plug>(coc-definition)
-        nmap <silent> gy <Plug>(coc-type-definition)
-        nmap <silent> gi <Plug>(coc-implementation)
-        nmap <silent> gr <Plug>(coc-references)
-
-        " Use K to show documentation in preview window.
-        nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-        function! s:show_documentation()
-            if (index(['vim','help'], &filetype) >= 0)
-                execute 'h '.expand('<cword>')
-            elseif (coc#rpc#ready())
-                call CocActionAsync('doHover')
-            else
-                execute '!' . &keywordprg . " " . expand('<cword>')
-            endif
-        endfunction
-
-        " Highlight the symbol and its references when holding the cursor.
-        autocmd CursorHold * silent call CocActionAsync('highlight')
-
-        " Symbol renaming.
-        nmap <leader>rn <Plug>(coc-rename)
-
-        " Formatting selected code.
-        xmap <leader>f  <Plug>(coc-format-selected)
-        nmap <leader>f  <Plug>(coc-format-selected)
-
-        augroup mygroup
-            autocmd!
-            " Setup formatexpr specified filetype(s).
-            autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-            " Update signature help on jump placeholder.
-            autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-        augroup end
-
-        " Applying codeAction to the selected region.
-        " Example: `<leader>aap` for current paragraph
-        xmap <leader>a  <Plug>(coc-codeaction-selected)
-        nmap <leader>a  <Plug>(coc-codeaction-selected)
-
-        " Remap keys for applying codeAction to the current buffer.
-        nmap <leader>ac  <Plug>(coc-codeaction)
-        " Apply AutoFix to problem on the current line.
-        nmap <leader>qf  <Plug>(coc-fix-current)
-
-        " Map function and class text objects
-        " NOTE: Requires 'textDocument.documentSymbol' support from the language server.
-        xmap if <Plug>(coc-funcobj-i)
-        omap if <Plug>(coc-funcobj-i)
-        xmap af <Plug>(coc-funcobj-a)
-        omap af <Plug>(coc-funcobj-a)
-        xmap ic <Plug>(coc-classobj-i)
-        omap ic <Plug>(coc-classobj-i)
-        xmap ac <Plug>(coc-classobj-a)
-        omap ac <Plug>(coc-classobj-a)
-
-        " Remap <C-f> and <C-b> for scroll float windows/popups.
-        if has('nvim-0.4.0') || has('patch-8.2.0750')
-            nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-            nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-            inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-            inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-            vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-            vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-        endif
-
-        " Use CTRL-S for selections ranges.
-        " Requires 'textDocument/selectionRange' support of language server.
-        nmap <silent> <C-s> <Plug>(coc-range-select)
-        xmap <silent> <C-s> <Plug>(coc-range-select)
-
-        " Add `:Format` command to format current buffer.
-        command! -nargs=0 Format :call CocAction('format')
-
-        " Add `:Fold` command to fold current buffer.
-        command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-        " Add `:OR` command for organize imports of the current buffer.
-        command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
-        " Mappings for CoCList
-        " Show all diagnostics.
-        nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
-        " Manage extensions.
-        nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
-        " Show commands.
-        nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
-        " Find symbol of current document.
-        nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
-        " Search workspace symbols.
-        nnoremap <silent><nowait> <space>s  :<C-u>CocList -I symbols<cr>
-        " Do default action for next item.
-        nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
-        " Do default action for previous item.
-        nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
-        " Resume latest coc list.
-        nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
-
-    " Syntax highlighting
-    Plug 'sheerun/vim-polyglot'
 
     " Writing mode
     Plug 'QuocAnhVu/write.vim'
