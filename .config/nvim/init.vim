@@ -6,6 +6,9 @@
 "              on this file is still a good idea.
 
 "------------------------------------------------------------
+
+let mapleader=" "
+
 " Plugins
 
 " Ensure Plug is installed
