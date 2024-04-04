@@ -111,7 +111,7 @@ vim.opt.breakindent = true
 vim.opt.formatoptions = 'l'
 vim.opt.lbr = true
 -- ident by an additional 2 characters on wrapped lines, when line >= 40 characters, put 'showbreak' at start of line
-vim.opt.breakindentopt = { 'shift:2' , 'min:40' , 'sbr' }
+vim.opt.breakindentopt = { 'shift:2', 'min:40', 'sbr' }
 
 ------------------------------------------------------------
 -- Mappings
@@ -161,14 +161,14 @@ vim.g.python3_host_prog = '$HOME/.local/share/asdf/shims/python3'
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
-    lazypath,
-  })
+    vim.fn.system({
+        "git",
+        "clone",
+        "--filter=blob:none",
+        "https://github.com/folke/lazy.nvim.git",
+        "--branch=stable", -- latest stable release
+        lazypath,
+    })
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -241,7 +241,8 @@ require('lazy').setup({
         end,
     },
     {
-        'nvim-telescope/telescope.nvim', tag = '0.1.6',
+        'nvim-telescope/telescope.nvim',
+        tag = '0.1.6',
         dependencies = { 'nvim-lua/plenary.nvim' },
         config = function()
             local builtin = require('telescope.builtin')
@@ -258,37 +259,37 @@ require('lazy').setup({
     },
     {
         'nvim-treesitter/nvim-treesitter-context',
-		dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
         config = function()
             vim.keymap.set("n", "[c", function()
                 require("treesitter-context").go_to_context(vim.v.count1)
             end, { silent = true })
         end
     },
---    {
---        'nvim-treesitter/nvim-treesitter-textobjects',
---		dependencies = { 'nvim-treesitter/nvim-treesitter' },
---    },
+    --    {
+    --        'nvim-treesitter/nvim-treesitter-textobjects',
+    --		dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    --    },
     'williamboman/mason.nvim',
     {
         'williamboman/mason-lspconfig.nvim',
-        dependencies = { 'williamboman/mason.nvim'},
+        dependencies = { 'williamboman/mason.nvim' },
     },
     {
         'neovim/nvim-lspconfig',
         dependencies = { 'williamboman/mason-lspconfig.nvim' },
         config = function()
             -- Setup language servers.
-            local lspconfig = require('lspconfig')
-            lspconfig.pyright.setup {}
-            lspconfig.tsserver.setup {}
-            lspconfig.rust_analyzer.setup {
-                -- Server-specific settings. See `:help lspconfig-setup`
-                settings = {
-                    ['rust-analyzer'] = {},
-                },
+            require('mason').setup()
+            require('mason-lspconfig').setup()
+            require('mason-lspconfig').setup_handlers {
+                -- The first entry (without a key) will be the default handler
+                -- and will be called for each installed server that doesn't have
+                -- a dedicated handler.
+                function(server_name) -- default handler (optional)
+                    require('lspconfig')[server_name].setup {}
+                end
             }
-
 
             -- Global mappings.
             -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -339,12 +340,12 @@ require('lazy').setup({
             require('lspsaga').setup({})
         end,
     },
---    {
---        'hrsh7th/nvim-cmp',
---        config = function()
---            -- so much things
---        end
---    },
+    --    {
+    --        'hrsh7th/nvim-cmp',
+    --        config = function()
+    --            -- so much things
+    --        end
+    --    },
 }, {})
 
 ------------------------------------------------------------
