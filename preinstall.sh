@@ -41,7 +41,7 @@ run sudo $PKG update
 if grep -q "Ubuntu" /etc/os-release; then
     run sudo apt upgrade -y
 fi
-run sudo $PKG install -y curl git zsh tmux neovim ripgrep
+run sudo $PKG install -y curl git zsh tmux neovim ripgrep fd-find
 run /usr/bin/pip3 install neovim
 
 # python build dependencies (https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
