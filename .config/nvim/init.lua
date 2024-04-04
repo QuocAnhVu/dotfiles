@@ -175,10 +175,16 @@ vim.opt.rtp:prepend(lazypath)
 -- Initialize plugins
 require('lazy').setup({
     {
-        'arcticicestudio/nord-vim',
+        'shaunsingh/nord.nvim',
         priority = 1000,
         config = function()
-            vim.o.termguicolors = true
+            vim.g.nord_contrast = true
+            vim.g.nord_borders = true
+            vim.g.nord_disable_background = false
+            vim.g.nord_enable_sidebar_background = false
+            vim.g.nord_uniform_diff_background = true
+            vim.g.nord_italic = true
+            vim.g.nord_bold = true
             vim.cmd('colorscheme nord')
         end,
     },
