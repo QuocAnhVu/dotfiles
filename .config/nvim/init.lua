@@ -176,6 +176,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
     {
         'arcticicestudio/nord-vim',
+        priority = 1000,
         config = function()
             vim.o.termguicolors = true
             vim.cmd('colorscheme nord')
@@ -183,7 +184,7 @@ require('lazy').setup({
     },
     {
         'nvim-lualine/lualine.nvim',
-        requires = { 'nvim-tree/nvim-web-devicons', opt = true },
+        dependencies = { 'nvim-tree/nvim-web-devicons', opt = true },
         config = function()
             require('lualine').setup()
         end
