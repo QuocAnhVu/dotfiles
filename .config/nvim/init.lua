@@ -38,9 +38,16 @@ vim.opt.hlsearch = true
 -- script, <http://www.vim.org/scripts/script.php?script_id=1876>.
 -- vim.opt.nomodeline = true
 
+-- Sync clipboard between OS and Neovim.
+--  Remove this option if you want your OS clipboard to remain independent.
+--  See `:help 'clipboard'`
+vim.opt.clipboard = 'unnamedplus'
 -- UTF-8
 vim.opt.encoding = 'utf-8'
 vim.opt.fileencoding = 'utf-8'
+
+-- Use Nerd fonts for features enabled
+vim.g.have_nerd_font = true
 
 ------------------------------------------------------------
 -- Usability options
