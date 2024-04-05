@@ -89,8 +89,27 @@ vim.opt.mouse = 'a'
 -- "press <Enter> to continue"
 vim.opt.cmdheight = 2
 
--- Display line numbers on the left
+-- Display relative line numbers on focus, absolute in background
 vim.opt.number = true
+vim.api.nvim_create_augroup('NumberToggle', { clear = true })
+vim.api.nvim_create_autocmd({ 'BufEnter', 'FocusGained', 'InsertLeave', 'WinEnter' }, {
+    group = 'NumberToggle',
+    pattern = '*',
+    callback = function()
+        if vim.opt.number and vim.api.nvim_get_mode() ~= 'i' then
+            vim.opt.relativenumber = true
+        end
+    end,
+})
+vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost', 'InsertEnter', 'WinLeave' }, {
+    group = 'NumberToggle',
+    pattern = '*',
+    callback = function()
+        if vim.opt.number then
+            vim.opt.relativenumber = false
+        end
+    end,
+})
 
 -- Quickly time out on keycodes, but never time out on mappings
 vim.opt.timeout = false
