@@ -116,6 +116,9 @@ vim.opt.timeout = false
 vim.opt.ttimeout = true
 vim.opt.ttimeoutlen = 200
 
+-- Keep sign column open so that UI stops jumping around
+vim.opt.signcolumn = 'yes'
+
 ------------------------------------------------------------
 -- Indentation options
 --
