@@ -70,13 +70,16 @@ run git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $XDG_DATA_H
 
 context 'Installing tmux customizations: tpm'
 message 'Run <prefix>-I in tmux to install plugins!'
-run "git clone https://github.com/tmux-plugins/tpm $XDG_DATA_HOME/tmux/plugins/tpm"
+run git clone https://github.com/tmux-plugins/tpm $XDG_DATA_HOME/tmux/plugins/tpm
 
 context 'Installing language-specific neovim packages'
-run "pip3 install pynvim"
-run "npm install -g neovim"
+run pip3 install pynvim
+run npm install -g neovim
 
 # context 'Installing font: UbuntuMono Nerd Font'
+# if grep -q "Ubuntu" /etc/os-release; then
+#     run sudo apt install -y fontconfig
+# fi
 # if ! fc-list | grep 'UbuntuMono Nerd Font' > /dev/null ; then
 #     # https://github.com/ryanoasis/nerd-fonts#option-6-ad-hoc-curl-download
 #     run git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git $XDG_CACHE_HOME/nerd-fonts

@@ -81,17 +81,14 @@ fi
 #     message "Warning: default shell could not be changed to zsh."
 # fi
 
-# Disto-specific
-if grep -q "Ubuntu" /etc/os-release; then
-    context 'Installing Ubuntu specific packages'
-    run sudo apt install -y fontconfig
-fi
+context 'Enabling automatic updates'
 if grep -q "Fedora" /etc/os-release; then
-    context 'Enabling automatic updates'
     run sudo dnf install -y dnf-automatic
     run sudo sed -i 's/apply_updates = no/apply_updates = yes/' /etc/dnf/automatic.conf
     run sudo systemctl enable --now dnf-automatic.timer
-fi
+elif grep -q "Ubuntu" /etc/os-release; then
+    sudo apt install unattended-upgrades
+    sudo dpkg-reconfigure --priority=low unattended-upgrades
 
 # Remove old config files
 context 'Removing old config files'
