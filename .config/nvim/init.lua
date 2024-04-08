@@ -176,14 +176,6 @@ vim.keymap.set('i', '{;<CR>', '{<CR>};<ESC>O')
 vim.keymap.set('i', '{,<CR>', '{<CR>},<ESC>O')
 
 ------------------------------------------------------------
--- Fixes
---
--- Environment specific fixes.
-
--- Set correct python3
-vim.g.python3_host_prog = '$HOME/.local/share/asdf/shims/python3'
-
-------------------------------------------------------------
 -- Plugins
 --
 -- Additional third-party functionality

@@ -104,10 +104,6 @@ context 'Installing tmux customizations: tpm'
 message 'Run <prefix>-I in tmux to install plugins!'
 run git clone https://github.com/tmux-plugins/tpm $XDG_DATA_HOME/tmux/plugins/tpm
 
-context 'Installing language-specific neovim packages'
-run pip3 install pynvim
-run npm install -g neovim
-
 # context 'Installing font: UbuntuMono Nerd Font'
 # if grep -q "Ubuntu" /etc/os-release; then
 #     run sudo apt install -y fontconfig
