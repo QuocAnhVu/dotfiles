@@ -262,6 +262,11 @@ require('lazy').setup({
         end,
     },
     {
+        'akinsho/bufferline.nvim',
+        version = "*",
+        dependencies = 'nvim-tree/nvim-web-devicons'
+    },
+    {
         'stevearc/oil.nvim',
         opts = {},
         dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -282,10 +287,66 @@ require('lazy').setup({
             vim.keymap.set('n', 'fh', builtin.help_tags, {})
         end,
     },
+    {
+        "folke/noice.nvim",
+        event = "VeryLazy",
+        opts = {},
+        dependencies = {
+            "MunifTanjim/nui.nvim",
+            "rcarriga/nvim-notify",
+        },
+        config = function()
+            require('noice').setup({
+                lsp = {
+                    -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+                    override = {
+                        ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+                        ["vim.lsp.util.stylize_markdown"] = true,
+                        ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+                    },
+                },
+                -- you can enable a preset for easier configuration
+                presets = {
+                    bottom_search = true,         -- use a classic bottom cmdline for search
+                    command_palette = true,       -- position the cmdline and popupmenu together
+                    long_message_to_split = true, -- long messages will be sent to a split
+                    inc_rename = false,           -- enables an input dialog for inc-rename.nvim
+                    lsp_doc_border = true,        -- add a border to hover docs and signature help
+                },
+            })
+        end
+    },
+    {
+        "folke/which-key.nvim",
+        event = "VeryLazy",
+        init = function()
+            vim.o.timeout = true
+            vim.o.timeoutlen = 500
+        end,
+        opts = {
+            triggers_blacklist = {
+                i = {
+                    '{',
+                },
+            },
+        },
+    },
     'sheerun/vim-polyglot',
     {
         'nvim-treesitter/nvim-treesitter',
-        build = { ':TSUpdate', ':TSInstall all' },
+        build = ':TSUpdate',
+        opts = {
+            ensure_installed = { 'all' }
+        },
+        config = function()
+            vim.filetype.add {
+                extension = {
+                    -- Buck2 Extensions
+                    BUCK = 'starlark',
+                    TARGETS = 'starlark',
+                }
+            }
+        end,
     },
     {
         'nvim-treesitter/nvim-treesitter-context',
@@ -366,8 +427,16 @@ require('lazy').setup({
             'nvim-treesitter/nvim-treesitter',
             'nvim-tree/nvim-web-devicons',
         },
+        build = function()
+            vim.cmd('TSInstall markdown')
+            vim.cmd('TSInstall markdown_inline')
+        end,
         config = function()
-            require('lspsaga').setup({})
+            require('lspsaga').setup({
+                lightbulb = {
+                    virtual_text = false
+                },
+            })
         end,
     },
     --    {
