@@ -251,14 +251,14 @@ require('lazy').setup({
             vim.g.EasyMotion_do_mapping = 0
             -- Jump to anywhere you want with minimal keystrokes, with just one key binding.
             -- `s{char}{char}{label}`
-            vim.keymap.set('', 'ss', '<Plug>(easymotion-overwin-f2)')
+            vim.keymap.set('', 'gs', '<Plug>(easymotion-overwin-f2)')
             -- Turn on case-insensitive feature
             vim.g.EasyMotion_smartcase = 1
             -- HJKL motions: Line motions
-            vim.keymap.set('n', 'sh', '<plug>(easymotion-linebackward)')
-            vim.keymap.set('n', 'sj', '<plug>(easymotion-j)')
-            vim.keymap.set('n', 'sk', '<plug>(easymotion-k)')
-            vim.keymap.set('n', 'sl', '<plug>(easymotion-lineforward)')
+            vim.keymap.set('n', 'gh', '<plug>(easymotion-linebackward)')
+            vim.keymap.set('n', 'gj', '<plug>(easymotion-j)')
+            vim.keymap.set('n', 'gk', '<plug>(easymotion-k)')
+            vim.keymap.set('n', 'gl', '<plug>(easymotion-lineforward)')
         end,
     },
     {
