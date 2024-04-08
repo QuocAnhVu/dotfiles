@@ -46,9 +46,6 @@ vim.opt.clipboard = 'unnamedplus'
 vim.opt.encoding = 'utf-8'
 vim.opt.fileencoding = 'utf-8'
 
--- Use Nerd fonts for features enabled
-vim.g.have_nerd_font = true
-
 ------------------------------------------------------------
 -- Usability options
 --
@@ -72,9 +69,6 @@ vim.opt.autoindent = true
 -- line of a window
 vim.opt.ruler = true
 
--- Always display the status line, even if only one window is displayed
-vim.opt.laststatus = 2
-
 -- Instead of failing a command because of unsaved changes, instead raise a
 -- dialogue asking if you wish to save changed files.
 vim.opt.confirm = true
@@ -84,6 +78,9 @@ vim.opt.visualbell = true
 
 -- Enable use of the mouse for all modes
 vim.opt.mouse = 'a'
+
+-- Always display the status line, even if only one window is displayed
+vim.opt.laststatus = 2
 
 -- Set the command window height to 2 lines, to avoid many cases of having to
 -- "press <Enter> to continue"
@@ -118,6 +115,9 @@ vim.opt.ttimeoutlen = 200
 
 -- Keep sign column open so that UI stops jumping around
 vim.opt.signcolumn = 'yes'
+
+-- Use Nerd fonts for features enabled
+vim.g.have_nerd_font = true
 
 ------------------------------------------------------------
 -- Indentation options
@@ -173,6 +173,7 @@ vim.keymap.set('n', '<C-L>', ':nohl<CR><C-L>')
 -- vim.keymap.set('i', '{', '{}<left>')
 vim.keymap.set('i', '{<CR>', '{<CR>}<ESC>O')
 vim.keymap.set('i', '{;<CR>', '{<CR>};<ESC>O')
+vim.keymap.set('i', '{,<CR>', '{<CR>},<ESC>O')
 
 ------------------------------------------------------------
 -- Fixes

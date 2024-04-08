@@ -23,6 +23,7 @@ export LANG=en_US.UTF-8
 # Aliases
 alias sprunge="curl -F 'sprunge=<-' http://sprunge.us"
 export EDITOR=nvim
+alias vi=nvim
 alias exa="exa --header --extended --all --classify --color-scale --long --git --icons --tree --level=1" 
 
 # XDG Extra
