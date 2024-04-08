@@ -38,9 +38,8 @@ alias wget=wget --hsts-file="$XDG_STATE_HOME/wget-hsts"
 export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
-# asdf
-export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
-. $ASDF_DATA_DIR/asdf.sh
+# mise-en-place version manager
+eval "$(mise activate zsh)"
 
 # Rust
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
@@ -66,7 +65,7 @@ export ZSH_COMPDUMP=$XDG_CACHE_HOME/oh-my-zsh/zcompdump-$HOST
 export HISTFILE="$XDG_STATE_HOME/zsh/history"
 export HISTSIZE=65536
 
-plugins=(git asdf)
+plugins=(git mise)
 
 source $ZSH/oh-my-zsh.sh
 

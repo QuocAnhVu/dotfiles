@@ -41,25 +41,57 @@ run ln -s $DOTFILES/.config/* $HOME/.config/
 run ln -s $DOTFILES/.zshrc $HOME/
 run ln -s $DOTFILES/.profile $HOME/
 
-# https://asdf-vm.com/guide/getting-started.html
-context 'Installing asdf, nodejs, python'
-run git clone https://github.com/asdf-vm/asdf.git $XDG_DATA_HOME/asdf --branch v0.14.0
-run source ~/.zshrc
-# https://github.com/danhper/asdf-python
-if ! asdf current python ; then
-    run asdf plugin-add python
-    run asdf install python latest
-    run asdf global python latest
-else
-    message 'asdf python detected - no installation needed.'
+# https://mise.jdx.dev/getting-started.html
+context 'Installing mise-en-place'
+if grep -q "Fedora" /etc/os-release; then
+    run dnf install -y dnf-plugins-core
+    run dnf config-manager --add-repo https://mise.jdx.dev/rpm/mise.repo
+    run dnf install -y mise
+elif grep -q "Ubuntu" /etc/os-release; then
+    run apt update -y && apt install -y gpg sudo wget curl
+    run sudo install -dm 755 /etc/apt/keyrings
+    run wget -qO - https://mise.jdx.dev/gpg-key.pub | gpg --dearmor | sudo tee /etc/apt/keyrings/mise-archive-keyring.gpg 1> /dev/null
+    run echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
+    run sudo apt update
+    run sudo apt install -y mise
 fi
-# https://github.com/asdf-vm/asdf-nodejs
-if ! asdf current nodejs ; then
-    run asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
-    run asdf install nodejs latest
-    run asdf global nodejs latest
+
+context 'Installing Python'
+if ! mise current python ; then
+    # python build dependencies (https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+    context 'Installing python build dependencies'
+    if grep -q "Fedora" /etc/os-release; then
+        run sudo dnf install -y make gcc zlib-devel bzip2 bzip2-devel \
+            readline-devel sqlite sqlite-devel \
+            openssl-devel tk-devel libffi-devel xz-devel
+    elif grep -q "Ubuntu" /etc/os-release; then
+        run sudo apt install -y make build-essential libssl-dev zlib1g-dev \
+            libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+            libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+    else
+        message "Installing python build dependencies failed"
+    fi
+    context 'Installing python with mise'
+    run mise use -g python@3.11
 else
-    message 'asdf nodejs detected - no installation needed.' 
+    message 'Python detected. No need to install.'
+fi
+
+context 'Installing NodeJS'
+if ! mise current node ; then
+    # nodejs build dependencies (https://github.com/nodejs/node/blob/master/BUILDING.md#building-nodejs-on-supported-platforms)
+    context 'Installing nodejs build dependencies'
+    if grep -q "Fedora" /etc/os-release; then
+        run sudo dnf install -y python3 gcc-c++ make python3-pip
+    elif grep -q "Ubuntu" /etc/os-release; then
+        run sudo apt install -y python3 g++ make python3-pip
+    else
+        message "Installing nodejs build dependencies failed"
+    fi
+    context 'Installing nodejs with mise'
+    run mise use -g node@lts
+else
+    message 'NodeJS detected. No need to install.'
 fi
 
 context 'Installing shell customizations: oh-my-zsh and powerlevel10k'

@@ -38,34 +38,10 @@ fi
 
 context 'Installing packages'
 run sudo $PKG update
-if grep -q "Ubuntu" /etc/os-release; then
-    run sudo apt upgrade -y
-fi
-run sudo $PKG install -y curl git zsh tmux neovim ripgrep fd-find
-run /usr/bin/pip3 install neovim
-
-# python build dependencies (https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
-context 'Installing python build dependencies'
-if command -v apt &> /dev/null; then
-    run sudo apt install -y make build-essential libssl-dev zlib1g-dev \
-        libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-        libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-elif command -v dnf &> /dev/null; then
-    run sudo dnf install -y make gcc zlib-devel bzip2 bzip2-devel \
-        readline-devel sqlite sqlite-devel \
-        openssl-devel tk-devel libffi-devel xz-devel
-else
-    message "Installing python build dependencies failed"
-fi
-
-# nodejs build dependencies (https://github.com/nodejs/node/blob/master/BUILDING.md#building-nodejs-on-supported-platforms)
-context 'Installing nodejs build dependencies'
-if command -v apt &> /dev/null; then
-    run sudo apt install -y python3 g++ make python3-pip
-elif command -v dnf &> /dev/null; then
-    run sudo dnf install -y python3 gcc-c++ make python3-pip
-else
-    message "Installing nodejs build dependencies failed"
+if grep -q "Fedora" /etc/os-release; then
+    run sudo dnf install -y curl git zsh tmux neovim ripgrep fd-find
+elif grep -q "Ubuntu" /etc/os-release; then
+    run sudo apt install -y curl git zsh tmux neovim ripgrep fd-find
 fi
 
 # window managers: i3/sway + polybar/waybar
