@@ -28,6 +28,37 @@ run mkdir -p $XDG_CACHE_HOME
 run mkdir -p $XDG_DATA_HOME
 run mkdir -p $XDG_STATE_HOME
 
+context 'Installing packages'
+run sudo $PKG update
+if grep -q "Fedora" /etc/os-release; then
+    run sudo dnf install -y curl git zsh tmux neovim ripgrep fd-find
+elif grep -q "Ubuntu" /etc/os-release; then
+    run sudo apt install -y curl git zsh tmux neovim ripgrep fd-find
+fi
+
+# # Set default shell to ZSH
+# context 'Changing default shell to zsh'
+# if command -v lchsh &> /dev/null; then
+#     run sudo lchsh $USER  # set to /usr/bin/zsh
+# elif command -v chsh &> /dev/null; then
+#     run chsh -s $(which zsh)
+# else
+#     message "Warning: default shell could not be changed to zsh."
+# fi
+
+context 'Enabling automatic updates'
+if grep -q "Fedora" /etc/os-release; then
+    run sudo dnf install -y dnf-automatic
+    run sudo sed -i 's/apply_updates = no/apply_updates = yes/' /etc/dnf/automatic.conf
+    run sudo systemctl enable --now dnf-automatic.timer
+elif grep -q "Ubuntu" /etc/os-release; then
+    sudo apt install unattended-upgrades
+    sudo dpkg-reconfigure --priority=low unattended-upgrades
+fi
+
+# Remove old config files
+context 'Removing old config files'
+run rm -rf ~/.zshrc ~/.tmux.conf ~/.config/tmux ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.config/i3 ~/.config/nvim ~/.config/polybar ~/.config/powerlevel10k ~/.config/sway ~/.config/waybar ~/.asdf ~/.config/dotfiles
 context 'Creating prerequisite directories'
 run mkdir -p $HOME/ws
 run mkdir -p $XDG_STATE_HOME/zsh  # for zsh_history
