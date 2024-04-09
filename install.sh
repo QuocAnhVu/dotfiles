@@ -71,6 +71,7 @@ context 'Symlinking config files'
 run ln -s $DOTFILES/.config/* $HOME/.config/
 run ln -s $DOTFILES/.zshrc $HOME/
 run ln -s $DOTFILES/.profile $HOME/
+run touch $XDG_CONFIG_HOME/localrc
 
 # https://mise.jdx.dev/getting-started.html
 context 'Installing mise-en-place'

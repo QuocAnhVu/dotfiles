@@ -1,2 +1,3 @@
 .config/tmux/plugins/
 .config/nvim/coc-settings.json
+.config/localrc
