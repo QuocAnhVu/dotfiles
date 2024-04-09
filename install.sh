@@ -35,9 +35,9 @@ function unique_append() {
 context 'Installing packages'
 run sudo $PKG update
 if grep -q 'Fedora' /etc/os-release; then
-    run sudo dnf install -y curl git zsh tmux neovim ripgrep fd-find
+    run sudo dnf install -y curl git tmux neovim ripgrep fd-find
 elif grep -q 'Ubuntu' /etc/os-release; then
-    run sudo apt install -y curl git zsh tmux neovim ripgrep fd-find
+    run sudo apt install -y curl git tmux neovim ripgrep fd-find
 fi
 
 # # Set default shell to ZSH
