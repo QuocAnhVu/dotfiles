@@ -1,30 +1,37 @@
 #! /usr/bin/zsh
 # https://stribika.github.io/2015/01/04/secure-secure-shell.html
 
-ORANGE='\033[0;33m'
-CYAN='\033[0;36m'
-GREEN_BOLD='\033[1;32m'
-NC='\033[0m'
+GE='\e[0;33m'
+CYAN='\e[0;36m'
+CYAN_ITALIC='\e[3;36m'
+GREEN_BOLD='\e[1;32m'
+NC='\e[0m'
 function context() {
-    echo "\n${ORANGE}${@:1}${NC}"
+    echo "\n$ORANGE${@:1}$NC"
 }
 function message() {
-    echo "${ORANGE}${@:1}${NC}"
+    echo "$ORANGE${@:1}$NC"
+}
+function run_noeval() {
+    echo "$CYAN${@:1}$NC"
 }
 function run() {
-    (echo "${CYAN}${@:1}${NC}") >&2
+    echo "$CYAN${@:1}$NC"
     eval ${@:1}
 }
 function prompt() {
-    echo -n "${GREEN_BOLD}${@:1}${NC}" >&2
+    echo -n "$GREEN_BOLD$1$NC"
     read response
     echo "$response"
 }
-XDG_CONFIG_HOME="$HOME/.config"
-XDG_CACHE_HOME="$HOME/.cache"
-XDG_DATA_HOME="$HOME/.local/share"
-XDG_STATE_HOME="$HOME/.local/state"
-DOTFILES="$XDG_DATA_HOME/dotfiles"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+function unique_append() {
+    read -r -d '' MSG
+    rg --quiet --fixed-strings --multiline $MSG $1 || echo "$MSG\n" >> $1
+}
 
 context 'Setting up dotfiles directory'
 run mkdir -p $HOME/.ssh

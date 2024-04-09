@@ -33,10 +33,12 @@ function unique_append() {
 }
 
 context 'Installing packages'
-run sudo $PKG update
-if grep -q 'Fedora' /etc/os-release; then
+if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
+    run sudo dnf update -y
     run sudo dnf install -y curl git tmux neovim ripgrep fd-find
-elif grep -q 'Ubuntu' /etc/os-release; then
+elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
+    run sudo apt update
+    run sudo apt upgrade -y
     run sudo apt install -y curl git tmux neovim ripgrep fd-find
 fi
 
@@ -51,11 +53,11 @@ fi
 # fi
 
 context 'Enabling automatic updates'
-if grep -q 'Fedora' /etc/os-release; then
+if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
     run sudo dnf install -y dnf-automatic
     run sudo sed -i 's/apply_updates = no/apply_updates = yes/' /etc/dnf/automatic.conf
     run sudo systemctl enable --now dnf-automatic.timer
-elif grep -q 'Ubuntu' /etc/os-release; then
+elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
     sudo apt install unattended-upgrades
     sudo dpkg-reconfigure --priority=low unattended-upgrades
 fi
@@ -88,7 +90,7 @@ message 'Run <prefix>-I in tmux to install plugins!'
 run git clone https://github.com/tmux-plugins/tpm $XDG_DATA_HOME/tmux/plugins/tpm
 
 # context 'Installing font: UbuntuMono Nerd Font'
-# if grep -q 'Ubuntu' /etc/os-release; then
+# if rg --quiet 'Ubuntu|Debian' /etc/os-release; then
 #     run sudo apt install -y fontconfig
 # fi
 # if ! fc-list | grep 'UbuntuMono Nerd Font' > /dev/null ; then
