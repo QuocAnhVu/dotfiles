@@ -220,7 +220,6 @@ require('lazy').setup({
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		main = "ibl",
-		opts = {},
 		config = function()
 			require("ibl").setup()
 		end
@@ -233,7 +232,6 @@ require('lazy').setup({
 	},
 	{
 		'numToStr/Comment.nvim',
-		opts = {},
 		lazy = false,
 	},
 	{
@@ -260,7 +258,6 @@ require('lazy').setup({
 	},
 	{
 		'stevearc/oil.nvim',
-		opts = {},
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = function()
 			require("oil").setup()
@@ -272,6 +269,20 @@ require('lazy').setup({
 		tag = '0.1.6',
 		dependencies = { 'nvim-lua/plenary.nvim' },
 		config = function()
+			require('telescope').setup({
+				pickers = {
+					find_files = {
+						hidden = true,
+						find_command = {
+							'rg',
+							'--files',
+							'--hidden',
+							'--glob', '!**/.git/*',
+							'--glob', '!**/node%_modules/*',
+						},
+					}
+				}
+			})
 			local builtin = require('telescope.builtin')
 			vim.keymap.set('n', 'ff', builtin.find_files, {})
 			vim.keymap.set('n', 'fg', builtin.live_grep, {})
@@ -282,7 +293,6 @@ require('lazy').setup({
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
-		opts = {},
 		dependencies = {
 			"MunifTanjim/nui.nvim",
 			"rcarriga/nvim-notify",
@@ -327,10 +337,10 @@ require('lazy').setup({
 	{
 		'nvim-treesitter/nvim-treesitter',
 		build = ':TSUpdate',
-		opts = {
-			ensure_installed = { 'all' }
-		},
 		config = function()
+			require('nvim-treesitter.configs').setup({
+				ensure_installed = 'all',
+			})
 			vim.filetype.add {
 				extension = {
 					-- Buck2 Extensions
@@ -524,14 +534,14 @@ require('lazy').setup({
 		config = function()
 			require("gx").setup {
 				handlers = {
-					plugin = true,               -- open plugin links in lua (e.g. packer, lazy, ..)
-					github = true,               -- open github issues
-					brewfile = true,             -- open Homebrew formulaes and casks
-					package_json = true,         -- open dependencies from package.json
-					search = true,               -- search the web/selection on the web if nothing else is found
-					rust = {                     -- custom handler to open rust's cargo packages
-						name = "rust",           -- set name of handler
-						filetype = { "toml" },   -- you can also set the required filetype for this handler
+					plugin = true, -- open plugin links in lua (e.g. packer, lazy, ..)
+					github = true, -- open github issues
+					brewfile = true, -- open Homebrew formulaes and casks
+					package_json = true, -- open dependencies from package.json
+					search = true, -- search the web/selection on the web if nothing else is found
+					rust = {   -- custom handler to open rust's cargo packages
+						name = "rust", -- set name of handler
+						filetype = { "toml" }, -- you can also set the required filetype for this handler
 						filename = "Cargo.toml", -- or the necessary filename
 						handle = function(mode, line, _)
 							local crate = require("gx.helper").find(line, mode, "(%w+)%s-=%s")
@@ -543,7 +553,7 @@ require('lazy').setup({
 					},
 				},
 				handler_options = {
-					search_engine = "google",  -- you can select between google, bing, duckduckgo, and ecosia
+					search_engine = "google", -- you can select between google, bing, duckduckgo, and ecosia
 					select_for_search = false, -- if your cursor is e.g. on a link, the pattern for the link AND for the word will always match. This disables this behaviour for default so that the link is opened without the select option for the word AND link
 				},
 			}

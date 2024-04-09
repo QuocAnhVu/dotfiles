@@ -91,6 +91,7 @@ if ! mise current node ; then
 else
     message 'NodeJS detected. No need to install.'
 fi
+run corepack enable pnpm
 
 context 'Installing Go'
 if ! mise current go ; then
