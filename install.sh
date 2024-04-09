@@ -55,7 +55,7 @@ fi
 context 'Enabling automatic updates'
 if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
     run sudo dnf install -y dnf-automatic
-    run sudo sed -i 's/apply_updates = no/apply_updates = yes/' /etc/dnf/automatic.conf
+    run sudo sed -i \'s/apply_updates = no/apply_updates = yes/\' /etc/dnf/automatic.conf
     run sudo systemctl enable --now dnf-automatic.timer
 elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
     sudo apt install unattended-upgrades
