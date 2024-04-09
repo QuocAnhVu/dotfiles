@@ -90,22 +90,22 @@ vim.opt.cmdheight = 2
 vim.opt.number = true
 vim.api.nvim_create_augroup('NumberToggle', { clear = true })
 vim.api.nvim_create_autocmd({ 'BufEnter', 'FocusGained', 'InsertLeave', 'WinEnter' }, {
-    group = 'NumberToggle',
-    pattern = '*',
-    callback = function()
-        if vim.opt.number and vim.api.nvim_get_mode() ~= 'i' then
-            vim.opt.relativenumber = true
-        end
-    end,
+	group = 'NumberToggle',
+	pattern = '*',
+	callback = function()
+		if vim.opt.number and vim.api.nvim_get_mode() ~= 'i' then
+			vim.opt.relativenumber = true
+		end
+	end,
 })
 vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost', 'InsertEnter', 'WinLeave' }, {
-    group = 'NumberToggle',
-    pattern = '*',
-    callback = function()
-        if vim.opt.number then
-            vim.opt.relativenumber = false
-        end
-    end,
+	group = 'NumberToggle',
+	pattern = '*',
+	callback = function()
+		if vim.opt.number then
+			vim.opt.relativenumber = false
+		end
+	end,
 })
 
 -- Quickly time out on keycodes, but never time out on mappings
@@ -183,335 +183,372 @@ vim.keymap.set('i', '{,<CR>', '{<CR>},<ESC>O')
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-    vim.fn.system({
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/folke/lazy.nvim.git",
-        "--branch=stable", -- latest stable release
-        lazypath,
-    })
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/folke/lazy.nvim.git",
+		"--branch=stable", -- latest stable release
+		lazypath,
+	})
 end
 vim.opt.rtp:prepend(lazypath)
 
 -- Initialize plugins
 require('lazy').setup({
-    {
-        'shaunsingh/nord.nvim',
-        priority = 1000,
-        config = function()
-            vim.g.nord_contrast = true
-            vim.g.nord_borders = true
-            vim.g.nord_disable_background = false
-            vim.g.nord_enable_sidebar_background = false
-            vim.g.nord_uniform_diff_background = true
-            vim.g.nord_italic = true
-            vim.g.nord_bold = true
-            vim.cmd('colorscheme nord')
-        end,
-    },
-    {
-        'nvim-lualine/lualine.nvim',
-        dependencies = { 'nvim-tree/nvim-web-devicons', opt = true },
-        config = function()
-            require('lualine').setup()
-        end
-    },
-    {
-        "lukas-reineke/indent-blankline.nvim",
-        main = "ibl",
-        opts = {},
-        config = function()
-            require("ibl").setup()
-        end
-    },
-    {
-        'lewis6991/gitsigns.nvim',
-        config = function()
-            require('gitsigns').setup()
-        end,
-    },
-    {
-        'numToStr/Comment.nvim',
-        opts = {},
-        lazy = false,
-    },
-    {
-        'easymotion/vim-easymotion',
-        config = function()
-            -- Disable default mappings
-            vim.g.EasyMotion_do_mapping = 0
-            -- Jump to anywhere you want with minimal keystrokes, with just one key binding.
-            -- `s{char}{char}{label}`
-            vim.keymap.set('', 'gs', '<Plug>(easymotion-overwin-f2)')
-            -- Turn on case-insensitive feature
-            vim.g.EasyMotion_smartcase = 1
-            -- HJKL motions: Line motions
-            vim.keymap.set('n', 'gh', '<plug>(easymotion-linebackward)')
-            vim.keymap.set('n', 'gj', '<plug>(easymotion-j)')
-            vim.keymap.set('n', 'gk', '<plug>(easymotion-k)')
-            vim.keymap.set('n', 'gl', '<plug>(easymotion-lineforward)')
-        end,
-    },
-    {
-        'akinsho/bufferline.nvim',
-        version = "*",
-        dependencies = 'nvim-tree/nvim-web-devicons'
-    },
-    {
-        'stevearc/oil.nvim',
-        opts = {},
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        config = function()
-            require("oil").setup()
-            vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
-        end,
-    },
-    {
-        'nvim-telescope/telescope.nvim',
-        tag = '0.1.6',
-        dependencies = { 'nvim-lua/plenary.nvim' },
-        config = function()
-            local builtin = require('telescope.builtin')
-            vim.keymap.set('n', 'ff', builtin.find_files, {})
-            vim.keymap.set('n', 'fg', builtin.live_grep, {})
-            vim.keymap.set('n', 'fb', builtin.buffers, {})
-            vim.keymap.set('n', 'fh', builtin.help_tags, {})
-        end,
-    },
-    {
-        "folke/noice.nvim",
-        event = "VeryLazy",
-        opts = {},
-        dependencies = {
-            "MunifTanjim/nui.nvim",
-            "rcarriga/nvim-notify",
-        },
-        config = function()
-            require('noice').setup({
-                lsp = {
-                    -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
-                    override = {
-                        ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-                        ["vim.lsp.util.stylize_markdown"] = true,
-                        ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
-                    },
-                },
-                -- you can enable a preset for easier configuration
-                presets = {
-                    bottom_search = true,         -- use a classic bottom cmdline for search
-                    command_palette = true,       -- position the cmdline and popupmenu together
-                    long_message_to_split = true, -- long messages will be sent to a split
-                    inc_rename = false,           -- enables an input dialog for inc-rename.nvim
-                    lsp_doc_border = true,        -- add a border to hover docs and signature help
-                },
-            })
-        end
-    },
-    {
-        "folke/which-key.nvim",
-        event = "VeryLazy",
-        init = function()
-            vim.o.timeout = true
-            vim.o.timeoutlen = 500
-        end,
-        opts = {
-            triggers_blacklist = {
-                i = {
-                    '{',
-                },
-            },
-        },
-    },
-    'sheerun/vim-polyglot',
-    {
-        'nvim-treesitter/nvim-treesitter',
-        build = ':TSUpdate',
-        opts = {
-            ensure_installed = { 'all' }
-        },
-        config = function()
-            vim.filetype.add {
-                extension = {
-                    -- Buck2 Extensions
-                    BUCK = 'starlark',
-                    TARGETS = 'starlark',
-                }
-            }
-        end,
-    },
-    {
-        'nvim-treesitter/nvim-treesitter-context',
-        dependencies = { 'nvim-treesitter/nvim-treesitter' },
-        config = function()
-            vim.keymap.set("n", "[c", function()
-                require("treesitter-context").go_to_context(vim.v.count1)
-            end, { silent = true })
-        end
-    },
-    --    {
-    --        'nvim-treesitter/nvim-treesitter-textobjects',
-    --		dependencies = { 'nvim-treesitter/nvim-treesitter' },
-    --    },
-    'williamboman/mason.nvim',
-    {
-        'williamboman/mason-lspconfig.nvim',
-        dependencies = { 'williamboman/mason.nvim' },
-    },
-    {
-        'neovim/nvim-lspconfig',
-        dependencies = { 'williamboman/mason-lspconfig.nvim' },
-        config = function()
-            -- Setup language servers.
-            require('mason').setup()
-            require('mason-lspconfig').setup()
-            require('mason-lspconfig').setup_handlers {
-                -- The first entry (without a key) will be the default handler
-                -- and will be called for each installed server that doesn't have
-                -- a dedicated handler.
-                function(server_name) -- default handler (optional)
-                    require('lspconfig')[server_name].setup {}
-                end
-            }
+	{
+		'shaunsingh/nord.nvim',
+		priority = 1000,
+		config = function()
+			vim.g.nord_contrast = true
+			vim.g.nord_borders = true
+			vim.g.nord_disable_background = false
+			vim.g.nord_enable_sidebar_background = false
+			vim.g.nord_uniform_diff_background = true
+			vim.g.nord_italic = true
+			vim.g.nord_bold = true
+			vim.cmd('colorscheme nord')
+		end,
+	},
+	{
+		'nvim-lualine/lualine.nvim',
+		dependencies = { 'nvim-tree/nvim-web-devicons', opt = true },
+		config = function()
+			require('lualine').setup()
+		end
+	},
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		main = "ibl",
+		opts = {},
+		config = function()
+			require("ibl").setup()
+		end
+	},
+	{
+		'lewis6991/gitsigns.nvim',
+		config = function()
+			require('gitsigns').setup()
+		end,
+	},
+	{
+		'numToStr/Comment.nvim',
+		opts = {},
+		lazy = false,
+	},
+	{
+		'easymotion/vim-easymotion',
+		config = function()
+			-- Disable default mappings
+			vim.g.EasyMotion_do_mapping = 0
+			-- Jump to anywhere you want with minimal keystrokes, with just one key binding.
+			-- `s{char}{char}{label}`
+			vim.keymap.set('', 'gs', '<Plug>(easymotion-overwin-f2)')
+			-- Turn on case-insensitive feature
+			vim.g.EasyMotion_smartcase = 1
+			-- HJKL motions: Line motions
+			vim.keymap.set('n', 'gh', '<plug>(easymotion-linebackward)')
+			vim.keymap.set('n', 'gj', '<plug>(easymotion-j)')
+			vim.keymap.set('n', 'gk', '<plug>(easymotion-k)')
+			vim.keymap.set('n', 'gl', '<plug>(easymotion-lineforward)')
+		end,
+	},
+	{
+		'akinsho/bufferline.nvim',
+		version = "*",
+		dependencies = 'nvim-tree/nvim-web-devicons'
+	},
+	{
+		'stevearc/oil.nvim',
+		opts = {},
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		config = function()
+			require("oil").setup()
+			vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+		end,
+	},
+	{
+		'nvim-telescope/telescope.nvim',
+		tag = '0.1.6',
+		dependencies = { 'nvim-lua/plenary.nvim' },
+		config = function()
+			local builtin = require('telescope.builtin')
+			vim.keymap.set('n', 'ff', builtin.find_files, {})
+			vim.keymap.set('n', 'fg', builtin.live_grep, {})
+			vim.keymap.set('n', 'fb', builtin.buffers, {})
+			vim.keymap.set('n', 'fh', builtin.help_tags, {})
+		end,
+	},
+	{
+		"folke/noice.nvim",
+		event = "VeryLazy",
+		opts = {},
+		dependencies = {
+			"MunifTanjim/nui.nvim",
+			"rcarriga/nvim-notify",
+		},
+		config = function()
+			require('noice').setup({
+				lsp = {
+					-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+					override = {
+						["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+						["vim.lsp.util.stylize_markdown"] = true,
+						["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+					},
+				},
+				-- you can enable a preset for easier configuration
+				presets = {
+					bottom_search = true, -- use a classic bottom cmdline for search
+					command_palette = true, -- position the cmdline and popupmenu together
+					long_message_to_split = true, -- long messages will be sent to a split
+					inc_rename = false, -- enables an input dialog for inc-rename.nvim
+					lsp_doc_border = true, -- add a border to hover docs and signature help
+				},
+			})
+		end
+	},
+	{
+		"folke/which-key.nvim",
+		event = "VeryLazy",
+		init = function()
+			vim.o.timeout = true
+			vim.o.timeoutlen = 500
+		end,
+		opts = {
+			triggers_blacklist = {
+				i = {
+					'{',
+				},
+			},
+		},
+	},
+	'sheerun/vim-polyglot',
+	{
+		'nvim-treesitter/nvim-treesitter',
+		build = ':TSUpdate',
+		opts = {
+			ensure_installed = { 'all' }
+		},
+		config = function()
+			vim.filetype.add {
+				extension = {
+					-- Buck2 Extensions
+					BUCK = 'starlark',
+					TARGETS = 'starlark',
+				}
+			}
+		end,
+	},
+	{
+		'nvim-treesitter/nvim-treesitter-context',
+		dependencies = { 'nvim-treesitter/nvim-treesitter' },
+		config = function()
+			vim.keymap.set("n", "[c", function()
+				require("treesitter-context").go_to_context(vim.v.count1)
+			end, { silent = true })
+		end
+	},
+	--    {
+	--        'nvim-treesitter/nvim-treesitter-textobjects',
+	--		dependencies = { 'nvim-treesitter/nvim-treesitter' },
+	--    },
+	'williamboman/mason.nvim',
+	{
+		'williamboman/mason-lspconfig.nvim',
+		dependencies = { 'williamboman/mason.nvim' },
+	},
+	{
+		'neovim/nvim-lspconfig',
+		dependencies = { 'williamboman/mason-lspconfig.nvim' },
+		config = function()
+			-- Setup language servers.
+			require('mason').setup()
+			require('mason-lspconfig').setup()
+			require('mason-lspconfig').setup_handlers {
+				-- The first entry (without a key) will be the default handler
+				-- and will be called for each installed server that doesn't have
+				-- a dedicated handler.
+				function(server_name) -- default handler (optional)
+					require('lspconfig')[server_name].setup {}
+				end
+			}
 
-            -- Global mappings.
-            -- See `:help vim.diagnostic.*` for documentation on any of the below functions
-            vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
-            vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-            vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-            vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
+			-- Global mappings.
+			-- See `:help vim.diagnostic.*` for documentation on any of the below functions
+			vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
+			vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+			vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+			vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 
-            -- Use LspAttach autocommand to only map the following keys
-            -- after the language server attaches to the current buffer
-            vim.api.nvim_create_autocmd('LspAttach', {
-                group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-                callback = function(ev)
-                    -- Enable completion triggered by <c-x><c-o>
-                    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+			-- Use LspAttach autocommand to only map the following keys
+			-- after the language server attaches to the current buffer
+			vim.api.nvim_create_autocmd('LspAttach', {
+				group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+				callback = function(ev)
+					-- Enable completion triggered by <c-x><c-o>
+					vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-                    -- Buffer local mappings.
-                    -- See `:help vim.lsp.*` for documentation on any of the below functions
-                    local opts = { buffer = ev.buf }
-                    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-                    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-                    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-                    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-                    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-                    vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
-                    vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
-                    vim.keymap.set('n', '<leader>wl', function()
-                        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-                    end, opts)
-                    vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
-                    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-                    vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
-                    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-                    vim.keymap.set('n', '<leader>f', function()
-                        vim.lsp.buf.format { async = true }
-                    end, opts)
-                end,
-            })
-        end
-    },
-    {
-        'nvimdev/lspsaga.nvim',
-        dependencies = {
-            'nvim-treesitter/nvim-treesitter',
-            'nvim-tree/nvim-web-devicons',
-        },
-        build = function()
-            vim.cmd('TSInstall markdown')
-            vim.cmd('TSInstall markdown_inline')
-        end,
-        config = function()
-            require('lspsaga').setup({
-                lightbulb = {
-                    virtual_text = false
-                },
-            })
-        end,
-    },
-    {
-        'hrsh7th/nvim-cmp',
-        dependencies = {
-            'neovim/nvim-lspconfig',
-            'hrsh7th/cmp-nvim-lsp',
-            'hrsh7th/cmp-buffer',
-            'hrsh7th/cmp-path',
-            'hrsh7th/cmp-cmdline',
-            'hrsh7th/nvim-cmp',
-        },
-        config = function()
-            local cmp = require 'cmp'
-            cmp.setup({
-                snippet = {
-                    -- REQUIRED - you must specify a snippet engine
-                    expand = function(args)
-                        -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-                        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-                        -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
-                        -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
-                        vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
-                    end,
-                },
-                window = {
-                    completion = cmp.config.window.bordered(),
-                    documentation = cmp.config.window.bordered(),
-                },
-                mapping = cmp.mapping.preset.insert({
-                    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-                    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-                    ['<C-Space>'] = cmp.mapping.complete(),
-                    ['<C-e>'] = cmp.mapping.abort(),
-                    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-                }),
-                sources = cmp.config.sources({
-                    { name = 'nvim_lsp' },
-                    -- { name = 'vsnip' }, -- For vsnip users.
-                    -- { name = 'luasnip' }, -- For luasnip users.
-                    -- { name = 'ultisnips' }, -- For ultisnips users.
-                    -- { name = 'snippy' }, -- For snippy users.
-                }, {
-                    { name = 'buffer' },
-                })
-            })
+					-- Buffer local mappings.
+					-- See `:help vim.lsp.*` for documentation on any of the below functions
+					local opts = { buffer = ev.buf }
+					vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+					vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+					vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+					vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+					vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+					vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, opts)
+					vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, opts)
+					vim.keymap.set('n', '<leader>wl', function()
+						print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+					end, opts)
+					vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
+					vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+					vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts)
+					vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+					vim.keymap.set('n', '<leader>f', function()
+						vim.lsp.buf.format { async = true }
+					end, opts)
+				end,
+			})
+		end
+	},
+	{
+		'nvimdev/lspsaga.nvim',
+		dependencies = {
+			'nvim-treesitter/nvim-treesitter',
+			'nvim-tree/nvim-web-devicons',
+		},
+		build = function()
+			vim.cmd('TSInstall markdown')
+			vim.cmd('TSInstall markdown_inline')
+		end,
+		config = function()
+			require('lspsaga').setup({
+				lightbulb = {
+					virtual_text = false
+				},
+			})
+		end,
+	},
+	{
+		'hrsh7th/nvim-cmp',
+		dependencies = {
+			'neovim/nvim-lspconfig',
+			'hrsh7th/cmp-nvim-lsp',
+			'hrsh7th/cmp-buffer',
+			'hrsh7th/cmp-path',
+			'hrsh7th/cmp-cmdline',
+			'hrsh7th/nvim-cmp',
+		},
+		config = function()
+			local cmp = require 'cmp'
+			cmp.setup({
+				snippet = {
+					-- REQUIRED - you must specify a snippet engine
+					expand = function(args)
+						-- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+						-- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+						-- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+						-- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+						vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
+					end,
+				},
+				window = {
+					completion = cmp.config.window.bordered(),
+					documentation = cmp.config.window.bordered(),
+				},
+				mapping = cmp.mapping.preset.insert({
+					['<C-b>'] = cmp.mapping.scroll_docs(-4),
+					['<C-f>'] = cmp.mapping.scroll_docs(4),
+					['<C-Space>'] = cmp.mapping.complete(),
+					['<C-e>'] = cmp.mapping.abort(),
+					['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+				}),
+				sources = cmp.config.sources({
+					{ name = 'nvim_lsp' },
+					-- { name = 'vsnip' }, -- For vsnip users.
+					-- { name = 'luasnip' }, -- For luasnip users.
+					-- { name = 'ultisnips' }, -- For ultisnips users.
+					-- { name = 'snippy' }, -- For snippy users.
+				}, {
+					{ name = 'buffer' },
+				})
+			})
 
-            -- Set configuration for specific filetype.
-            cmp.setup.filetype('gitcommit', {
-                sources = cmp.config.sources({
-                    { name = 'git' }, -- You can specify the `git` source if [you were installed it](https://github.com/petertriho/cmp-git).
-                }, {
-                    { name = 'buffer' },
-                })
-            })
+			-- Set configuration for specific filetype.
+			cmp.setup.filetype('gitcommit', {
+				sources = cmp.config.sources({
+					{ name = 'git' }, -- You can specify the `git` source if [you were installed it](https://github.com/petertriho/cmp-git).
+				}, {
+					{ name = 'buffer' },
+				})
+			})
 
-            -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-            cmp.setup.cmdline({ '/', '?' }, {
-                mapping = cmp.mapping.preset.cmdline(),
-                sources = {
-                    { name = 'buffer' }
-                }
-            })
+			-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+			cmp.setup.cmdline({ '/', '?' }, {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = {
+					{ name = 'buffer' }
+				}
+			})
 
-            -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-            cmp.setup.cmdline(':', {
-                mapping = cmp.mapping.preset.cmdline(),
-                sources = cmp.config.sources({
-                    { name = 'path' }
-                }, {
-                    { name = 'cmdline' }
-                }),
-                matching = { disallow_symbol_nonprefix_matching = false }
-            })
+			-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+			cmp.setup.cmdline(':', {
+				mapping = cmp.mapping.preset.cmdline(),
+				sources = cmp.config.sources({
+					{ name = 'path' }
+				}, {
+					{ name = 'cmdline' }
+				}),
+				matching = { disallow_symbol_nonprefix_matching = false }
+			})
 
-            -- Set up lspconfig.
-            local capabilities = require('cmp_nvim_lsp').default_capabilities()
-            -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
-            require('lspconfig')['rust_analyzer'].setup {
-                capabilities = capabilities
-            }
-        end
-    },
+			-- Set up lspconfig.
+			local capabilities = require('cmp_nvim_lsp').default_capabilities()
+			-- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+			require('lspconfig')['rust_analyzer'].setup {
+				capabilities = capabilities
+			}
+		end
+	},
+	{
+		"chrishrb/gx.nvim",
+		keys = { { "gx", "<cmd>Browse<cr>", mode = { "n", "x" } } },
+		cmd = { "Browse" },
+		init = function()
+			vim.g.netrw_nogx = 1 -- disable netrw gx
+		end,
+		dependencies = { "nvim-lua/plenary.nvim" },
+		submodules = false, -- not needed, submodules are required only for tests
+		config = function()
+			require("gx").setup {
+				handlers = {
+					plugin = true,               -- open plugin links in lua (e.g. packer, lazy, ..)
+					github = true,               -- open github issues
+					brewfile = true,             -- open Homebrew formulaes and casks
+					package_json = true,         -- open dependencies from package.json
+					search = true,               -- search the web/selection on the web if nothing else is found
+					rust = {                     -- custom handler to open rust's cargo packages
+						name = "rust",           -- set name of handler
+						filetype = { "toml" },   -- you can also set the required filetype for this handler
+						filename = "Cargo.toml", -- or the necessary filename
+						handle = function(mode, line, _)
+							local crate = require("gx.helper").find(line, mode, "(%w+)%s-=%s")
+
+							if crate then
+								return "https://crates.io/crates/" .. crate
+							end
+						end,
+					},
+				},
+				handler_options = {
+					search_engine = "google",  -- you can select between google, bing, duckduckgo, and ecosia
+					select_for_search = false, -- if your cursor is e.g. on a link, the pattern for the link AND for the word will always match. This disables this behaviour for default so that the link is opened without the select option for the word AND link
+				},
+			}
+		end,
+	},
 }, {})
 
 ------------------------------------------------------------
