@@ -230,10 +230,7 @@ require('lazy').setup({
 			require('gitsigns').setup()
 		end,
 	},
-	{
-		'numToStr/Comment.nvim',
-		lazy = false,
-	},
+	'tpope/vim-commentary',
 	{
 		'easymotion/vim-easymotion',
 		config = function()
