@@ -230,6 +230,13 @@ require('lazy').setup({
 			require('gitsigns').setup()
 		end,
 	},
+	{
+		'chentoast/marks.nvim',
+		config = function()
+			require('marks').setup()
+		end,
+
+	},
 	'tpope/vim-commentary',
 	{
 		'easymotion/vim-easymotion',
