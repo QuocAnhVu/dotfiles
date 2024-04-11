@@ -55,7 +55,7 @@ eval "$(mise activate zsh)"
 END
 
 context 'Installing Python'
-if ! mise current python ; then
+if ! mise current python | rg '\d+\.\d+\.\d+' ; then
     # python build dependencies (https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
     context 'Installing python build dependencies.'
     if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
@@ -76,7 +76,7 @@ else
 fi
 
 context 'Installing NodeJS'
-if ! mise current node ; then
+if ! mise current node | rg '\d+\.\d+\.\d+' ; then
     # nodejs build dependencies (https://github.com/nodejs/node/blob/master/BUILDING.md#building-nodejs-on-supported-platforms)
     context 'Installing nodejs build dependencies.'
     if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
@@ -94,7 +94,7 @@ fi
 run corepack enable pnpm
 
 context 'Installing Go'
-if ! mise current go ; then
+if ! mise current go | rg '\d+\.\d+\.\d+' ; then
     run mise use -g go@1.21
     message 'Appending $localrc.'
     run unique_append $localrc << "END"

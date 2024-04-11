@@ -32,6 +32,12 @@ function unique_append() {
     rg --quiet --fixed-strings --multiline $MSG $1 || echo "$MSG\n" >> $1
 }
 
+context 'Ensuring XDG directories exist'
+run mkdir -p $XDG_CONFIG_HOME
+run mkdir -p $XDG_CACHE_HOME
+run mkdir -p $XDG_DATA_HOME
+run mkdir -p $XDG_STATE_HOME
+
 context 'Installing packages'
 if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
     run sudo dnf update -y
@@ -70,8 +76,8 @@ elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
 fi
 
 # Remove old config files
-context 'Removing old config files'
-run rm -rf ~/.zshrc ~/.tmux.conf ~/.config/tmux ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.config/i3 ~/.config/nvim ~/.config/polybar ~/.config/powerlevel10k ~/.config/sway ~/.config/waybar ~/.asdf ~/.config/dotfiles
+# context 'Removing old config files'
+# run rm -rf ~/.zshrc ~/.tmux.conf ~/.config/tmux ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.config/i3 ~/.config/nvim ~/.config/polybar ~/.config/powerlevel10k ~/.config/sway ~/.config/waybar ~/.asdf ~/.config/dotfiles
 context 'Creating prerequisite directories'
 run mkdir -p $HOME/ws
 run mkdir -p $XDG_STATE_HOME/zsh  # for zsh_history
