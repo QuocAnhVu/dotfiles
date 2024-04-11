@@ -1,5 +1,5 @@
 #! /usr/bin/zsh
-source $(dirname $0)/lib.sh
+source $(dirname $0)/_lib.sh
 
 localrc="$XDG_CONFIG_HOME/localrc"
 
@@ -63,19 +63,20 @@ fi
 
 context 'Installing Go'
 if ! mise current go | rg '\d+\.\d+\.\d+' ; then
+    message 'Appending $localrc.'
     run unique_append $localrc << "END"
 # Go
 export GOPATH="$XDG_DATA_HOME/go"
 export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 END
     run mise use -g go@1.21
-    message 'Appending $localrc.'
 else
     message 'Go detected. No need to install.'
 fi
 
 context 'Installing Rust'
-if ! rustc --version ; then
+if ! rustc --version | rg '\d+\.\d+\.\d+' ; then
+    message 'Appending $localrc.'
     run unique_append $localrc << "END"
 # Rust
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
@@ -84,7 +85,6 @@ export PATH="$CARGO_HOME/bin":$PATH
 END
     run_noeval 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh'
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-    message 'Appending $localrc.'
 else
     message 'Rust detected. No need to install.'
 fi

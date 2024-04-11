@@ -1,5 +1,5 @@
 #! /usr/bin/zsh
-source $(dirname $0)/lib.sh
+source $(dirname $0)/_lib.sh
 
 context 'Ensuring XDG directories exist'
 run mkdir -p $XDG_CONFIG_HOME

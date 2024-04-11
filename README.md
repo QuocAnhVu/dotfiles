@@ -2,15 +2,16 @@
 
 ```shell
 sudo dnf update -y
-sudo dnf install -y zsh curl ripgrep
+sudo dnf install -y zsh ripgrep
 
 XDG_DATA_HOME=$HOME/.local/share
 mkdir -p $XDG_DATA_HOME/dotfiles
 git clone https://github.com/QuocAnhVu/dotfiles.git $XDG_DATA_HOME/dotfiles
+
 cd $XDG_DATA_HOME/dotfiles
 ./base.sh
 ./langs.sh
-./ssh.sh
+./harden.sh
 ```
 
 # Manual post-install tasks

@@ -1,5 +1,5 @@
 #! /usr/bin/zsh
-source $(dirname $0)/lib.sh
+source $(dirname $0)/_lib.sh
 
 # https://stribika.github.io/2015/01/04/secure-secure-shell.html
 context 'Setting up dotfiles directory'
@@ -97,13 +97,13 @@ context 'Configuring ssh with hardened config'
 if [ -f /etc/ssh/ssh_config ]; then
     run sudo mv /etc/ssh/ssh_config /etc/ssh/ssh_config.orig
 fi
-run sudo cp $DOTFILES/.ssh/ssh_config.default /etc/ssh/ssh_config
+run sudo cp $(dirname $0)/.ssh/ssh_config.default /etc/ssh/ssh_config
 
 context 'Configuring sshd with hardened config'
 if [ -f /etc/ssh/sshd_config ]; then
     run sudo mv /etc/ssh/sshd_config /etc/ssh/sshd_config.orig
 fi
-run sudo cp $DOTFILES/.ssh/sshd_config.default /etc/ssh/sshd_config
+run sudo cp $(dirname $0)/.ssh/sshd_config.default /etc/ssh/sshd_config
 
 context 'Generating custom moduli... this may take a while'
 function cleanup {

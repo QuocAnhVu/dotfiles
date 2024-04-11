@@ -19,8 +19,7 @@ function run() {
     eval ${@:1}
 }
 function prompt() {
-    echo -n "$GREEN_BOLD$1$NC"
-    read -e response
+    echo -n "$GREEN_BOLD${@:1}$NC"
 }
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
