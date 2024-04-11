@@ -3,10 +3,14 @@
 ```shell
 sudo dnf update -y
 sudo dnf install -y zsh curl ripgrep
-curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/install.sh | zsh
-cd ~/.local/share/dotfiles
-./install_langs.sh
-./harden_ssh.sh
+
+XDG_DATA_HOME=$HOME/.local/share
+mkdir -p $XDG_DATA_HOME/dotfiles
+git clone https://github.com/QuocAnhVu/dotfiles.git $XDG_DATA_HOME/dotfiles
+cd $XDG_DATA_HOME/dotfiles
+./base.sh
+./langs.sh
+./ssh.sh
 ```
 
 # Manual post-install tasks

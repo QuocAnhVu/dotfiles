@@ -1,41 +1,24 @@
 #! /usr/bin/zsh
-
-ORANGE='\e[0;33m'
-CYAN='\e[0;36m'
-CYAN_ITALIC='\e[3;36m'
-GREEN_BOLD='\e[1;32m'
-NC='\e[0m'
-function context() {
-    echo "\n$ORANGE${@:1}$NC"
-}
-function message() {
-    echo "$ORANGE${@:1}$NC"
-}
-function run_noeval() {
-    echo "$CYAN${@:1}$NC"
-}
-function run() {
-    echo "$CYAN${@:1}$NC"
-    eval ${@:1}
-}
-function prompt() {
-    echo -n "$GREEN_BOLD$1$NC"
-    read -e response
-}
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
-function unique_append() {
-    read -r -d '' MSG
-    rg --quiet --fixed-strings --multiline $MSG $1 || echo "$MSG\n" >> $1
-}
+source $(dirname $0)/lib.sh
 
 context 'Ensuring XDG directories exist'
 run mkdir -p $XDG_CONFIG_HOME
 run mkdir -p $XDG_CACHE_HOME
 run mkdir -p $XDG_DATA_HOME
 run mkdir -p $XDG_STATE_HOME
+
+# context 'Removing old config files'
+# run rm -rf ~/.zshrc ~/.tmux.conf ~/.config/tmux ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.config/i3 ~/.config/nvim ~/.config/polybar ~/.config/powerlevel10k ~/.config/sway ~/.config/waybar ~/.asdf ~/.config/dotfiles
+
+context 'Symlinking config files'
+run ln -s $XDG_DATA_HOME/dotfiles/.config/* $HOME/.config/
+run ln -s $XDG_DATA_HOME/dotfiles/.zshrc $HOME/
+run ln -s $XDG_DATA_HOME/dotfiles/.profile $HOME/
+
+context 'Creating prerequisite directories'
+run mkdir -p $HOME/ws
+run mkdir -p $XDG_STATE_HOME/zsh  # for zsh_history
+run touch $XDG_CONFIG_HOME/localrc
 
 context 'Installing packages'
 if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
@@ -54,16 +37,6 @@ if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
     sudo dnf remove cockpit
 fi
 
-# # Set default shell to ZSH
-# context 'Changing default shell to zsh'
-# if command -v lchsh &> /dev/null; then
-#     run sudo lchsh $USER  # set to /usr/bin/zsh
-# elif command -v chsh &> /dev/null; then
-#     run chsh -s $(which zsh)
-# else
-#     message "Warning: default shell could not be changed to zsh."
-# fi
-
 context 'Enabling automatic updates'
 if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
     run sudo dnf install -y dnf-automatic
@@ -73,23 +46,6 @@ elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
     sudo apt install unattended-upgrades
     sudo dpkg-reconfigure --priority=low unattended-upgrades
 fi
-
-# Remove old config files
-# context 'Removing old config files'
-# run rm -rf ~/.zshrc ~/.tmux.conf ~/.config/tmux ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.config/i3 ~/.config/nvim ~/.config/polybar ~/.config/powerlevel10k ~/.config/sway ~/.config/waybar ~/.asdf ~/.config/dotfiles
-context 'Creating prerequisite directories'
-run mkdir -p $HOME/ws
-run mkdir -p $XDG_STATE_HOME/zsh  # for zsh_history
-DOTFILES="$XDG_DATA_HOME/dotfiles"
-
-context 'Installing dotfiles'
-run mkdir -p $HOME/ws
-run git clone https://github.com/QuocAnhVu/dotfiles.git $DOTFILES
-context 'Symlinking config files'
-run ln -s $DOTFILES/.config/* $HOME/.config/
-run ln -s $DOTFILES/.zshrc $HOME/
-run ln -s $DOTFILES/.profile $HOME/
-run touch $XDG_CONFIG_HOME/localrc
 
 context 'Installing shell customizations: oh-my-zsh and powerlevel10k'
 # https://github.com/ohmyzsh/ohmyzsh#advanced-installation
