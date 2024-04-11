@@ -90,32 +90,31 @@ if ! mise current node | rg '\d+\.\d+\.\d+' ; then
 else
     message 'NodeJS detected. No need to install.'
 fi
-run corepack enable pnpm
 
 context 'Installing Go'
 if ! mise current go | rg '\d+\.\d+\.\d+' ; then
-    run mise use -g go@1.21
-    message 'Appending $localrc.'
     run unique_append $localrc << "END"
 # Go
 export GOPATH="$XDG_DATA_HOME/go"
 export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 END
+    run mise use -g go@1.21
+    message 'Appending $localrc.'
 else
     message 'Go detected. No need to install.'
 fi
 
 context 'Installing Rust'
 if ! rustc --version ; then
-    run_noeval 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh'
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-    message 'Appending $localrc.'
     run unique_append $localrc << "END"
 # Rust
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 export PATH="$CARGO_HOME/bin":$PATH
 END
+    run_noeval 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh'
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    message 'Appending $localrc.'
 else
     message 'Rust detected. No need to install.'
 fi
