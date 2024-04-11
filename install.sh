@@ -42,6 +42,13 @@ elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
     run sudo apt install -y curl git tmux neovim ripgrep fd-find
 fi
 
+context 'Uninstalling cockpit'
+if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
+    sudo systemctl stop cockpit
+    sudo systemctl disable cockpit
+    sudo dnf remove cockpit
+fi
+
 # # Set default shell to ZSH
 # context 'Changing default shell to zsh'
 # if command -v lchsh &> /dev/null; then
