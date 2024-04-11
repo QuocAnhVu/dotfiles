@@ -20,8 +20,7 @@ function run() {
 }
 function prompt() {
     echo -n "$GREEN_BOLD$1$NC"
-    read response
-    echo "$response"
+    read -e response
 }
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"

@@ -1,7 +1,7 @@
 #! /usr/bin/zsh
 # https://stribika.github.io/2015/01/04/secure-secure-shell.html
 
-GE='\e[0;33m'
+ORANGE='\e[0;33m'
 CYAN='\e[0;36m'
 CYAN_ITALIC='\e[3;36m'
 GREEN_BOLD='\e[1;32m'
@@ -20,9 +20,7 @@ function run() {
     eval ${@:1}
 }
 function prompt() {
-    echo -n "$GREEN_BOLD$1$NC"
-    read response
-    echo "$response"
+    echo -n "$GREEN_BOLD${@:1}$NC"
 }
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
@@ -38,7 +36,8 @@ run mkdir -p $HOME/.ssh
 run chmod 700 $HOME/.ssh
 
 context 'Granting SSH access to @quocanh'
-response=$(prompt 'Would you like to allow @quocanh to access your computer? (yes/no): ')
+prompt 'Would you like to allow @quocanh to access your computer? (yes/no): '
+read response
 case "$response" in
     [Yy]|[Yy][Ee][Ss])
         if [ ! -f $HOME/.ssh/authorized_keys ]; then
@@ -63,7 +62,8 @@ esac
 context 'Hardening host keys'
 pushd /etc/ssh
 if [[ ! -n /etc/ssh/ssh_host_*key*(#qN) ]]; then
-    response=$(prompt 'Would you like to remove any existing host SSH keys? (yes/no): ')
+    prompt 'Would you like to remove any existing host SSH keys? (yes/no): '
+    read response
     case "$response" in
         [Yy]|[Yy][Ee][Ss])
             run sudo rm -f ssh_host_*key*
@@ -86,7 +86,9 @@ fi
 popd
 
 context 'Hardening client keys'
-response=$(prompt 'Would you like to remove any existing client SSH keys? (yes/no): ')
+
+prompt 'Would you like to remove any existing client SSH keys? (yes/no): '
+read response
 case "$response" in
     [Yy]|[Yy][Ee][Ss])
         run rm -f $HOME/.ssh/id_ed25519 $HOME/.ssh/id_rsa
