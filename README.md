@@ -2,7 +2,7 @@
 
 ```shell
 sudo dnf update -y
-sudo dnf install -y curl zsh
+sudo dnf install -y zsh curl ripgrep
 curl -fsSL https://raw.github.com/QuocAnhVu/dotfiles/master/install.sh | zsh
 cd ~/.local/share/dotfiles
 ./install_langs.sh
