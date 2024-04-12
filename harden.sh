@@ -1,6 +1,8 @@
 #! /usr/bin/zsh
 source $(dirname $0)/_lib.sh
 
+DOTFILES=$(dirname $0)
+
 # https://stribika.github.io/2015/01/04/secure-secure-shell.html
 context 'Setting up dotfiles directory'
 run mkdir -p $HOME/.ssh
@@ -23,7 +25,7 @@ case "$response" in
             else
                 message 'Authorized key detected' $key
             fi
-        done < $HOME/.ssh/authorized_keys
+        done < $DOTFILES/.ssh/authorized_keys
         ;;
     *)
         message 'Skipping access grant to @quocanh'
@@ -97,13 +99,13 @@ context 'Configuring ssh with hardened config'
 if [ -f /etc/ssh/ssh_config ]; then
     run sudo mv /etc/ssh/ssh_config /etc/ssh/ssh_config.orig
 fi
-run sudo cp $(dirname $0)/.ssh/ssh_config.default /etc/ssh/ssh_config
+run sudo cp $DOTFILES/.ssh/ssh_config.default /etc/ssh/ssh_config
 
 context 'Configuring sshd with hardened config'
 if [ -f /etc/ssh/sshd_config ]; then
     run sudo mv /etc/ssh/sshd_config /etc/ssh/sshd_config.orig
 fi
-run sudo cp $(dirname $0)/.ssh/sshd_config.default /etc/ssh/sshd_config
+run sudo cp $DOTFILES/.ssh/sshd_config.default /etc/ssh/sshd_config
 
 context 'Generating custom moduli... this may take a while'
 function cleanup {
