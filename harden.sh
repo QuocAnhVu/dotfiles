@@ -19,9 +19,9 @@ case "$response" in
         else
             message 'Authorized keys file detected'
         fi
-        while read key; do
-            if ! grep -qF "$key" $HOME/.ssh/authorized_keys; then
-                run 'echo "$key" >> $HOME/.ssh/authorized_keys'
+        while read key ; do
+            if ! rg -qF $key $HOME/.ssh/authorized_keys ; then
+                run echo $key >> $HOME/.ssh/authorized_keys
             else
                 message 'Authorized key detected' $key
             fi
