@@ -24,18 +24,16 @@ export HISTSIZE=65536
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+[[ ! -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]] || source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 # Start oh-my-zsh
 plugins=(git mise)
 ZSH_THEME="powerlevel10k/powerlevel10k"
 HIST_STAMPS="yyyy-mm-dd"
 export ZSH_COMPDUMP=$XDG_CACHE_HOME/oh-my-zsh/zcompdump-$HOST
-source $XDG_DATA_HOME/oh-my-zsh/oh-my-zsh.sh
+[[ ! -r $XDG_DATA_HOME/oh-my-zsh/oh-my-zsh.sh ]] || source $XDG_DATA_HOME/oh-my-zsh/oh-my-zsh.sh
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 POWERLEVEL9K_CONFIG_FILE=$XDG_CONFIG_HOME/powerlevel10k/config.zsh
-[[ ! -f $XDG_CONFIG_HOME/powerlevel10k/config.zsh ]] || source $XDG_CONFIG_HOME/powerlevel10k/config.zsh
+[[ ! -r $XDG_CONFIG_HOME/powerlevel10k/config.zsh ]] || source $XDG_CONFIG_HOME/powerlevel10k/config.zsh
 # Custom functions in ~/.zsh_functions
 fpath+=${ZDOTDIR:-~}/.zsh_functions
 
@@ -45,4 +43,4 @@ alias vi=nvim
 alias sprunge="curl -F 'sprunge=<-' http://sprunge.us"
 
 # Local (untracked) config
-source $XDG_CONFIG_HOME/localrc
+[[ ! -r $XDG_CONFIG_HOME/localrc ]] || source $XDG_CONFIG_HOME/localrc
