@@ -35,3 +35,22 @@ nvim \
 ```shell
 curl -fsSL https://tailscale.com/install.sh | sh
 ```
+
+## Switch from grub2 to systemd-boot
+
+```shell
+# Remove grub2, install systemd-boot
+sudo mkdir /boot/efi/$(cat /etc/machine-id)
+sudo rm /etc/dnf/protected.d/grub* /etc/dnf/protected.d/shim*
+sudo dnf remove -y grubby grub2\* && sudo rm -rf /boot/grub2 && sudo rm -rf /boot/loader
+sudo dnf install -y systemd-boot-unsigned sdubby
+
+# Reconfigure kernel
+cat /proc/cmdline | cut -d ' ' -f 2- | sudo tee /etc/kernel/cmdline
+sudo bootctl install
+sudo kernel-install add $(uname -r) /lib/modules/$(uname -r)/vmlinuz
+sudo dnf reinstall kernel-core
+
+# Test config
+sudo bootctl
+```
