@@ -1,0 +1,5 @@
+- [ ] ~/bin
+- [ ] ~/Documents ~/Pictures ~/Music ~/Desktop ~/Public ~/Videos ~/Templates
+- [ ] ~/Downloads
+- [ ] ~/ws
+- [ ] ~/.ssh
