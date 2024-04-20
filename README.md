@@ -29,3 +29,9 @@ nvim \
     -c 'TSInstall all' \
     -c 'qa!'
 ```
+
+## Install Tailscale
+
+```shell
+curl -fsSL https://tailscale.com/install.sh | sh
+```
