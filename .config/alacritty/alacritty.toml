@@ -55,10 +55,10 @@ cursor = "#d8dee9"
 text = "#2e3440"
 
 [font]
-size = 12
+size = 8
 
 [font.normal]
-family = "UbuntuMono Nerd Font"
+family = "JetBrainsMono Nerd Font"
 
 [shell]
 args = ["-l", "-c", "SHELL=/usr/bin/zsh tmux new -A -s bare"]
