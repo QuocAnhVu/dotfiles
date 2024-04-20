@@ -2,7 +2,7 @@
 
 ```shell
 sudo dnf update -y
-sudo dnf install -y zsh ripgrep
+sudo dnf install -y zsh git ripgrep
 
 XDG_DATA_HOME=$HOME/.local/share
 mkdir -p $XDG_DATA_HOME/dotfiles
