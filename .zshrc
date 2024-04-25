@@ -16,6 +16,7 @@ export AWS_CONFIG_FILE="$XDG_CONFIG_HOME/aws/config"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 export LESSHISTFILE="$XDG_STATE_HOME/less/history"
 export NODE_REPL_HISTORY="$XDG_STATE_HOME/node_repl_history"
+export __GL_SHADER_DISK_CACHE_PATH="$XDG_CACHE_HOME/nv"
 alias wget=wget --hsts-file="$XDG_STATE_HOME/wget-hsts" 
 
 # Zsh Customization
