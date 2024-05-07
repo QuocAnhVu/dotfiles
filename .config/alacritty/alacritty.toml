@@ -61,8 +61,12 @@ size = 8
 family = "JetBrainsMono Nerd Font"
 
 [shell]
-args = ["-l", "-c", "SHELL=/usr/bin/zsh tmux new -A -s bare"]
+# program = "/usr/bin/zsh"
+# args = ["-l", "-c", "SHELL=/usr/bin/zsh tmux new -A -s bare"]
 program = "/usr/bin/zsh"
+args = ["-i", "-c", "/home/quocanh/.local/share/cargo/bin/zellij options --default-shell /home/quocanh/.local/share/cargo/bin/nu"]
+# program = "/home/quocanh/.local/share/cargo/bin/zellij"
+# args = ["options", "--default-shell", "/home/quocanh/.local/share/cargo/bin/nu"]
 
 [window]
 decorations = 'None'

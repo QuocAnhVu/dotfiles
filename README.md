@@ -35,3 +35,10 @@ nvim \
 ```shell
 curl -fsSL https://tailscale.com/install.sh | sh
 ```
+
+## Install apps
+
+```shell
+sudo dnf install alacritty
+cargo install nu starship zellij
+```
