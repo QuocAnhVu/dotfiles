@@ -19,11 +19,11 @@ run touch $XDG_CONFIG_HOME/localrc
 context 'Installing packages'
 if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
     run sudo dnf update -y
-    run sudo dnf install -y curl git tmux neovim fd-find
+    run sudo dnf install -y curl git neovim fd-find
 elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
     run sudo apt update
     run sudo apt upgrade -y
-    run sudo apt install -y curl git tmux neovim fd-find
+    run sudo apt install -y curl git neovim fd-find
 fi
 
 context 'Uninstalling cockpit'
