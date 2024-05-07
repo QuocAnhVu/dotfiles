@@ -42,3 +42,7 @@ curl -fsSL https://tailscale.com/install.sh | sh
 sudo dnf install alacritty
 cargo install nu starship zellij
 ```
+
+## Swap caps:escape
+
+Follow instructions for your desktop environment.
