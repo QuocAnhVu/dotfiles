@@ -7,13 +7,9 @@ run mkdir -p $XDG_CACHE_HOME
 run mkdir -p $XDG_DATA_HOME
 run mkdir -p $XDG_STATE_HOME
 
-# context 'Removing old config files'
-# run rm -rf ~/.zshrc ~/.tmux.conf ~/.config/tmux ~/.profile ~/.p10k.zsh ~/.config/alacritty ~/.config/i3 ~/.config/nvim ~/.config/polybar ~/.config/powerlevel10k ~/.config/sway ~/.config/waybar ~/.asdf ~/.config/dotfiles
-
 context 'Symlinking config files'
 run ln -s $XDG_DATA_HOME/dotfiles/.config/* $HOME/.config/
 run ln -s $XDG_DATA_HOME/dotfiles/.zshrc $HOME/
-run ln -s $XDG_DATA_HOME/dotfiles/.profile $HOME/
 
 context 'Creating prerequisite directories'
 run mkdir -p $HOME/ws
@@ -52,24 +48,3 @@ context 'Installing shell customizations: oh-my-zsh and powerlevel10k'
 run git clone https://github.com/ohmyzsh/ohmyzsh.git $XDG_DATA_HOME/oh-my-zsh
 # https://github.com/romkatv/powerlevel10k#oh-my-zsh
 run git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $XDG_DATA_HOME/oh-my-zsh/custom/themes/powerlevel10k
-
-context 'Installing tmux customizations: tpm'
-message 'Run <prefix>-I in tmux to install plugins!'
-run git clone https://github.com/tmux-plugins/tpm $XDG_DATA_HOME/tmux/plugins/tpm
-
-# context 'Installing font: UbuntuMono Nerd Font'
-# if rg --quiet 'Ubuntu|Debian' /etc/os-release; then
-#     run sudo apt install -y fontconfig
-# fi
-# if ! fc-list | grep 'UbuntuMono Nerd Font' > /dev/null ; then
-#     # https://github.com/ryanoasis/nerd-fonts#option-6-ad-hoc-curl-download
-#     run git clone --filter=blob:none --sparse https://github.com/ryanoasis/nerd-fonts.git $XDG_CACHE_HOME/nerd-fonts
-#     # https://github.com/ryanoasis/nerd-fonts#option-3-install-script
-#     run pushd $XDG_CACHE_HOME/nerd-fonts
-#     run git sparse-checkout add patched-fonts/UbuntuMono
-#     run ./install.sh UbuntuMono
-#     run popd
-#     run rm -rf $XDG_CACHE_HOME/nerd-fonts
-# else
-#     message 'UbuntuMono Nerd Font detected - no installation needed.'
-# fi
