@@ -39,10 +39,32 @@ curl -fsSL https://tailscale.com/install.sh | sh
 ## Install apps
 
 ```shell
-sudo dnf install alacritty
+sudo dnf install alacritty fzf xxd
 cargo install nu starship zellij
+go install github.com/boyter/scc@master
+go install github.com/charmbracelet/glow@latest
+npm install -g tldr
 ```
 
 ## Swap caps:escape
 
 Follow instructions for your desktop environment.
+
+## Install fonts
+
+```shell
+git clone --filter=blob:none git@github.com:ryanoasis/nerd-fonts
+cd nerd-fonts
+```
+
+### Install one font:
+
+```shell
+git sparse-checkout add patched-fonts/JetBrainsMono
+```
+
+### Install all fonts:
+
+```shell
+./install.sh
+```
