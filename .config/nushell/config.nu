@@ -869,3 +869,5 @@ alias l = ls -al
 alias vi = nvim
 
 use ~/.cache/starship/init.nu
+
+source ~/.local/share/atuin/init.nu
