@@ -271,7 +271,25 @@ require('lazy').setup({
 	{
 		'nvim-telescope/telescope.nvim',
 		tag = '0.1.6',
-		dependencies = { 'nvim-lua/plenary.nvim' },
+		dependencies = {
+			{     -- If encountering errors, see telescope-fzf-native README for installation instructions
+				'nvim-telescope/telescope-fzf-native.nvim',
+
+				-- `build` is used to run some command when the plugin is installed/updated.
+				-- This is only run then, not every time Neovim starts up.
+				build = 'make',
+
+				-- `cond` is a condition used to determine whether this plugin should be
+				-- installed and loaded.
+				cond = function()
+					return vim.fn.executable 'make' == 1
+				end,
+			},
+			'nvim-lua/plenary.nvim',
+			'nvim-telescope/telescope-ui-select.nvim',
+			{ 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+
+		},
 		config = function()
 			require('telescope').setup({
 				pickers = {
@@ -285,8 +303,17 @@ require('lazy').setup({
 							'--glob', '!**/node%_modules/*',
 						},
 					}
-				}
+				},
+				extensions = {
+					['ui-select'] = {
+						require('telescope.themes').get_dropdown(),
+					},
+				},
 			})
+
+			pcall(require('telescope').load_extension, 'fzf')
+			pcall(require('telescope').load_extension, 'ui-select')
+
 			local builtin = require('telescope.builtin')
 			vim.keymap.set('n', 'ff', builtin.find_files, {})
 			vim.keymap.set('n', 'fg', builtin.live_grep, {})
@@ -313,11 +340,11 @@ require('lazy').setup({
 				},
 				-- you can enable a preset for easier configuration
 				presets = {
-					bottom_search = true, -- use a classic bottom cmdline for search
-					command_palette = true, -- position the cmdline and popupmenu together
+					bottom_search = true,    -- use a classic bottom cmdline for search
+					command_palette = true,  -- position the cmdline and popupmenu together
 					long_message_to_split = true, -- long messages will be sent to a split
-					inc_rename = false, -- enables an input dialog for inc-rename.nvim
-					lsp_doc_border = true, -- add a border to hover docs and signature help
+					inc_rename = false,      -- enables an input dialog for inc-rename.nvim
+					lsp_doc_border = true,   -- add a border to hover docs and signature help
 				},
 			})
 		end
@@ -337,7 +364,6 @@ require('lazy').setup({
 			},
 		},
 	},
-	'sheerun/vim-polyglot',
 	{
 		'nvim-treesitter/nvim-treesitter',
 		build = ':TSUpdate',
@@ -360,10 +386,10 @@ require('lazy').setup({
 			end, { silent = true })
 		end
 	},
-	--    {
-	--        'nvim-treesitter/nvim-treesitter-textobjects',
-	--		dependencies = { 'nvim-treesitter/nvim-treesitter' },
-	--    },
+	{
+		'nvim-treesitter/nvim-treesitter-textobjects',
+		dependencies = { 'nvim-treesitter/nvim-treesitter' },
+	},
 	'williamboman/mason.nvim',
 	{
 		'williamboman/mason-lspconfig.nvim',
@@ -535,13 +561,13 @@ require('lazy').setup({
 		config = function()
 			require("gx").setup {
 				handlers = {
-					plugin = true, -- open plugin links in lua (e.g. packer, lazy, ..)
-					github = true, -- open github issues
-					brewfile = true, -- open Homebrew formulaes and casks
+					plugin = true,       -- open plugin links in lua (e.g. packer, lazy, ..)
+					github = true,       -- open github issues
+					brewfile = true,     -- open Homebrew formulaes and casks
 					package_json = true, -- open dependencies from package.json
-					search = true, -- search the web/selection on the web if nothing else is found
-					rust = {   -- custom handler to open rust's cargo packages
-						name = "rust", -- set name of handler
+					search = true,       -- search the web/selection on the web if nothing else is found
+					rust = {             -- custom handler to open rust's cargo packages
+						name = "rust",     -- set name of handler
 						filetype = { "toml" }, -- you can also set the required filetype for this handler
 						filename = "Cargo.toml", -- or the necessary filename
 						handle = function(mode, line, _)
