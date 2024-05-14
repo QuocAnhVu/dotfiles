@@ -31,6 +31,7 @@ plugins=(git mise)
 ZSH_THEME="powerlevel10k/powerlevel10k"
 HIST_STAMPS="yyyy-mm-dd"
 export ZSH_COMPDUMP=$XDG_CACHE_HOME/oh-my-zsh/zcompdump-$HOST
+DISABLE_AUTO_UPDATE=true
 [[ ! -r $XDG_DATA_HOME/oh-my-zsh/oh-my-zsh.sh ]] || source $XDG_DATA_HOME/oh-my-zsh/oh-my-zsh.sh
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 POWERLEVEL9K_CONFIG_FILE=$XDG_CONFIG_HOME/powerlevel10k/config.zsh
