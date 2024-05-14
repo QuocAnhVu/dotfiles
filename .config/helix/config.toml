@@ -1,0 +1,135 @@
+theme = "nord"
+
+[editor]
+line-number = "relative"
+color-modes = true
+
+[editor.statusline]
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"
+
+[editor.cursor-shape]
+normal = "block"
+insert = "bar"
+select = "underline"
+
+[editor.file-picker]
+hidden = true
+git-ignore = true
+
+[keys.normal."C-w"]
+"_" = "hsplit"
+"|" = "vsplit"
+"x" = "wclose"
+"C-x" = "wclose"
+"q" = "no_op"
+"C-q" = "no_op"
+
+[keys.normal]
+# Jump panes
+"C-h" = "jump_view_left"
+"C-j" = "jump_view_down"
+"C-k" = "jump_view_up"
+"C-l" = "jump_view_right"
+"C-x" = "wclose"
+
+# Consistent Helix
+X = "extend_line_above"
+"A-S" = "split_selection_on_newline"
+
+# Un-Alt Helix
+"C-p" = "select_prev_sibling"
+"C-n" = "select_next_sibling"
+"(" = "expand_selection"
+")" = "shrink_selection"
+"C-left" = "rotate_selections_backward"
+"C-right" = "rotate_selections_forward"
+"C-down" = "rotate_selection_contents_backward"
+"C-up" = "rotate_selection_contents_forward"
+
+# Muscle memory
+"{" = ["goto_prev_paragraph"]
+"}" = ["goto_next_paragraph"]
+# "%" = ["select_mode", "match_brackets", "normal_mode"]
+0 = ["select_mode", "goto_line_start", "normal_mode"]
+"^" = ["select_mode", "goto_first_nonwhitespace", "normal_mode"]
+"$" = ["select_mode", "goto_line_end", "normal_mode"]
+G = ["select_mode", "goto_file_end", "normal_mode"]
+# V = ["select_mode", "extend_to_line_bounds"]
+
+# # Clipboards over registers ye ye
+# # Would be nice to add ya and yi, but the surround commands can't be chained
+# y = ["yank_main_selection_to_clipboard"]
+# Y = ["save_selection", "extend_to_line_bounds", "yank_main_selection_to_clipboard", "collapse_selection", "jump_backward"]
+Y = ["save_selection", "extend_to_line_bounds", "yank", "collapse_selection", "jump_backward"]
+# d = ["yank_main_selection_to_clipboard", "delete_selection"]
+# D = ["goto_line_start", "extend_to_line_bounds", "yank_main_selection_to_clipboard", "delete_selection"]
+D = ["extend_to_line_bounds", "delete_selection", "normal_mode"]
+# # D = ["extend_to_line_end", "yank_main_selection_to_clipboard", "delete_selection"]
+# # C = ["extend_to_line_end", "yank_main_selection_to_clipboard", "change_selection"]
+# p = ["paste_clipboard_after"]
+# P = ["paste_clipboard_before"]
+# R = ["replace_selections_with_clipboard"]
+
+# Escape the madness! No more fighting with the cursor! Or with multiple cursors!
+esc = ["collapse_selection", "keep_primary_selection"]
+
+[keys.insert]
+"C-c" = "completion"
+
+# Jump panes
+"C-h" = "jump_view_left"
+"C-j" = "jump_view_down"
+"C-k" = "jump_view_up"
+"C-l" = "jump_view_right"
+"C-x" = "wclose"
+
+# Escape the madness! No more fighting with the cursor! Or with multiple cursors!
+esc = ["collapse_selection", "normal_mode"]
+
+[keys.select]
+# Jump panes
+"C-h" = "jump_view_left"
+"C-j" = "jump_view_down"
+"C-k" = "jump_view_up"
+"C-l" = "jump_view_right"
+"C-x" = "wclose"
+
+# Consistent Helix
+X = "extend_line_above"
+"A-S" = "split_selection_on_newline"
+
+# Un-Alt Helix
+"C-p" = "select_prev_sibling"
+"C-n" = "select_next_sibling"
+"(" = "expand_selection"
+")" = "shrink_selection"
+"C-left" = "rotate_selections_backward"
+"C-right" = "rotate_selections_forward"
+"C-down" = "rotate_selection_contents_backward"
+"C-up" = "rotate_selection_contents_forward"
+
+# Muscle memory
+"{" = ["extend_to_line_bounds", "goto_prev_paragraph"]
+"}" = ["extend_to_line_bounds", "goto_next_paragraph"]
+# "%" = ["match_brackets"]
+0 = ["goto_line_start"]
+"^" = ["goto_first_nonwhitespace"]
+"$" = ["goto_line_end"]
+G = ["goto_file_end"]
+
+# # Clipboards over registers ye ye
+# y = ["yank_main_selection_to_clipboard"]
+# Y = ["save_selection", "extend_to_line_bounds", "yank_main_selection_to_clipboard", "jump_backward"]
+Y = ["save_selection", "extend_to_line_bounds", "yank", "collapse_selection", "jump_backward"]
+# d = ["yank_main_selection_to_clipboard", "delete_selection"]
+# D = ["extend_to_line_bounds", "yank_main_selection_to_clipboard", "delete_selection", "normal_mode"]
+D = ["extend_to_line_bounds", "delete_selection", "normal_mode"]
+# # C = ["goto_line_start", "extend_to_line_bounds", "yank_main_selection_to_clipboard", "change_selection"]
+# p = ["replace_selections_with_clipboard"] # No life without this
+# P = ["paste_clipboard_before"]
+# R = ["replace_selections_with_clipboard"]
+
+# Escape the madness! No more fighting with the cursor! Or with multiple cursors!
+esc = ["collapse_selection", "keep_primary_selection", "normal_mode"]

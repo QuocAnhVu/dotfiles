@@ -865,6 +865,8 @@ $env.config = {
     ]
 }
 
+$env.EDITOR = "hx"
+
 alias l = ls -al
 alias vi = nvim
 alias pn = pnpm
