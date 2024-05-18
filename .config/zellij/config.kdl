@@ -21,7 +21,7 @@ keybinds clear-defaults=true {
         bind "-" { Resize "Decrease"; }
     }
     pane {
-        bind "Alt p" { SwitchToMode "Normal"; }
+        bind "Alt w" { SwitchToMode "Normal"; }
         bind "h" "Left" { MoveFocus "Left"; }
         bind "l" "Right" { MoveFocus "Right"; }
         bind "j" "Down" { MoveFocus "Down"; }
@@ -173,7 +173,7 @@ keybinds clear-defaults=true {
         bind "Enter" "Esc" { SwitchToMode "Normal"; }
     }
     shared_except "pane" "locked" {
-        bind "Alt p" { SwitchToMode "Pane"; }
+        bind "Alt w" { SwitchToMode "Pane"; }
     }
     shared_except "resize" "locked" {
         bind "Alt r" { SwitchToMode "Resize"; }
