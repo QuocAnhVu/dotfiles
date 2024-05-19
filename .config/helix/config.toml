@@ -3,6 +3,7 @@ theme = "nord"
 [editor]
 line-number = "relative"
 color-modes = true
+true-color = true
 
 [editor.lsp]
 display-messages = true
@@ -19,7 +20,7 @@ insert = "bar"
 select = "underline"
 
 [editor.file-picker]
-hidden = true
+hidden = false
 git-ignore = true
 
 [keys.normal."C-w"]
