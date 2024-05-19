@@ -59,7 +59,7 @@ X = "extend_line_above"
 0 = ["select_mode", "goto_line_start", "normal_mode"]
 "^" = ["select_mode", "goto_first_nonwhitespace", "normal_mode"]
 "$" = ["select_mode", "goto_line_end", "normal_mode"]
-G = ["select_mode", "goto_file_end", "normal_mode"]
+# G = ["select_mode", "goto_file_end", "normal_mode"]
 # V = ["select_mode", "extend_to_line_bounds"]
 
 # # Clipboards over registers ye ye
@@ -119,7 +119,7 @@ X = "extend_line_above"
 0 = ["goto_line_start"]
 "^" = ["goto_first_nonwhitespace"]
 "$" = ["goto_line_end"]
-G = ["goto_file_end"]
+# G = ["goto_file_end"]
 
 # # Clipboards over registers ye ye
 # y = ["yank_main_selection_to_clipboard"]
