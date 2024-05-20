@@ -18,6 +18,7 @@ export LESSHISTFILE="$XDG_STATE_HOME/less/history"
 export NODE_REPL_HISTORY="$XDG_STATE_HOME/node_repl_history"
 export __GL_SHADER_DISK_CACHE_PATH="$XDG_CACHE_HOME/nv"
 alias wget=wget --hsts-file="$XDG_STATE_HOME/wget-hsts" 
+export JUPYTER_CONFIG_DIR="$XDG_CONFIG_HOME/jupyter"
 
 # Zsh Customization
 export HISTFILE="$XDG_STATE_HOME/zsh/history"
