@@ -1,6 +1,16 @@
 [[language]]
 name = "python"
-roots = ["pyproject.toml", "setup.py", "Poetry.lock", ".git"]
-language-servers = [ "pyright"]
-auto-format = true
-formatter = {command = 'black', args = ["--quiet", "-"]}
+language-servers = [ "pyright", "ruff" ]
+
+[language-server.pyright.config.python.analysis]
+typeCheckingMode = "basic"
+
+[language-server.ruff]
+command = "ruff-lsp"
+
+[language-server.ruff.config.settings]
+args = ["--ignore", "E501"]
+
+[language.formatter]
+command = "black"
+args = ["--line-length", "88", "--quiet", "-"]
