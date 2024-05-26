@@ -43,7 +43,6 @@ POWERLEVEL9K_CONFIG_FILE=$XDG_CONFIG_HOME/powerlevel10k/config.zsh
 # Aliases
 export EDITOR=nvim
 alias vi=nvim
-alias sprunge="curl -F 'sprunge=<-' http://sprunge.us"
 
 # Local (untracked) config
 [[ ! -r $XDG_CONFIG_HOME/localrc ]] || source $XDG_CONFIG_HOME/localrc
