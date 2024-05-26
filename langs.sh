@@ -40,6 +40,11 @@ if ! mise current python | rg '\d+\.\d+\.\d+' ; then
     fi
     context 'Installing python with mise'
     run mise use -g python@3.11
+    message 'Appending $localrc.'
+    run unique_append $localrc << "END"
+# Python
+export PYTHON_HISTORY="$XDG_CACHE_HOME/python_history"
+END
 else
     message 'Python detected. No need to install.'
 fi
@@ -57,25 +62,36 @@ if ! mise current node | rg '\d+\.\d+\.\d+' ; then
     fi
     context 'Installing nodejs with mise'
     run mise use -g node@lts
+    context 'Switching to pnpm'
+    run corepack enable pnpm
+    message 'Appending $localrc.'
+    run unique_append $localrc << "END"
+# NodeJS
+alias pn = pnpm
+END
 else
     message 'NodeJS detected. No need to install.'
 fi
 
 context 'Installing Go'
 if ! mise current go | rg '\d+\.\d+\.\d+' ; then
+    context 'Installing go with mise'
+    run mise use -g go@1.21
     message 'Appending $localrc.'
     run unique_append $localrc << "END"
 # Go
 export GOPATH="$XDG_DATA_HOME/go"
 export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 END
-    run mise use -g go@1.21
 else
     message 'Go detected. No need to install.'
 fi
 
 context 'Installing Rust'
 if ! rustc --version | rg '\d+\.\d+\.\d+' ; then
+    context 'Installing rust with rustup'
+    run_noeval 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh'
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --no-modify-path
     message 'Appending $localrc.'
     run unique_append $localrc << "END"
 # Rust
@@ -83,8 +99,6 @@ export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 export PATH="$CARGO_HOME/bin":$PATH
 END
-    run_noeval 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh'
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --no-modify-path
 else
     message 'Rust detected. No need to install.'
 fi
