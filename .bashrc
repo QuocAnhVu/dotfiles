@@ -44,5 +44,9 @@ export NODE_REPL_HISTORY="$XDG_STATE_HOME/node_repl_history"
 alias wget=wget --hsts-file="$XDG_STATE_HOME/wget-hsts" 
 export CUDA_CACHE_PATH="$XDG_CACHE_HOME/nv"
 
+# Set default editor to nvim
+export EDITOR=nvim
+alias vi=nvim
+
 # Local (untracked) config
 [[ ! -r $XDG_CONFIG_HOME/localrc ]] || source $XDG_CONFIG_HOME/localrc

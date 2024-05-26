@@ -40,7 +40,7 @@ DISABLE_AUTO_UPDATE=true
 POWERLEVEL9K_CONFIG_FILE=$XDG_CONFIG_HOME/powerlevel10k/config.zsh
 [[ ! -r $XDG_CONFIG_HOME/powerlevel10k/config.zsh ]] || source $XDG_CONFIG_HOME/powerlevel10k/config.zsh
 
-# Aliases
+# Set default editor to nvim
 export EDITOR=nvim
 alias vi=nvim
 
