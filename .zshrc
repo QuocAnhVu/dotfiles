@@ -11,6 +11,7 @@ fpath+=${ZDOTDIR:-~}/.zsh_functions
 
 # Customize history
 export HISTFILE="$XDG_STATE_HOME/zsh/history"
+export HISTFILESIZE=65536
 export HISTSIZE=65536
 
 # XDG Basedir

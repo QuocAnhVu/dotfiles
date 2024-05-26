@@ -20,7 +20,7 @@ fi
 message 'Appending $localrc.'
 run unique_append $localrc << "END"
 # mise-en-place version manager
-eval "$(mise activate zsh)"
+eval "$(mise activate $(basename $SHELL))"
 END
 
 context 'Installing Python'

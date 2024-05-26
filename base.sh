@@ -9,10 +9,12 @@ run mkdir -p $XDG_STATE_HOME
 
 context 'Symlinking config files'
 run ln -s $XDG_DATA_HOME/dotfiles/.config/* $HOME/.config/
-run ln -s $XDG_DATA_HOME/dotfiles/.zshrc $HOME/
+run "rm $HOME/.bashrc > /dev/null; ln -s $XDG_DATA_HOME/dotfiles/.bashrc $HOME/"
+run "rm $HOME/.zshrc > /dev/null; ln -s $XDG_DATA_HOME/dotfiles/.zshrc $HOME/"
 
 context 'Creating prerequisite directories'
 run mkdir -p $HOME/ws
+run mkdir -p $XDG_STATE_HOME/bash # for bash_history
 run mkdir -p $XDG_STATE_HOME/zsh  # for zsh_history
 run touch $XDG_CONFIG_HOME/localrc
 
