@@ -39,7 +39,7 @@ if ! mise current python | rg '\d+\.\d+\.\d+' ; then
         message 'Installing python build dependencies failed.'
     fi
     context 'Installing python with mise'
-    run mise use -g python@3.11
+    run mise use -g python@3
     message 'Appending $localrc.'
     run unique_append $localrc << "END"
 # Python
