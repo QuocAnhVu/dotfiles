@@ -871,6 +871,9 @@ alias l = ls -al
 alias vi = nvim
 alias pn = pnpm
 
-use ~/.cache/starship/init.nu
-
-source ~/.local/share/atuin/init.nu
+if (which starship | is-not-empty) {
+    use ~/.cache/starship/init.nu
+}
+if (which atuin | is-not-empty) {
+    source ~/.local/share/atuin/init.nu
+}
