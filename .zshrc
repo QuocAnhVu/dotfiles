@@ -29,16 +29,8 @@ export NODE_REPL_HISTORY="$XDG_STATE_HOME/node_repl_history"
 alias wget=wget --hsts-file="$XDG_STATE_HOME/wget-hsts" 
 export CUDA_CACHE_PATH="$XDG_CACHE_HOME/nv"
 
-# oh-my-zsh + Powerlevel10k
-[[ ! -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]] || source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-plugins=(git mise)
-ZSH_THEME="powerlevel10k/powerlevel10k"
-HIST_STAMPS="yyyy-mm-dd"
-export ZSH_COMPDUMP=$XDG_CACHE_HOME/oh-my-zsh/zcompdump-$HOST
-DISABLE_AUTO_UPDATE=true
-[[ ! -r $XDG_DATA_HOME/oh-my-zsh/oh-my-zsh.sh ]] || source $XDG_DATA_HOME/oh-my-zsh/oh-my-zsh.sh
-POWERLEVEL9K_CONFIG_FILE=$XDG_CONFIG_HOME/powerlevel10k/config.zsh
-[[ ! -r $XDG_CONFIG_HOME/powerlevel10k/config.zsh ]] || source $XDG_CONFIG_HOME/powerlevel10k/config.zsh
+# Customize prompt with Starship
+(! command -v starship > /dev/null) || eval "$(starship init $(basename $SHELL))"
 
 # Set default editor to nvim
 export EDITOR=nvim

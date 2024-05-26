@@ -44,9 +44,3 @@ elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
     sudo apt install unattended-upgrades
     sudo dpkg-reconfigure --priority=low unattended-upgrades
 fi
-
-context 'Installing shell customizations: oh-my-zsh and powerlevel10k'
-# https://github.com/ohmyzsh/ohmyzsh#advanced-installation
-run git clone https://github.com/ohmyzsh/ohmyzsh.git $XDG_DATA_HOME/oh-my-zsh
-# https://github.com/romkatv/powerlevel10k#oh-my-zsh
-run git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $XDG_DATA_HOME/oh-my-zsh/custom/themes/powerlevel10k
