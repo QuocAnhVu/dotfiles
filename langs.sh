@@ -43,7 +43,7 @@ if ! mise current python | rg '\d+\.\d+\.\d+' ; then
     message 'Appending $localrc.'
     run unique_append $localrc << "END"
 # Python
-export PYTHON_HISTORY="$XDG_CACHE_HOME/python_history"
+export PYTHON_HISTORY="$XDG_STATE_HOME/python_history"
 END
 else
     message 'Python detected. No need to install.'
