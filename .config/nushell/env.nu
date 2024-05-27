@@ -45,9 +45,11 @@ $env.NU_PLUGIN_DIRS = [
 
 # Setup prompt (preferably Starship)
 if (which starship | is-not-empty) {
-    mkdir ~/.cache/starship
-    starship init nu | save -f ~/.cache/starship/init.nu
-    $env.TRANSIENT_PROMPT_COMMAND = {|| "❯ " }
+    if ("~/.cache/starship/init.nu" | path exists) {
+        mkdir ~/.cache/starship
+        starship init nu | save -f ~/.cache/starship/init.nu
+        $env.TRANSIENT_PROMPT_COMMAND = {|| "❯ " }
+    }
 } else {
     def create_left_prompt [] {
         let dir = match (do --ignore-shell-errors { $env.PWD | path relative-to $nu.home-path }) {
