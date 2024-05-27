@@ -62,7 +62,7 @@ family = "JetBrainsMono Nerd Font"
 
 [shell]
 # program = "/usr/bin/zsh"
-# args = ["-l", "-c", "SHELL=/usr/bin/zsh tmux new -A -s bare"]
+# args = ["-i", "-c", "zellij"]
 program = "/usr/bin/zsh"
 args = ["-i", "-c", "/home/quocanh/.local/share/cargo/bin/zellij options --default-shell /home/quocanh/.local/share/cargo/bin/nu"]
 # program = "/home/quocanh/.local/share/cargo/bin/zellij"
