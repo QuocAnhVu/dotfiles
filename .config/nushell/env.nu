@@ -105,9 +105,3 @@ if (which starship | is-not-empty) {
     $env.TRANSIENT_PROMPT_MULTILINE_INDICATOR = {|| "" }
     $env.TRANSIENT_PROMPT_COMMAND_RIGHT = {|| "" }
 }
-
-# Setup history with Atuin
-if ((which atuin | is-not-empty) and not ($"($env.XDG_DATA_HOME)/atuin" | path exists)) {
-    mkdir $"($env.XDG_DATA_HOME)/atuin"
-    atuin init nu | save $"($env.XDG_DATA_HOME)/atuin/init.nu"
-}
