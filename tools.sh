@@ -43,15 +43,19 @@ run pushd rust-analyzer
 run cargo xtask install --server
 run popd
 
-message "Go: gopls"
-run go install -v golang.org/x/tools/gopls@latest
+message "Go: gopls (LSP) + delve (debugger) + goimports (formatter)"
+go install golang.org/x/tools/gopls@latest          # LSP
+go install github.com/go-delve/delve/cmd/dlv@latest # Debugger
+go install golang.org/x/tools/cmd/goimports@latest  # Formatter
 
 message "Javascript/Typescript: typescript-language-server"
-pnpm install -g typescript-language-server typescript
+run pnpm install -g typescript-language-server typescript
 message "SvelteJS: svelte-language-tools"
-pnpm install -g svelte-language-server typescript-svelte-plugin
-message "TailwindCSS"
-pnpm install -g @tailwindcss/language-server
+run pnpm install -g svelte-language-server typescript-svelte-plugin
+message "TailwindCSS: tailwindcss-ls"
+run pnpm install -g @tailwindcss/language-server
+message "HTML+JSON: vscode-langservers-extracted"
+run pnpm install -g vscode-langservers-extracted
 
 message "Python: pyright (autocompletion) + ruff (linter) + black (formatting)"
 pip install --user pyright ruff black
@@ -63,7 +67,7 @@ run sh make.sh
 run popd
 
 message "TOML: taplo"
-run cargo install taplo-cli
+run cargo install taplo-cli --features lsp
 
 message "WGSL: wgsl_analyzer"
 run cargo install --git https://github.com/wgsl-analyzer/wgsl-analyzer wgsl_analyzer
