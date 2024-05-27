@@ -915,3 +915,6 @@ alias pn = pnpm
 if (which starship | is-not-empty) {
     use ~/.cache/starship/init.nu
 }
+if (which mise | is-not-empty) {
+    use ~/.cache/mise/init.nu
+}

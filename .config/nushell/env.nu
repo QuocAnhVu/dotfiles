@@ -105,3 +105,9 @@ if (which starship | is-not-empty) {
     $env.TRANSIENT_PROMPT_MULTILINE_INDICATOR = {|| "" }
     $env.TRANSIENT_PROMPT_COMMAND_RIGHT = {|| "" }
 }
+
+# Setup mise-en-place
+if ((which mise | is-not-empty) and not ("~/.cache/mise/init.nu" | path exists)) {
+    mkdir ~/.cache/mise
+    mise activate nu | save ~/.cache/mise/init.nu
+}
