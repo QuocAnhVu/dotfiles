@@ -48,16 +48,13 @@ run go install -v golang.org/x/tools/gopls@latest
 
 message "Javascript/Typescript: typescript-language-server"
 pnpm install -g typescript-language-server typescript
+message "SvelteJS: svelte-language-tools"
+pnpm install -g svelte-language-server typescript-svelte-plugin
+message "TailwindCSS"
+pnpm install -g @tailwindcss/language-server
 
 message "Python: pyright (autocompletion) + ruff (linter) + black (formatting)"
 pip install --user pyright ruff black
-
-message "SvelteJS: svelte-language-tools"
-run git clone https://github.com/sveltejs/language-tools.git svelte-language-tools
-run pushd svelte-language-tools
-run pnpm install
-run pnpm boostrap
-run popd
 
 message "Lua: lua-language-server"
 run git clone https://github.com/LuaLS/lua-language-server
