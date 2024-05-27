@@ -910,6 +910,7 @@ load-env {
 
 alias l = ls -al
 alias vi = nvim
+alias pn = pnpm
 
 if (which starship | is-not-empty) {
     use ~/.cache/starship/init.nu
