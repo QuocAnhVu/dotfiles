@@ -914,6 +914,3 @@ alias vi = nvim
 if (which starship | is-not-empty) {
     use ~/.cache/starship/init.nu
 }
-# if (which atuin | is-not-empty) {
-#     source ~/.local/share/atuin/init.nu
-# }

@@ -71,6 +71,13 @@ if ! mise current node | rg '\d+\.\d+\.\d+' ; then
     message 'Appending $localrc.'
     run unique_append $localrc << "END"
 # NodeJS
+# pnpm
+export PNPM_HOME="/home/quocanh/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
 alias pn = pnpm
 END
 else
