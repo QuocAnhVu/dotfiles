@@ -5,23 +5,27 @@ localrc="$XDG_CONFIG_HOME/localrc"
 
 # https://mise.jdx.dev/getting-started.html
 context 'Installing mise-en-place'
-if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
-    run sudo dnf install -y dnf-plugins-core
-    run sudo dnf config-manager --add-repo https://mise.jdx.dev/rpm/mise.repo
-    run sudo dnf install -y mise
-elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
-    run apt update -y && apt install -y gpg sudo wget curl
-    run sudo install -dm 755 /etc/apt/keyrings
-    run wget -qO - https://mise.jdx.dev/gpg-key.pub | gpg --dearmor | sudo tee /etc/apt/keyrings/mise-archive-keyring.gpg 1> /dev/null
-    run echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
-    run sudo apt update
-    run sudo apt install -y mise
-fi
-message 'Appending $localrc.'
-run unique_append $localrc << "END"
+if ! mise -v; then
+    if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
+        run sudo dnf install -y dnf-plugins-core
+        run sudo dnf config-manager --add-repo https://mise.jdx.dev/rpm/mise.repo
+        run sudo dnf install -y mise
+    elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
+        run apt update -y && apt install -y gpg sudo wget curl
+        run sudo install -dm 755 /etc/apt/keyrings
+        run wget -qO - https://mise.jdx.dev/gpg-key.pub | gpg --dearmor | sudo tee /etc/apt/keyrings/mise-archive-keyring.gpg 1> /dev/null
+        run echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
+        run sudo apt update
+        run sudo apt install -y mise
+    fi
+    message 'Appending $localrc.'
+    run unique_append $localrc << "END"
 # mise-en-place version manager
 eval "$(mise activate $(basename $SHELL))"
 END
+else
+    message 'Mise detected. No need to install.'
+fi
 
 context 'Installing Python'
 if ! mise current python | rg '\d+\.\d+\.\d+' ; then
