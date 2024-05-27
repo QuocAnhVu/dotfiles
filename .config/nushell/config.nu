@@ -865,11 +865,21 @@ $env.config = {
     ]
 }
 
-$env.EDITOR = "hx"
+# Setup env variables
+load-env {
+    # XDG
+    XDG_CONFIG_HOME: $"($env.HOME)/.config"
+    XDG_CACHE_HOME: $"($env.HOME)/.cache"
+    XDG_DATA_HOME: $"($env.HOME)/.local/share"
+    XDG_STATE_HOME: $"($env.HOME)/.local/state"
+    # Editor
+    EDITOR: "hx"
+    # History
+    HISTSIZE: 65536
+}
 
 alias l = ls -al
 alias vi = nvim
-alias pn = pnpm
 
 if (which starship | is-not-empty) {
     use ~/.cache/starship/init.nu
