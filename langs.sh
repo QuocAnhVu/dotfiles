@@ -21,7 +21,7 @@ if ! mise -v; then
     message 'Appending $localrc.'
     run unique_append $localrc << "END"
 # mise-en-place version manager
-eval "$(mise activate $(basename $SHELL))"
+(! command -v mise > /dev/null) || eval "$(mise activate $(basename $SHELL))"
 END
 else
     message 'Mise detected. No need to install.'
