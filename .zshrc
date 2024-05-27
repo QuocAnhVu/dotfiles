@@ -32,6 +32,7 @@ export CUDA_CACHE_PATH="$XDG_CACHE_HOME/nv"
 # Set default editor to nvim
 export EDITOR=nvim
 alias vi=nvim
+alias l=ls -al
 
 # Local (untracked) config
 [[ ! -r $XDG_CONFIG_HOME/localrc ]] || source $XDG_CONFIG_HOME/localrc
