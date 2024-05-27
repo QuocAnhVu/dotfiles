@@ -45,7 +45,6 @@ alias wget=wget --hsts-file="$XDG_STATE_HOME/wget-hsts"
 export CUDA_CACHE_PATH="$XDG_CACHE_HOME/nv"
 
 # Customize prompt with Starship
-export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship-bash.toml"
 (! command -v starship > /dev/null) || eval "$(starship init $(basename $SHELL))"
 
 # Set default editor to nvim
