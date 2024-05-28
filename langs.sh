@@ -18,14 +18,14 @@ if ! mise -v; then
         run sudo apt update
         run sudo apt install -y mise
     fi
-    message 'Appending $localrc.'
-    run unique_append $localrc << "END"
-# mise-en-place version manager
-(! command -v mise > /dev/null) || eval "$(mise activate $(basename $SHELL))"
-END
 else
     message 'Mise detected. No need to install.'
 fi
+message 'Appending $localrc.'
+run unique_append $localrc << "END"
+# mise-en-place version manager
+(! command -v mise > /dev/null) || eval "$(mise activate $(basename $SHELL))"
+END
 
 context 'Installing Python'
 if ! mise current python | rg '\d+\.\d+\.\d+' ; then
@@ -44,14 +44,14 @@ if ! mise current python | rg '\d+\.\d+\.\d+' ; then
     fi
     context 'Installing python with mise'
     run mise use -g python@3
-    message 'Appending $localrc.'
-    run unique_append $localrc << "END"
-# Python
-export PYTHON_HISTORY="$XDG_STATE_HOME/python_history"
-END
 else
     message 'Python detected. No need to install.'
 fi
+message 'Appending $localrc.'
+run unique_append $localrc << "END"
+# Python
+export PYTHON_HISTORY="$XDG_STATE_HOME/python_history"
+END
 
 context 'Installing NodeJS'
 if ! mise current node | rg '\d+\.\d+\.\d+' ; then
@@ -68,8 +68,11 @@ if ! mise current node | rg '\d+\.\d+\.\d+' ; then
     run mise use -g node@lts
     context 'Switching to pnpm'
     run corepack enable pnpm
-    message 'Appending $localrc.'
-    run unique_append $localrc << "END"
+else
+    message 'NodeJS detected. No need to install.'
+fi
+message 'Appending $localrc.'
+run unique_append $localrc << "END"
 # NodeJS
 # pnpm
 export PNPM_HOME="/home/quocanh/.local/share/pnpm"
@@ -80,9 +83,6 @@ esac
 # pnpm end
 alias pn = pnpm
 END
-else
-    message 'NodeJS detected. No need to install.'
-fi
 
 context 'Installing Go'
 if ! mise current go | rg '\d+\.\d+\.\d+' ; then
@@ -104,12 +104,12 @@ if ! rustc --version | rg '\d+\.\d+\.\d+' ; then
     run_noeval 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh'
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --no-modify-path
     message 'Appending $localrc.'
-    run unique_append $localrc << "END"
+else
+    message 'Rust detected. No need to install.'
+fi
+run unique_append $localrc << "END"
 # Rust
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 export PATH="$CARGO_HOME/bin":$PATH
 END
-else
-    message 'Rust detected. No need to install.'
-fi
