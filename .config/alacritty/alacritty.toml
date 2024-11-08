@@ -54,13 +54,15 @@ text = "CellForeground"
 cursor = "#d8dee9"
 text = "#2e3440"
 
+[terminal]
+
 [font]
 size = 8
 
 [font.normal]
 family = "JetBrainsMono Nerd Font"
 
-[shell]
+[terminal.shell]
 # program = "/usr/bin/zsh"
 # args = ["-i", "-c", "zellij"]
 program = "/usr/bin/zsh"
