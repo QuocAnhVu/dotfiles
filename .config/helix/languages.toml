@@ -1,22 +1,22 @@
 # Rust
 [language-server.rust-analyzer.config.check]
 command = "clippy"
+[language-server.rust-analyzer.workspace.symbol.search]
+limit = 1048576
 
-# Python
 [[language]]
 name = "python"
+auto-format = true
 language-servers = [ "pyright", "ruff" ]
-[language-server.pyright.config.python.analysis]
-typeCheckingMode = "basic"
+[language-server.pyright]
+command = "pyright-langserver"
+args = ["--stdio"]
+config.python.analysis.typeCheckingMode = "standard"
 [language-server.ruff]
-command = "ruff"
-[language-server.ruff.config.settings]
-args = ["--ignore", "E501"]
+command = "ruff server"
+config.settings.args = ["--ignore", "E501"]
 
 # JS/TS
-[language.formatter]
-command = "black"
-args = ["--line-length", "88", "--quiet", "-"]
 [[language]]
 name = "html"
 language-servers = [ "vscode-html-language-server", "tailwindcss-ls" ]
