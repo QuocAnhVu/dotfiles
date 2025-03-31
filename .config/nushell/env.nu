@@ -111,7 +111,7 @@ if (which starship | is-not-empty) {
 }
 
 # Setup mise-en-place
-if ((which mise | is-not-empty) and not ("~/.cache/mise/init.nu" | path exists)) {
+if (which mise | is-not-empty) {
     let mise_path = $nu.default-config-dir | path join mise.nu
     ^mise activate nu | save $mise_path --force
 }
