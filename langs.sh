@@ -81,7 +81,7 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
-alias pn = pnpm
+alias pn=pnpm
 END
 
 context 'Installing Go'
