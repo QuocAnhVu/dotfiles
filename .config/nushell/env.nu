@@ -110,6 +110,11 @@ if (which starship | is-not-empty) {
     $env.TRANSIENT_PROMPT_COMMAND_RIGHT = {|| "" }
 }
 
+# Setup Starship
+if (which starship | is-not-empty) {
+    mkdir ($nu.data-dir | path join "vendor/autoload")
+    starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
+}
 # Setup mise-en-place
 if (which mise | is-not-empty) {
     let mise_path = $nu.default-config-dir | path join mise.nu

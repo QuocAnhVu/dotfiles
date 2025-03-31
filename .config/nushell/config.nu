@@ -909,9 +909,6 @@ alias l = ls -al
 alias vi = nvim
 alias pn = pnpm
 
-if (which starship | is-not-empty) {
-    use ~/.cache/starship/init.nu
-}
 if (which mise | is-not-empty) {
     use ($nu.default-config-dir | path join mise.nu)
 }
