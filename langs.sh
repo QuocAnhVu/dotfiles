@@ -31,7 +31,7 @@ context 'Installing Python'
 if ! mise current python | rg '\d+\.\d+\.\d+' ; then
     # python build dependencies (https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
     context 'Installing python build dependencies.'
-    if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
+    if rg --quiet 'Fedora|Red Hat|Rocky Linux' /etc/os-release; then
         run sudo dnf install -y make gcc zlib-devel bzip2 bzip2-devel \
             readline-devel sqlite sqlite-devel \
             openssl-devel tk-devel libffi-devel xz-devel
