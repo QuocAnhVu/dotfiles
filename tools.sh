@@ -7,8 +7,8 @@ run sudo dnf install perl
 
 context "Install tools"
 run sudo dnf install fzf helix
-run cargo install sccache
-run cargo install \
+run cargo install sccache cargo-binstall
+run cargo binstall \
   bandwhich \
   bat \
   bottom \
@@ -70,6 +70,6 @@ message "TOML: taplo"
 run cargo install taplo-cli --features lsp
 
 message "WGSL: wgsl_analyzer"
-run cargo install --git https://github.com/wgsl-analyzer/wgsl-analyzer wgsl_analyzer
+run cargo install --git https://github.com/wgsl-analyzer/wgsl-analyzer wgsl-analyzer
 
 run popd
