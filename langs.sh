@@ -6,7 +6,7 @@ localrc="$XDG_CONFIG_HOME/localrc"
 # https://mise.jdx.dev/getting-started.html
 context 'Installing mise-en-place'
 if ! mise -v; then
-    if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
+    if rg --quiet 'Fedora|Red Hat|Rocky Linux' /etc/os-release; then
         run sudo dnf install -y dnf-plugins-core
         run sudo dnf config-manager --add-repo https://mise.jdx.dev/rpm/mise.repo
         run sudo dnf install -y mise
