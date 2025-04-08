@@ -47,11 +47,8 @@ path add ($env.HOME | path join ".local/share/flutter/bin")
 
 # Setup prompt (preferably Starship)
 if (which starship | is-not-empty) {
-    if ("~/.cache/starship/init.nu" | path exists) {
-        mkdir ~/.cache/starship
-        starship init nu | save -f ~/.cache/starship/init.nu
-        $env.TRANSIENT_PROMPT_COMMAND = {|| "❯ " }
-    }
+    mkdir ($nu.data-dir | path join "vendor/autoload")
+    starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
 } else {
     def create_left_prompt [] {
         let dir = match (do --ignore-errors { $env.PWD | path relative-to $nu.home-path }) {
@@ -110,11 +107,6 @@ if (which starship | is-not-empty) {
     $env.TRANSIENT_PROMPT_COMMAND_RIGHT = {|| "" }
 }
 
-# Setup Starship
-if (which starship | is-not-empty) {
-    mkdir ($nu.data-dir | path join "vendor/autoload")
-    starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
-}
 # Setup mise-en-place
 if (which mise | is-not-empty) {
     let mise_path = $nu.default-config-dir | path join mise.nu
