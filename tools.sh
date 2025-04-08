@@ -7,7 +7,7 @@ run sudo dnf install perl
 
 context "Install tools"
 run sudo dnf install fzf helix
-run cargo install sccache cargo-binstall
+run cargo install sccache cargo-binstall cargo-update
 run cargo binstall \
   bandwhich \
   bat \
