@@ -12,6 +12,7 @@ cd $XDG_DATA_HOME/dotfiles
 ./base.sh
 ./langs.sh
 ./harden.sh
+./tools.sh
 ```
 
 # Manual post-install tasks

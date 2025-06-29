@@ -6,18 +6,7 @@ localrc="$XDG_CONFIG_HOME/localrc"
 # https://mise.jdx.dev/getting-started.html
 context 'Installing mise-en-place'
 if ! mise -v; then
-    if rg --quiet 'Fedora|Red Hat|Rocky Linux' /etc/os-release; then
-        run sudo dnf install -y dnf-plugins-core
-        run sudo dnf config-manager --add-repo https://mise.jdx.dev/rpm/mise.repo
-        run sudo dnf install -y mise
-    elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
-        run apt update -y && apt install -y gpg sudo wget curl
-        run sudo install -dm 755 /etc/apt/keyrings
-        run wget -qO - https://mise.jdx.dev/gpg-key.pub | gpg --dearmor | sudo tee /etc/apt/keyrings/mise-archive-keyring.gpg 1> /dev/null
-        run echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
-        run sudo apt update
-        run sudo apt install -y mise
-    fi
+    curl https://mise.run | sh
 else
     message 'Mise detected. No need to install.'
 fi
@@ -58,9 +47,9 @@ if ! mise current node | rg '\d+\.\d+\.\d+' ; then
     # nodejs build dependencies (https://github.com/nodejs/node/blob/master/BUILDING.md#building-nodejs-on-supported-platforms)
     context 'Installing nodejs build dependencies.'
     if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
-        run sudo dnf install -y python3 gcc-c++ make python3-pip
+        run sudo dnf install -y python3 gcc-c++ make python3-pip gnupg2
     elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
-        run sudo apt install -y python3 g++ make python3-pip
+        run sudo apt install -y python3 g++ make python3-pip gnupg
     else
         message 'Installing nodejs build dependencies failed.'
     fi
@@ -101,7 +90,7 @@ fi
 context 'Installing Rust'
 if ! rustc --version | rg '\d+\.\d+\.\d+' ; then
     context 'Installing rust with rustup'
-    run_noeval 'curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh'
+    run_noeval "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --no-modify-path
     message 'Appending $localrc.'
 else

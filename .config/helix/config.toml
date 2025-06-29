@@ -20,8 +20,8 @@ insert = "bar"
 select = "underline"
 
 [editor.file-picker]
-hidden = false
-git-ignore = true
+# hidden = false
+# git-ignore = true
 
 [keys.normal."C-w"]
 "_" = "hsplit"

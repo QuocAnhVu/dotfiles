@@ -41,6 +41,7 @@ use std "path add"
 # $env.PATH = ($env.PATH | uniq)
 path add ($env.HOME | path join ".local/share/android-studio/bin")
 path add ($env.HOME | path join ".local/share/flutter/bin")
+path add ($env.HOME | path join ".local/share/google-cloud-sdk/bin")
 
 # To load from a custom file you can use:
 # source ($nu.default-config-dir | path join 'custom.nu')
