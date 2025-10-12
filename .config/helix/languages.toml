@@ -1,4 +1,16 @@
 # Rust
+[[language]]
+name = "rust"
+
+[language-server.rust-analyzer.config.procMacro.ignored]
+leptos_macro = [
+    # Optional:
+    # "component",
+    "server"
+]
+
+[language-server.rust-analyzer.config.cargo]
+allFeatures = true
 [language-server.rust-analyzer.config.check]
 command = "clippy"
 [language-server.rust-analyzer.workspace.symbol.search]
