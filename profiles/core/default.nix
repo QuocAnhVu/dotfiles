@@ -2,14 +2,13 @@
 {
   imports = [
     ../common.nix
-    ./../../hardware/disko-config.nix
   ];
 
   environment.systemPackages = with pkgs; [
     mosh
   ];
 
-  services.openssh = lib.mkIf enableSsh {
+  services.openssh = {
     enable = true;
     settings = {
       PermitRootLogin = "no";
@@ -24,7 +23,7 @@
         "aes256-gcm@openssh.com"
         "aes128-gcm@openssh.com"
       ];
-      MACs = [
+      Macs = [
         "hmac-sha2-512-etm@openssh.com"
         "hmac-sha2-256-etm@openssh.com"
         "hmac-sha2-512"
@@ -36,17 +35,6 @@
     };
   };
 
-  programs.ssh.extraConfig = lib.mkIf enableSsh ''
-    PasswordAuthentication yes
-    ChallengeResponseAuthentication no
-    PubkeyAuthentication yes
-    HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-rsa-cert-v01@openssh.com,ssh-ed25519,ssh-rsa
-    KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
-    Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
-    MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256
-    UseRoaming no
-  '';
-
   systemd.services.cockpit.enable = false;
 
   system.autoUpgrade.enable = true;
@@ -54,7 +42,7 @@
   users.users.quocanh = {
     isNormalUser = true;
     description = "Quoc-Anh Vu";
-    extraGroups = [ "wheel" ] ++ lib.mkIf enableSsh [ "ssh-user" ];
+    extraGroups = [ "wheel" ] ++ lib.optionals enableSsh [ "ssh-user" ];
     shell = pkgs.zsh;
   };
 

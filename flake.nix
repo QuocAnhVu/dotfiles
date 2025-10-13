@@ -16,26 +16,39 @@
   outputs = { self, nixpkgs, home-manager, disko, ... }:
     let
       system = "x86_64-linux";
-      createNixosConfig = { profile, enableSsh ? true }: nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = { inherit disko enableSsh; };
-        modules = [
-          disko.nixosModules.disko
-          (import ./profiles/${profile})
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { pkgs = nixpkgs.legacyPackages.${system}; };
-          }
-        ];
-      };
     in
     {
       nixosConfigurations = {
-        core = createNixosConfig { profile = "core"; };
-        console = createNixosConfig { profile = "console"; };
-        desktop = createNixosConfig { profile = "desktop"; };
+        "vm-core" = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit disko; enableSsh = true; };
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/vm
+            ./profiles/core
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { pkgs = nixpkgs.legacyPackages.${system}; };
+            }
+          ];
+        };
+        "desktop-full" = nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit disko; enableSsh = false; };
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/desktop
+            ./profiles/desktop
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { pkgs = nixpkgs.legacyPackages.${system}; };
+            }
+          ];
+        };
       };
     };
 }
