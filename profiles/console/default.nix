@@ -2,64 +2,66 @@
 {
   imports = [ ../core ];
 
-  home-manager.users.quocanh = {
-    home.packages = with pkgs; [
-      # Common tools
-      curl
-      git
-      neovim
-      fd
-      ripgrep
+  virtualisation.podman.enable = true;
 
-      # TUI tools
-      fzf
-      helix
-      zellij
-      starship
-      scc
-      glow
-      tldr
-      sccache
-      cargo-binstall
-      cargo-update
-      bandwhich
-      bat
-      bottom
-      difftastic
-      dust
-      git-delta
-      hyperfine
-      nushell
-      procs
-      sd
-      tealdeer
-      tokei
+  environment.systemPackages = with pkgs; [
+    # Common tools
+    curl
+    git
+    neovim
+    fd
+    ripgrep
+    podman
 
-      # Language toolchains
-      python3
-      nodejs
-      go
-      rustc
-      cargo
+    # TUI tools
+    fzf
+    helix
+    zellij
+    starship
+    scc
+    glow
+    tldr
+    sccache
+    cargo-binstall
+    cargo-update
+    bandwhich
+    bat
+    bottom
+    difftastic
+    dust
+    git-delta
+    hyperfine
+    nushell
+    procs
+    sd
+    tealdeer
+    tokei
 
-      # Language servers
-      rust-analyzer
-      gopls
-      delve
-      goimports
-      nodePackages.typescript-language-server
-      nodePackages.typescript
-      nodePackages.svelte-language-server
-      nodePackages.typescript-svelte-plugin
-      nodePackages_latest."@tailwindcss/language-server"
-      nodePackages.vscode-langservers-extracted
-      pyright
-      ruff
-      black
-      lua-language-server
-      taplo
-      wgsl-analyzer
-    ];
+    # Language toolchains
+    python3
+    nodejs
+    go
+    rustc
+    cargo
+
+    # Language servers
+    rust-analyzer
+    gopls
+    delve
+    goimports
+    nodePackages.typescript-language-server
+    nodePackages.typescript
+    nodePackages.svelte-language-server
+    nodePackages.typescript-svelte-plugin
+    nodePackages_latest."@tailwindcss/language-server"
+    nodePackages.vscode-langservers-extracted
+    pyright
+    ruff
+    black
+    lua-language-server
+    taplo
+    wgsl-analyzer
+  ];
 
     home.file.".config/atuin/config.toml".source = ./../../.config/atuin/config.toml;
     home.file.".config/helix/config.toml".source = ./../../.config/helix/config.toml;

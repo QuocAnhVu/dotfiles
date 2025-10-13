@@ -17,9 +17,7 @@
   services.desktopManager.cosmic.enable = true;
 
   home-manager.users.quocanh = {
-    home.packages = with pkgs; [
-      nerdfonts
-    ];
+    fonts.packages = builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
 
     home.file.".config/alacritty/alacritty.toml".source = ./../../.config/alacritty/alacritty.toml;
 
@@ -47,7 +45,7 @@
       profiles.default.extensions = {
         packages = with pkgs.nur.repos.rycee.firefox-addons; [
           ublock-origin
-          tampermonkey
+          violentmonkey
           vimium
         ];
       };
