@@ -26,7 +26,9 @@
     programs.alacritty.enable = true;
     programs.keepassxc = {
       enable = true;
-      browserIntegration = true;
+      browser = {
+        enable = true; # <-- The CORRECT option
+      };
     };
 
     programs.chromium = {
