@@ -1,5 +1,3 @@
-# This is a placeholder for your hardware-specific configuration.
-# You will need to replace this with a file generated for your specific hardware.
 {
   # Use virtio drivers for virtualized hardware (disk, network, etc.)
   boot.initrd.availableKernelModules = [ "virtio_pci" "virtio_blk" "virtio_net" ];

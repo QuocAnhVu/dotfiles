@@ -51,6 +51,27 @@
 
   system.autoUpgrade.enable = true;
 
+  users.users.quocanh = {
+    isNormalUser = true;
+    description = "Quoc-Anh Vu";
+    extraGroups = [ "wheel" ] ++ lib.mkIf enableSsh [ "ssh-user" ];
+    shell = pkgs.zsh;
+  };
+
+  home-manager.users.quocanh = {
+    home.username = "quocanh";
+    home.homeDirectory = "/home/quocanh";
+
+    home.sessionVariables = {
+      XDG_CONFIG_HOME = "$HOME/.config";
+      XDG_CACHE_HOME = "$HOME/.cache";
+      XDG_DATA_HOME = "$HOME/.local/share";
+      XDG_STATE_HOME = "$HOME/.local/state";
+    };
+
+    home.stateVersion = "23.11";
+  };
+
   networking.firewall = lib.mkIf enableSsh {
     allowedTCPPorts = [ 22 ];
     allowedUDPPortRanges = [ { from = 60000; to = 61000; } ]; # For mosh
