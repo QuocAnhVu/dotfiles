@@ -23,8 +23,6 @@
 
   environment.systemPackages = with pkgs; [];
 
-  security.hardening.enable = true;
-
   home-manager.users.quocanh = {
     home.username = "quocanh";
     home.homeDirectory = "/home/quocanh";
