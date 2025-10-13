@@ -44,6 +44,10 @@
     description = "Quoc-Anh Vu";
     extraGroups = [ "wheel" ] ++ lib.optionals enableSsh [ "ssh-user" ];
     shell = pkgs.zsh;
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICctgJYITp0Xe+Vv8JW1TDbjPsm/6a2v8y36x+9U/Ze1 quocanh@bawk"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBg/QyxNs7g4UpiJumdz6A2di4pBkhFljOiYEEnHZbKc quocanh@woof"
+    ];
   };
 
   users.users.root.hashedPassword = "!";
