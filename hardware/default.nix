@@ -6,25 +6,6 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems = {
-    "/" = {
-      device = "/dev/disk/by-label/NIXOS";
-      fsType = "btrfs";
-      options = [ "subvol=@" ];
-    };
-    "/home" = {
-      device = "/dev/disk/by-label/NIXOS";
-      fsType = "btrfs";
-      options = [ "subvol=@home" ];
-    };
-    "/boot" = {
-      device = "/dev/disk/by-label/BOOT";
-      fsType = "vfat";
-    };
-  };
-
-  swapDevices = [ ];
-
   networking.useDHCP = false;
   networking.interfaces.enp0s31f6.useDHCP = true;
 
