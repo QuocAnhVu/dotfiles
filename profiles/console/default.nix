@@ -7,62 +7,59 @@
   environment.systemPackages = with pkgs; [
     # Common tools
     curl
+    fd
     git
     neovim
-    fd
-    ripgrep
     podman
+    ripgrep
 
     # TUI tools
-    fzf
-    helix
-    zellij
-    starship
-    scc
-    glow
-    tldr
-    sccache
-    cargo-binstall
-    cargo-update
     bandwhich
     bat
     bottom
+    cargo-binstall
+    cargo-update
+    delta
     difftastic
     dust
-    git-delta
+    fzf
+    glow
+    helix
     hyperfine
     nushell
     procs
+    scc
+    sccache
     sd
+    starship
     tealdeer
     tokei
+    zellij
 
     # Language toolchains
-    python3
-    nodejs
-    go
-    rustc
     cargo
+    go
+    nodejs
+    python3
+    rustc
 
     # Language servers
-    rust-analyzer
-    gopls
+    black
     delve
-    goimports
-    nodePackages.typescript-language-server
+    gopls
+    lua-language-server
     nodePackages.typescript
-    nodePackages.svelte-language-server
-    nodePackages.typescript-svelte-plugin
+    nodePackages.typescript-language-server
     nodePackages_latest."@tailwindcss/language-server"
     nodePackages.vscode-langservers-extracted
     pyright
     ruff
-    black
-    lua-language-server
+    rust-analyzer
     taplo
     wgsl-analyzer
   ];
 
+  home-manager.users.quocanh = {
     home.file.".config/atuin/config.toml".source = ./../../.config/atuin/config.toml;
     home.file.".config/helix/config.toml".source = ./../../.config/helix/config.toml;
     home.file.".config/helix/languages.toml".source = ./../../.config/helix/languages.toml;

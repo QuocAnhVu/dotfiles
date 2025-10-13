@@ -17,7 +17,8 @@
   services.desktopManager.cosmic.enable = true;
 
   home-manager.users.quocanh = {
-    fonts.packages = builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
+    home.packages = builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
+    fonts.fontconfig.enable = true;
 
     home.file.".config/alacritty/alacritty.toml".source = ./../../.config/alacritty/alacritty.toml;
 
