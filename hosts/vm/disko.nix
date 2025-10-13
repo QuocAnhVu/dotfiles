@@ -14,6 +14,7 @@
                 type = "filesystem";
                 format = "vfat";
                 mountpoint = "/boot";
+                mountOptions = [ "dmask=077" "fmask=177" ];
               };
             };
             root = {

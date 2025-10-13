@@ -46,6 +46,8 @@
     shell = pkgs.zsh;
   };
 
+  users.users.root.hashedPassword = "!";
+
   home-manager.users.quocanh = {
     home.username = "quocanh";
     home.homeDirectory = "/home/quocanh";
