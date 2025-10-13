@@ -7,9 +7,13 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, ... }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -19,7 +23,8 @@
       createNixosConfig = { profile, enableSsh ? true }: nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
-          (import ./profiles/${profile})
+          disko.nixosModules.disko
+          (import ./profiles/${profile} { inherit pkgs disko; })
           home-manager.nixosModules.home-manager
           {
             config = {

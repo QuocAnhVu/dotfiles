@@ -1,5 +1,9 @@
+{ pkgs, disko, ... }:
 {
-  imports = [ ./common.nix ];
+  imports = [
+    ./common.nix
+    ./../../hardware/disko-config.nix
+  ];
 
   environment.systemPackages = with pkgs; [
     mosh
