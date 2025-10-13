@@ -1,13 +1,14 @@
 # This is a placeholder for your hardware-specific configuration.
 # You will need to replace this with a file generated for your specific hardware.
 {
-  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usb_storage" "sd_mod" ];
+  # Use virtio drivers for virtualized hardware (disk, network, etc.)
+  boot.initrd.availableKernelModules = [ "virtio_pci" "virtio_blk" "virtio_net" ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-intel" ];
+  boot.kernelModules = [ ]; # No extra modules needed for the guest
   boot.extraModulePackages = [ ];
 
-  networking.useDHCP = false;
-  networking.interfaces.enp0s31f6.useDHCP = true;
+  # Simplify networking for a typical single-interface VM
+  networking.useDHCP = true;
 
   nixpkgs.hostPlatform = "x86_64-linux";
 }
