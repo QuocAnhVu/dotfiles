@@ -25,5 +25,23 @@
       enable = true;
       browserIntegration = true;
     };
+
+    programs.chromium = {
+      enable = true;
+      extensions = [
+        { id = "ddbjnfjiigjmcpcpkmhogomapikjbjdk"; } # uBlock Origin Lite
+        { id = "dhdgffkkebhmkfjojejmpbldmpobfkfo"; } # Tampermonkey
+        { id = "dbepggeogbaibhgnhhndojpepiihcmeb"; } # Vimium
+      ];
+    };
+
+    programs.firefox = {
+      enable = true;
+      profiles.default.extensions = with pkgs.firefox-addons; [
+        ublock-origin
+        tampermonkey
+        vimium
+      ];
+    };
   };
 }
