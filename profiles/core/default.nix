@@ -1,7 +1,7 @@
-{ pkgs, disko, ... }:
+{ config, pkgs, lib, disko, enableSsh, ... }:
 {
   imports = [
-    ./common.nix
+    ../common.nix
     ./../../hardware/disko-config.nix
   ];
 
@@ -9,7 +9,7 @@
     mosh
   ];
 
-  services.openssh = lib.mkIf config.enableSsh {
+  services.openssh = lib.mkIf enableSsh {
     enable = true;
     settings = {
       PermitRootLogin = "no";
@@ -36,7 +36,7 @@
     };
   };
 
-  programs.ssh.extraConfig = lib.mkIf config.enableSsh ''
+  programs.ssh.extraConfig = lib.mkIf enableSsh ''
     PasswordAuthentication yes
     ChallengeResponseAuthentication no
     PubkeyAuthentication yes
@@ -51,7 +51,7 @@
 
   system.autoUpgrade.enable = true;
 
-  networking.firewall = lib.mkIf config.enableSsh {
+  networking.firewall = lib.mkIf enableSsh {
     allowedTCPPorts = [ 22 ];
     allowedUDPPortRanges = [ { from = 60000; to = 61000; } ]; # For mosh
   };

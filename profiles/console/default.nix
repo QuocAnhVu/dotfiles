@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ config, pkgs, lib, disko, enableSsh, ... }:
 {
-  imports = [ ./core ];
+  imports = [ ../core ];
 
   home-manager.users.quocanh = {
     home.packages = with pkgs; [

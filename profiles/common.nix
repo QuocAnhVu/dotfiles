@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, lib, disko, enableSsh, ... }:
 {
   imports = [ ./../hardware/default.nix ];
 

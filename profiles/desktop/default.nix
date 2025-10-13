@@ -1,6 +1,6 @@
-{ pkgs, ... }:
+{ config, pkgs, lib, disko, enableSsh, ... }:
 {
-  imports = [ ./console ];
+  imports = [ ../console ];
 
   environment.systemPackages = with pkgs; [
     alacritty

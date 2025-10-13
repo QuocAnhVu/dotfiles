@@ -16,22 +16,17 @@
   outputs = { self, nixpkgs, home-manager, disko, ... }:
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
       createNixosConfig = { profile, enableSsh ? true }: nixpkgs.lib.nixosSystem {
         inherit system;
+        specialArgs = { inherit disko enableSsh; };
         modules = [
           disko.nixosModules.disko
-          (import ./profiles/${profile} { inherit pkgs disko; })
+          (import ./profiles/${profile})
           home-manager.nixosModules.home-manager
           {
-            config = {
-              inherit enableSsh;
-            };
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = { pkgs = nixpkgs.legacyPackages.${system}; };
           }
         ];
       };
