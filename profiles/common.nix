@@ -1,5 +1,5 @@
 {
-  imports = [ ./../nixos/hardware-configuration.nix ];
+  imports = [ ./../hardware/default.nix ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
