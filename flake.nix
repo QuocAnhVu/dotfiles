@@ -28,6 +28,7 @@
             ./hosts/vm
             ./profiles/core
             home-manager.nixosModules.home-manager
+            ({ pkgs, ... }: { nixpkgs.overlays = [ nur.overlays.default ]; })
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
@@ -37,12 +38,13 @@
         };
         "desktop-full" = nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit disko nur; enableSsh = false; }; # Pass nur as specialArgs
+          specialArgs = { inherit disko; enableSsh = false; }; # Remove nur from specialArgs
           modules = [
             disko.nixosModules.disko
             ./hosts/vm
             ./profiles/desktop
             home-manager.nixosModules.home-manager
+            ({ pkgs, ... }: { nixpkgs.overlays = [ nur.overlays.default ]; })
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;

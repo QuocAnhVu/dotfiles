@@ -1,4 +1,4 @@
-{ config, pkgs, lib, disko, enableSsh, nur, ... }:
+{ config, pkgs, lib, disko, enableSsh, ... }:
 {
   imports = [ ../console ];
 
