@@ -8,12 +8,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
-      url = "github:nix-community/disko";
+      url = "github.com:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nur.url = "github:nix-community/NUR"; # Add NUR input
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, nur, ... }:
     let
       system = "x86_64-linux";
     in
@@ -36,7 +37,7 @@
         };
         "desktop-full" = nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit disko; enableSsh = false; };
+          specialArgs = { inherit disko nur; enableSsh = false; }; # Pass nur as specialArgs
           modules = [
             disko.nixosModules.disko
             ./hosts/desktop

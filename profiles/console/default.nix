@@ -81,11 +81,6 @@
     programs.starship.enable = true;
     programs.git.enable = true;
     programs.helix.enable = true;
-    programs.neovim = {
-      enable = true;
-      extraPlugins = with pkgs.vimPlugins; [
-        nvim-treesitter.withAllGrammars
-      ];
-    };
+    programs.neovim.enable = true;
   };
 }

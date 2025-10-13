@@ -1,4 +1,4 @@
-{ config, pkgs, lib, disko, enableSsh, ... }:
+{ config, pkgs, lib, disko, enableSsh, nur, ... }:
 {
   imports = [ ../console ];
 
@@ -26,8 +26,10 @@
     programs.alacritty.enable = true;
     programs.keepassxc = {
       enable = true;
-      browser = {
-        enable = true; # <-- The CORRECT option
+      settings = {
+        Browser = {
+          Enabled = true;
+        };
       };
     };
 
@@ -42,11 +44,13 @@
 
     programs.firefox = {
       enable = true;
-      profiles.default.extensions = with pkgs.firefox-addons; [
-        ublock-origin
-        tampermonkey
-        vimium
-      ];
+      profiles.default.extensions = {
+        packages = with pkgs.nur.repos.rycee.firefox-addons; [
+          ublock-origin
+          tampermonkey
+          vimium
+        ];
+      };
     };
   };
 }
