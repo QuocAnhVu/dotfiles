@@ -40,7 +40,7 @@
           specialArgs = { inherit disko nur; enableSsh = false; }; # Pass nur as specialArgs
           modules = [
             disko.nixosModules.disko
-            ./hosts/desktop
+            ./hosts/vm
             ./profiles/desktop
             home-manager.nixosModules.home-manager
             {
