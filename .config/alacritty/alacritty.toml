@@ -1,60 +1,14 @@
-# Nord colorscheme
-[colors.bright]
-black = "#4c566a"
-blue = "#81a1c1"
-cyan = "#8fbcbb"
-green = "#a3be8c"
-magenta = "#b48ead"
-red = "#bf616a"
-white = "#eceff4"
-yellow = "#ebcb8b"
+[general]
+import = ["themes/nord.toml"]
 
-[colors.cursor]
-cursor = "#d8dee9"
-text = "#2e3440"
+[window]
+decorations = "None"
+opacity = 0.9375
+resize_increments = true
 
-[colors.dim]
-black = "#373e4d"
-blue = "#68809a"
-cyan = "#6d96a5"
-green = "#809575"
-magenta = "#8c738c"
-red = "#94545d"
-white = "#aeb3bb"
-yellow = "#b29e75"
-
-[colors.normal]
-black = "#3b4252"
-blue = "#81a1c1"
-cyan = "#88c0d0"
-green = "#a3be8c"
-magenta = "#b48ead"
-red = "#bf616a"
-white = "#e5e9f0"
-yellow = "#ebcb8b"
-
-[colors.primary]
-background = "#2e3440"
-dim_foreground = "#a5abb6"
-foreground = "#d8dee9"
-
-[colors.footer_bar]
-background = "#434c5e"
-foreground = "#d8dee9"
-
-[colors.search.matches]
-background = "#88c0d0"
-foreground = "CellBackground"
-
-[colors.selection]
-background = "#4c566a"
-text = "CellForeground"
-
-[colors.vi_mode_cursor]
-cursor = "#d8dee9"
-text = "#2e3440"
-
-[terminal]
+[window.padding]
+x = 4
+y = 2
 
 [font]
 size = 8
@@ -62,24 +16,13 @@ size = 8
 [font.normal]
 family = "JetBrainsMono Nerd Font"
 
+# zellij's default_shell (nu) is set in zellij/config.kdl
 [terminal.shell]
-# program = "/usr/bin/zsh"
-# args = ["-i", "-c", "zellij"]
 program = "/usr/bin/zsh"
-args = ["-i", "-c", "/home/quocanh/.local/share/cargo/bin/zellij options --default-shell /home/quocanh/.local/share/cargo/bin/nu"]
-# program = "/home/quocanh/.local/share/cargo/bin/zellij"
-# args = ["options", "--default-shell", "/home/quocanh/.local/share/cargo/bin/nu"]
+args = ["-i", "-c", "zellij"]
 
-[window]
-decorations = 'None'
-opacity = 0.9375
-blur = true
 [colors]
 transparent_background_colors = true
-
-[window.padding]
-x = 4
-y = 2
 
 [[keyboard.bindings]]
 key = "Return"
