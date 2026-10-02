@@ -1,0 +1,50 @@
+# Everforest dark (medium) colorscheme
+# Base/ANSI/selection/search colors from github.com/alacritty/alacritty-theme
+# (everforest_dark_medium.toml); cursor/footer colors added from the everforest palette.
+[colors.primary]
+background = "#2d353b" # hard: "#272e33", soft: "#333c43"
+foreground = "#d3c6aa"
+
+[colors.cursor]
+cursor = "#d3c6aa"
+text = "#2d353b"
+
+[colors.vi_mode_cursor]
+cursor = "#a7c080"
+text = "#2d353b"
+
+[colors.selection]
+background = "#543a48"
+text = "#d3c6aa"
+
+[colors.search.matches]
+background = "#a7c080"
+foreground = "#2d353b"
+
+[colors.search.focused_match]
+background = "#e67e80"
+foreground = "#2d353b"
+
+[colors.footer_bar]
+background = "#343f44"
+foreground = "#d3c6aa"
+
+[colors.normal]
+black = "#475258"
+red = "#e67e80"
+green = "#a7c080"
+yellow = "#dbbc7f"
+blue = "#7fbbb3"
+magenta = "#d699b6"
+cyan = "#83c092"
+white = "#d3c6aa"
+
+[colors.bright]
+black = "#475258"
+red = "#e67e80"
+green = "#a7c080"
+yellow = "#dbbc7f"
+blue = "#7fbbb3"
+magenta = "#d699b6"
+cyan = "#83c092"
+white = "#d3c6aa"

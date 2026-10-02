@@ -1,6 +1,7 @@
 # Theme: swap to switch (built-in themes)
-theme = "nord"
+# theme = "nord"
 # theme = "gruvbox"
+theme = "everforest_dark"
 
 [editor]
 line-number = "relative"
