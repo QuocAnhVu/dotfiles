@@ -4,6 +4,7 @@ theme = "nord"
 line-number = "relative"
 color-modes = true
 true-color = true
+soft-wrap.enable = true
 
 [editor.lsp]
 display-messages = true

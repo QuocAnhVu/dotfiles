@@ -1,7 +1,7 @@
 # Rust
 [[language]]
 name = "rust"
-
+auto-format = false
 [language-server.rust-analyzer.config.procMacro.ignored]
 leptos_macro = [
     # Optional:
@@ -25,7 +25,8 @@ command = "pyright-langserver"
 args = ["--stdio"]
 config.python.analysis.typeCheckingMode = "standard"
 [language-server.ruff]
-command = "ruff server"
+command = "ruff"
+args = ["server", "--preview"]
 config.settings.args = ["--ignore", "E501"]
 
 # JS/TS
@@ -45,3 +46,11 @@ language-servers = [ "typescript-language-server", "tailwindcss-ls" ]
 name = "svelte"
 auto-format = true
 language-servers = [ "svelteserver", "tailwindcss-ls" ]
+
+# Typst
+[language-server.tinymist]
+command = "tinymist"
+
+[[language]]
+name = "typst"
+language-servers = ["tinymist"]
