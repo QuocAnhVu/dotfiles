@@ -263,6 +263,7 @@ load_plugins {
 // Default: default
 // 
 theme "nord"
+// theme "gruvbox-dark"
  
 // Choose the base input mode of zellij.
 // Default: normal
