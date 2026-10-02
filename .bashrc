@@ -50,7 +50,7 @@ alias vi=nvim
 alias l=ls
 
 # Local (untracked) config
-[[ ! -r $XDG_CONFIG_HOME/localrc ]] || source $XDG_CONFIG_HOME/localrc
+# [[ ! -r $XDG_CONFIG_HOME/localrc ]] || source $XDG_CONFIG_HOME/localrc
 
 
 . "$HOME/.local/share/../bin/env"
