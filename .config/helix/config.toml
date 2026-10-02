@@ -1,6 +1,6 @@
-# Theme: swap to switch (built-in themes)
+# Theme: switch with ./theme.sh in the dotfiles repo (or swap by hand; built-in themes)
 # theme = "nord"
-# theme = "gruvbox"
+# theme = "gruvbox_dark_soft"
 theme = "everforest_dark"
 
 [editor]

@@ -13,6 +13,7 @@ cd $XDG_DATA_HOME/dotfiles
 ./langs.sh
 ./harden.sh
 ./tools.sh
+./theme.sh everforest  # or gruvbox, nord
 ```
 
 # Manual post-install tasks

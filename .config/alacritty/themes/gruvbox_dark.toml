@@ -1,8 +1,8 @@
-# Gruvbox dark colorscheme
+# Gruvbox dark (soft) colorscheme
 # Base/ANSI colors from github.com/alacritty/alacritty-theme (gruvbox_dark.toml);
 # UI colors added from the gruvbox palette.
 [colors.primary]
-background = "#282828" # hard: "#1d2021", soft: "#32302f"
+background = "#32302f" # hard: "#1d2021", medium: "#282828"
 foreground = "#ebdbb2"
 
 [colors.cursor]

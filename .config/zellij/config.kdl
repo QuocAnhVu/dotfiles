@@ -260,6 +260,7 @@ load_plugins {
 // simplified_ui true
  
 // Choose the theme that is specified in the themes section.
+// Switch with ./theme.sh in the dotfiles repo (or swap by hand).
 // Default: default
 // 
 // theme "nord"

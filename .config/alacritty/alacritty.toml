@@ -1,5 +1,5 @@
 [general]
-# Theme: swap the import to switch (live-reloads)
+# Theme: switch with ./theme.sh in the dotfiles repo (or swap the import by hand)
 # import = ["themes/nord.toml"]
 # import = ["themes/gruvbox_dark.toml"]
 import = ["themes/everforest_dark.toml"]
