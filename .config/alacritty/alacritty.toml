@@ -1,5 +1,7 @@
 [general]
+# Theme: swap the import to switch (live-reloads)
 import = ["themes/nord.toml"]
+# import = ["themes/gruvbox_dark.toml"]
 
 [window]
 decorations = "None"
