@@ -15,8 +15,17 @@ context 'Installing Nix'
 if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh || -e $HOME/.nix-profile/etc/profile.d/nix.sh ]]; then
     message 'Nix detected. No need to install.'
 elif [[ -d /run/systemd/system ]]; then
-    run_noeval "curl -sSfL https://nixos.org/nix/install | sh -s -- --daemon --yes"
-    curl --proto '=https' --tlsv1.2 -sSfL https://nixos.org/nix/install | sh -s -- --daemon --yes
+    # Determinate Systems' installer: unlike the official one it supports
+    # SELinux (Fedora) by installing a policy, and can uninstall cleanly
+    # (/nix/nix-installer uninstall). Installs upstream Nix, no diagnostics.
+    confirm=()
+    [[ -t 0 ]] || confirm=(--no-confirm) # show the plan and ask when interactive
+    # Download first (not curl | sh) so the installer's prompt can read the terminal
+    installer=$(mktemp)
+    run curl --proto "'=https'" --tlsv1.2 -sSfL -o $installer https://install.determinate.systems/nix
+    run_noeval "sh $installer install --prefer-upstream-nix $confirm"
+    NIX_INSTALLER_DIAGNOSTIC_ENDPOINT= sh $installer install --prefer-upstream-nix $confirm
+    rm -f $installer
 else
     # No systemd (e.g. a container): single-user install
     run_noeval "curl -sSfL https://nixos.org/nix/install | sh -s -- --no-daemon --yes"
@@ -33,8 +42,11 @@ context 'Removing symlinks into the dotfiles repo (home-manager recreates them)'
 repo=${DOTFILES:A}
 typeset -A removed # link -> its target, to restore if the switch fails
 for f in $HOME/.config/*(N@) $HOME/.bashrc(N@) $HOME/.zshrc(N@); do
-    # Only direct links (as base.sh makes), not home-manager's via /nix/store
-    if [[ $(readlink $f) != /nix/store/* && ${f:A} == $repo/* ]]; then
+    target=$(readlink $f)
+    [[ $target == /* ]] || target=${f:h}/$target
+    # Resolve only the parent, so links to files deleted from the repo still match.
+    # Only direct links (as base.sh makes), not home-manager's via /nix/store.
+    if [[ $target != /nix/store/* && ${target:h:A}/${target:t} == $repo/* ]]; then
         removed[$f]=$(readlink $f)
         run rm $f
     fi

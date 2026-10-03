@@ -42,5 +42,13 @@ in
     news.display = "silent";
     # Flakes for `home-manager switch --flake` (Nix itself comes from the system install)
     xdg.configFile."nix/nix.conf".text = "experimental-features = nix-command flakes\n";
+
+    # Weekly: delete home-manager generations older than 30 days, then
+    # garbage-collect /nix/store (keeps a month of rollbacks)
+    nix.gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
+    };
   };
 }

@@ -43,6 +43,13 @@ path add ($env.HOME | path join ".local/share/android-studio/bin")
 path add ($env.HOME | path join ".local/share/flutter/bin")
 path add ($env.HOME | path join ".local/share/google-cloud-sdk/bin")
 
+# Nix and home-manager packages, for when nu isn't started from zsh/bash (which
+# already set these up). Only added if missing, so zsh's PATH order is kept.
+# `path add` prepends, so list in reverse: ~/.nix-profile/bin ends up first.
+for p in ["/nix/var/nix/profiles/default/bin" ($env.HOME | path join ".nix-profile/bin")] {
+    if ($p | path exists) and ($p not-in $env.PATH) { path add $p }
+}
+
 # To load from a custom file you can use:
 # source ($nu.default-config-dir | path join 'custom.nu')
 
