@@ -34,6 +34,12 @@ in
     targets.genericLinux.enable = true;
     # GUI apps come from apt/Flatpak, so skip the Nix GPU driver setup check
     targets.genericLinux.gpu.enable = false;
+    # genericLinux sets XCURSOR_PATH (the Nix profile, /usr/share), which replaces
+    # the default search path: add back the user's cursors (theme.sh installs there)
+    home.sessionSearchVariables.XCURSOR_PATH = lib.mkBefore [
+      "${config.xdg.dataHome}/icons"
+      "${config.home.homeDirectory}/.icons"
+    ];
     xdg.enable = true;
     home.preferXdgDirectories = true;
 
