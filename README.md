@@ -54,8 +54,8 @@ _lib.sh                 helpers for the scripts above
 | ------------- | ---------------------------------------------------------------------- | ---------------------------------------------------- |
 | `server`      | zsh/bash and helix configs, starship, git, ripgrep, fd, bat, mosh…      | nothing                                              |
 | `dev`         | `server` + CLI/TUI suite, zellij, nushell, mise, rustup, uv, language servers, cargo tools, direnv | compilers, cmake, meson, clangd, podman |
-| `desktop`     | `server` + zellij, nushell, Alacritty config, JetBrainsMono Nerd Font, distrobox | podman, GNOME (if missing), RDP server, Firefox, Alacritty (Debian's) |
-| `workstation` | `dev` + `desktop` + Flatpak apps (`home/workstation.nix`), GNOME extension settings (`home/gnome.nix`) | KeePassXC, virt-manager, nvtop, Steam's udev rules, Mullvad, NVIDIA driver and container toolkit |
+| `desktop`     | `server` + zellij, nushell, Alacritty config, JetBrainsMono Nerd Font, distrobox, GNOME settings and extensions (`home/gnome.nix`) | podman, GNOME (if missing), RDP server, Firefox, Alacritty (Debian's) |
+| `workstation` | `dev` + `desktop` + Flatpak apps (`home/workstation.nix`) | KeePassXC, virt-manager, nvtop, Steam's udev rules, Mullvad, NVIDIA driver and container toolkit |
 
 Where everything else comes from:
 
@@ -121,7 +121,7 @@ only, name them: `./setup.sh dev home langs`. `./setup.sh` lists them:
 | `home`       | installs Nix (asks for sudo), applies the home-manager profile       | all          |
 | `langs`      | mise tools (`.config/mise/config.toml`), pnpm, Rust stable; Alacritty on Debian | workstation, dev |
 | `theme`      | reapplies the theme the configs select (`./theme.sh --current`)      | workstation, desktop |
-| `extensions` | installs the GNOME extensions `home/gnome.nix` enables               | workstation  |
+| `extensions` | installs the GNOME extensions `home/gnome.nix` enables               | workstation, desktop |
 | `ssh`        | client key; a hardened sshd with the keys in `.ssh/authorized_keys`  | all (no sshd on the workstation) |
 
 Afterwards, open a new shell; on desktops, log out and back in so GNOME picks
@@ -182,7 +182,7 @@ clones you want. Check the last run with `journalctl --user -u ws-backup`.
   connect through SSH: `ssh -L 3389:localhost:3389 <host>`, then point the RDP
   client at `localhost`.
 - **Optional extras**: Tailscale (`curl -fsSL https://tailscale.com/install.sh | sh`).
-  (Caps Lock as Esc is set on the workstation by `home/gnome.nix`; elsewhere:
+  (Caps Lock as Esc is set on desktops by `home/gnome.nix`; elsewhere:
   `gsettings set org.gnome.desktop.input-sources xkb-options "['caps:escape_shifted_capslock']"`.)
 
 ## Everyday use
@@ -270,7 +270,7 @@ one, add a column there and the option lines in `alacritty.toml` (plus a file in
 
 **GNOME extensions**: add the UUID (shown on the extension's
 extensions.gnome.org page or by `gnome-extensions list`) to `enabled-extensions`
-in `home/gnome.nix`, switch, then `./setup.sh workstation extensions` installs
+in `home/gnome.nix`, switch, then `./setup.sh <role> extensions` installs
 it. To keep a setting, change it in the extension's preferences, find the key
 with `dconf watch /org/gnome/shell/extensions/` (or `dconf dump`), and add it
 to `home/gnome.nix`; otherwise the next switch leaves it alone, but a new

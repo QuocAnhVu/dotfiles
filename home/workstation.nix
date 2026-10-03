@@ -5,7 +5,7 @@ let
   data = "/mnt/data";
 in
 {
-  imports = [ ./desktop.nix ./full.nix ./gnome.nix ];
+  imports = [ ./desktop.nix ./full.nix ];
 
   # Documents and media on the data drive; Desktop and Downloads (cleared by
   # hand) stay on the system drive. Public (GNOME file sharing) and Templates

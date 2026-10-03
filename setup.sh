@@ -26,7 +26,7 @@ ALL_STEPS=(base packages home langs theme extensions ssh)
 typeset -A ROLE_STEPS
 ROLE_STEPS=(
     workstation "base packages home langs theme extensions ssh"
-    desktop     "base packages home theme ssh"
+    desktop     "base packages home theme extensions ssh"
     dev         "base packages home langs ssh"
     server      "base home ssh"
 )

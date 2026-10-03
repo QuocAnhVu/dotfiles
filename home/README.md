@@ -7,8 +7,8 @@ the modules here:
 | ------------------ | ------------- | ----------------------------- |
 | `quocanh@server`   | `minimal.nix` | `common.nix`                  |
 | `quocanh@dev`      | `full.nix`    | `minimal.nix`, `terminal.nix` |
-| `quocanh@desktop`  | `desktop.nix` | `minimal.nix`, `terminal.nix` |
-| `quocanh@workstation` | `workstation.nix` | `desktop.nix`, `full.nix`, `gnome.nix` |
+| `quocanh@desktop`  | `desktop.nix` | `minimal.nix`, `terminal.nix`, `gnome.nix` |
+| `quocanh@workstation` | `workstation.nix` | `desktop.nix`, `full.nix` |
 
 - `common.nix`: user, XDG directories, environment variables (shells and the
   desktop session), the Nix profile location, garbage collection, `~/.zshenv`,
