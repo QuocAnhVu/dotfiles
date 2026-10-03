@@ -1,0 +1,60 @@
+#! /usr/bin/zsh
+# Back up ~/ws to the data drive (/mnt/data/ws), without build output, caches or
+# 3p clones (only their list: see 3p). Run hourly by a systemd user timer
+# (home/workstation.nix); fine to run by hand. Does nothing when the drive
+# isn't mounted; after a dropout, the next run continues.
+#
+# Files deleted or changed since the previous run are moved to
+# /mnt/data/ws-history/<date_time>/ and kept for 30 days.
+# To exclude more, add rsync filter rules to a .backupignore file in any
+# directory of ws (e.g. `- /big-dataset/`, anchored to that directory).
+setopt err_exit pipe_fail
+
+WS=$HOME/ws
+DRIVE=${WS_BACKUP_DRIVE:-/mnt/data} # the variable is for testing
+DEST=$DRIVE/ws
+HISTORY=$DRIVE/ws-history
+LIMIT=50M # write speed limit (rsync --bwlimit); the drive overheats
+KEEP_DAYS=30
+
+# Mounted, not just the automount point (listing it triggers the automount)
+if ! timeout 20 ls $DRIVE > /dev/null 2>&1 ||
+    ! findmnt -rn -o FSTYPE --mountpoint $DRIVE | grep -qvx autofs; then
+    print "$DRIVE is not mounted: skipping."
+    exit 0
+fi
+
+# Refresh the list of 3p clones at most daily (it checks every clone)
+manifest=($WS/3p/.manifest/manifest.tsv(N.mh-24))
+if [[ -d $WS/3p && -z $manifest ]]; then
+    ${0:A:h}/3p save > /dev/null || print '3p save failed: backing up the old list.'
+fi
+
+# Build output found by content: cargo target/ (next to a Cargo.toml),
+# virtualenvs (have pyvenv.cfg), caches marked with CACHEDIR.TAG
+filter=$(mktemp)
+trap 'rm -f $filter' EXIT
+{
+    print -r -- '+ /3p/'
+    print -r -- '+ /3p/.manifest/***'
+    print -r -- '- /3p/*'
+    print -l -- '- node_modules/' '- __pycache__/' '- .mypy_cache/' '- .ruff_cache/' \
+        '- .pytest_cache/' '- .direnv/' '- .svelte-kit/' '- .next/' '- .turbo/' '- .pnpm-store/'
+    cd $WS
+    find . -path ./3p -prune -o -name node_modules -prune -o \( \
+        \( -type d -name target -execdir test -f Cargo.toml \; -print -prune \) -o \
+        \( -type f -name pyvenv.cfg -printf '%h\n' \) -o \
+        \( -type f -name CACHEDIR.TAG -printf '%h\n' \) \) 2> /dev/null |
+        sed 's|^\./|/|; s|$|/|; s|^|- |' | sort -u
+} > $filter
+
+rc=0
+rsync -aHAX --delete --backup --backup-dir=$HISTORY/$(date +%F_%H%M) \
+    --partial-dir=.rsync-partial --no-whole-file --bwlimit=$LIMIT \
+    --filter=': .backupignore' --exclude-from=$filter \
+    --info=stats1 --human-readable $WS/ $DEST/ || rc=$?
+(( rc == 0 || rc == 24 )) || exit $rc # 24: files vanished during the copy (fine)
+
+timeout 600 sync -f $DEST
+find $HISTORY -mindepth 1 -maxdepth 1 -type d -mtime +$KEEP_DAYS -exec rm -rf {} + 2> /dev/null || true
+print "Backed up $WS to $DEST."

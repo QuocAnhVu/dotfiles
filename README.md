@@ -143,6 +143,31 @@ Two files aren't in git (`setup.sh` creates empty ones):
 - `~/.config/secrets.env`: API keys, `KEY=VALUE` per line, literal values.
   Keep it `chmod 600`.
 
+### Data drive (workstation)
+
+Bulky data lives on a separate drive mounted at `/mnt/data`; the system drive
+keeps programs, games and `~/ws`. `home/workstation.nix` points Documents,
+Pictures, Videos and Music there (Desktop and Downloads stay local; Public and
+Templates are off), and a timer backs up `~/ws` to it. Each machine's
+`/etc/fstab` decides which drive that is. With systemd's automount, a missing
+drive makes writes fail instead of landing on the system drive:
+
+```
+/dev/mapper/<name> /mnt/data btrfs noatime,compress=zstd:1,nofail,x-systemd.automount,x-systemd.device-timeout=10s 0 0
+```
+
+(plus its `/etc/crypttab` line if it's encrypted). Layout: `Documents/`, `Pictures/`,
+`Videos/`, `Music/`, `Models/`, `Datasets/`, `ws/` (backup), `ws-history/`.
+
+**ws backup**: `bin/ws-backup` runs hourly (`systemctl --user list-timers
+ws-backup`) and skips quietly while the drive is disconnected. It leaves out
+build output, caches and 3p clones (it keeps `3p save`'s list), at most 50 MiB/s
+since the drive overheats. Files deleted or changed since the previous run stay
+in `/mnt/data/ws-history/<date_time>/` for 30 days. To leave out more, add
+rsync filter rules to a `.backupignore` file in that directory (`- /big-data/`).
+Restore with `rsync -a /mnt/data/ws/ ~/ws/`, then `3p restore --all` for the
+clones you want. Check the last run with `journalctl --user -u ws-backup`.
+
 ### Role-specific steps
 
 - **Headless server without a checkout**: skip the clone and apply the profile

@@ -1,7 +1,48 @@
 # The workstation (this desktop): desktop.nix plus the desktop apps.
-{ ... }:
+{ config, ... }:
+let
+  # The data drive: each machine's /etc/fstab mounts its drive here
+  data = "/mnt/data";
+in
 {
   imports = [ ./desktop.nix ./gnome.nix ];
+
+  # Documents and media on the data drive; Desktop and Downloads (cleared by
+  # hand) stay on the system drive. Public (GNOME file sharing) and Templates
+  # (Files' "New Document" menu) are unused: set to ~, the convention for off.
+  # enabled=False in user-dirs.conf stops GNOME from resetting them to ~ when
+  # the drive is missing at login (screenshots then fail to save, though).
+  xdg.userDirs = {
+    enable = true;
+    documents = "${data}/Documents";
+    pictures = "${data}/Pictures";
+    videos = "${data}/Videos";
+    music = "${data}/Music";
+    projects = "${config.home.homeDirectory}/ws";
+    publicShare = config.home.homeDirectory;
+    templates = config.home.homeDirectory;
+  };
+
+  # ws stays on the system drive (builds write a lot; the drive's connection is
+  # flaky): back it up to the data drive hourly, when it's connected
+  systemd.user.services.ws-backup = {
+    Unit.Description = "Back up ~/ws to ${data}/ws";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${config.dotfiles.path}/bin/ws-backup";
+      Nice = 19;
+      IOSchedulingClass = "idle";
+    };
+  };
+  systemd.user.timers.ws-backup = {
+    Unit.Description = "Back up ~/ws hourly";
+    Timer = {
+      OnCalendar = "hourly";
+      Persistent = true; # catch up after the machine was off
+      RandomizedDelaySec = "5m";
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
 
   # Desktop apps from Flathub, in the user installation (~/.local/share/flatpak).
   # Installed and updated by a systemd user service after `home-manager switch`;
