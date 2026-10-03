@@ -1,20 +1,23 @@
 #! /usr/bin/zsh
-# Switch the desktop theme: alacritty, helix, zellij, GTK and GNOME Shell.
-# Installs the GTK/GNOME Shell theme into $XDG_DATA_HOME/themes first if it is
-# missing (or always, with --update). --current reapplies the theme the configs
-# select (setup.sh uses it on new machines).
+# Switch the desktop theme: alacritty, helix, zellij, GTK and GNOME Shell, and
+# the icon theme's colour. Installs the GTK/GNOME Shell theme (into
+# $XDG_DATA_HOME/themes), the icons and the cursor (into $XDG_DATA_HOME/icons,
+# where Flatpak apps see them too) first if they are missing, or always with
+# --update. --current reapplies the theme the configs select (setup.sh uses it
+# on new machines).
 source $(dirname $0)/_lib.sh
 setopt err_exit
 
 SCRIPT=$0
 DOTFILES=$(cd $(dirname $0) && pwd)
 THEMES_DIR=$XDG_DATA_HOME/themes
+ICONS_DIR=$XDG_DATA_HOME/icons
 SRC_DIR=$HOME/ws/3p
 USER_THEME=user-theme@gnome-shell-extensions.gcampax.github.com
 
 # Per-theme settings. To add a theme, add a column here and its option lines in
 # the alacritty/helix/zellij configs.
-typeset -A ALACRITTY HELIX ZELLIJ NVIM DELTA GTK REPO TWEAK
+typeset -A ALACRITTY HELIX ZELLIJ NVIM DELTA GTK REPO TWEAK ICONS
 ALACRITTY=(nord nord               gruvbox gruvbox_dark                       everforest everforest_dark)
 HELIX=(    nord nord               gruvbox gruvbox_dark_soft                  everforest everforest_dark)
 ZELLIJ=(   nord nord               gruvbox gruvbox-dark                       everforest everforest-dark)
@@ -23,11 +26,18 @@ DELTA=(    nord Nord               gruvbox gruvbox-dark                       ev
 GTK=(      nord Nordic             gruvbox Gruvbox-Dark-Soft                  everforest Everforest-Dark-Medium)
 REPO=(     nord EliverLara/Nordic  gruvbox Fausto-Korpsvart/Gruvbox-GTK-Theme everforest Fausto-Korpsvart/Everforest-GTK-Theme)
 TWEAK=(                            gruvbox soft                               everforest medium)
+# Tela-circle folder colour: one of its variants, or the theme's accent (hex)
+ICONS=(    nord nord               gruvbox d79921                             everforest a7c080)
+
+# Icons and cursor: the same for every theme
+ICONS_REPO=vinceliuice/Tela-circle-icon-theme
+CURSOR=Bibata-Modern-Ice
+CURSOR_URL=https://github.com/ful1e5/Bibata_Cursor/releases/latest/download/$CURSOR.tar.xz
 
 function usage() {
     local themes=(${(ko)GTK})
     echo "Usage: $SCRIPT [-u|--update] <${(j:|:)themes}|--current>"
-    echo "  -u, --update  Pull and reinstall the GTK/GNOME Shell theme even if installed"
+    echo "  -u, --update  Pull and reinstall the GTK/GNOME Shell theme, icons and cursor"
     echo "  --current     The theme the configs select now (the alacritty import)"
     exit 1
 }
@@ -48,11 +58,13 @@ function select_line() {
     run_noeval "$file: $want"
 }
 
-# Install sassc/git and the User Themes extension if missing (Debian or Fedora).
+# Install sassc/git, gtk-update-icon-cache and the User Themes extension if
+# missing (Debian or Fedora).
 function install_prerequisites() {
     local pkgs=()
     (( $+commands[sassc] )) || pkgs+=(sassc)
     (( $+commands[git] )) || pkgs+=(git)
+    (( $+commands[gtk-update-icon-cache] )) || pkgs+=(gtk-update-icon-cache)
     if ! gnome-extensions info $USER_THEME &> /dev/null; then
         if (( $+commands[apt-get] )); then
             pkgs+=(gnome-shell-extensions) # includes User Themes on Debian
@@ -102,6 +114,25 @@ function install_gtk_theme() {
     fi
 }
 
+# Tela-circle in one colour; its installer adds -light and -dark versions
+function install_icons() {
+    install_prerequisites
+    clone_or_pull $ICONS_REPO
+    run mkdir -p $ICONS_DIR
+    run $SRC_DIR/${ICONS_REPO:t}/install.sh -d $ICONS_DIR $1
+}
+
+# Prebuilt from the release. default/ makes it the cursor for X11 apps
+# (XWayland: games, Steam) that don't read GNOME's setting.
+function install_cursor() {
+    run mkdir -p $ICONS_DIR/default
+    run rm -rf $ICONS_DIR/$CURSOR
+    run_noeval "curl -fsSL $CURSOR_URL | tar -xJ -C $ICONS_DIR"
+    curl -fsSL $CURSOR_URL | tar -xJ -C $ICONS_DIR
+    print "[Icon Theme]\nInherits=$CURSOR" > $ICONS_DIR/default/index.theme
+    run_noeval "$ICONS_DIR/default/index.theme: Inherits=$CURSOR"
+}
+
 # libadwaita apps only read ~/.config/gtk-4.0. Import the theme's CSS instead of
 # symlinking it, so relative asset URLs (e.g. Nordic's ../assets) resolve
 # against the theme directory.
@@ -144,9 +175,21 @@ if [[ -n $update || ! -d $THEMES_DIR/${GTK[$theme]} ]]; then
     install_gtk_theme $theme
 fi
 
-context "GTK and GNOME Shell: ${GTK[$theme]}"
+icons=Tela-circle-${ICONS[$theme]}-dark
+if [[ -n $update || ! -d $ICONS_DIR/$icons ]]; then
+    context "Installing icon theme $icons"
+    install_icons ${ICONS[$theme]}
+fi
+if [[ -n $update || ! -d $ICONS_DIR/$CURSOR ]]; then
+    context "Installing cursor $CURSOR"
+    install_cursor
+fi
+
+context "GTK and GNOME Shell: ${GTK[$theme]}, icons $icons, cursor $CURSOR"
 run gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 run gsettings set org.gnome.desktop.interface gtk-theme ${GTK[$theme]}
+run gsettings set org.gnome.desktop.interface icon-theme $icons
+run gsettings set org.gnome.desktop.interface cursor-theme $CURSOR
 run_noeval "dconf write /org/gnome/shell/extensions/user-theme/name \"'${GTK[$theme]}'\""
 dconf write /org/gnome/shell/extensions/user-theme/name "'${GTK[$theme]}'"
 link_gtk4 ${GTK[$theme]}

@@ -203,8 +203,11 @@ checkout, so most edits apply right away. The rest:
 | `~/.config/secrets.env`                  | open a new shell                                                |
 
 **Themes**: `./theme.sh everforest` (or `gruvbox`, `nord`) switches Alacritty,
-helix, zellij, Neovim, delta (git diffs), the GTK theme and the GNOME Shell theme. It installs a GTK theme
-the first time; `./theme.sh -u <theme>` updates it.
+helix, zellij, Neovim, delta (git diffs), the GTK theme, the GNOME Shell theme
+and the folder colour of the icons (Tela-circle). The cursor (Bibata Modern Ice)
+is the same for every theme. It installs what's missing the first time (into
+`~/.local/share/themes` and `~/.local/share/icons`, where Flatpak apps see them
+too); `./theme.sh -u <theme>` updates them.
 
 **Language versions**: mise manages Python, Node, Go and Lua. Global versions
 are in `.config/mise/config.toml` (`mise use -g node@lts` edits it in the repo;
@@ -262,7 +265,8 @@ zellij configs only list what differs from the defaults (`config nu --doc`,
 
 **Scripts**: put them in `bin/` and make them executable (`chmod +x`).
 
-**Themes**: `theme.sh` has a table of theme names per program at the top. To add
+**Themes**: `theme.sh` has a table of theme names per program at the top (and
+the icon colour, a Tela-circle variant or hex code; the cursor is `CURSOR`). To add
 one, add a column there and the option lines in `alacritty.toml` (plus a file in
 `alacritty/themes/`), `helix/config.toml` and `zellij/config.kdl`.
 
@@ -301,7 +305,7 @@ What updates on its own, and what waits for `update`:
 | GNOME extensions         | GNOME Shell                                                |                           |
 | Nix packages, mise tools, Rust, cargo installs | no                                   | `update`                  |
 | These dotfiles           | config files are live links: `git pull`                    | `update` switches for `home/*.nix` changes |
-| GTK themes               | no                                                         | `./theme.sh -u <theme>`   |
+| GTK themes, icons, cursor | no                                                        | `./theme.sh -u <theme>`   |
 | Nix itself               | no                                                         | `sudo -i nix upgrade-nix`; check first that it stays upstream Nix (the installer's `/etc/nix/nix.conf` points upgrades at a Determinate Systems URL) |
 
 mise upgrades within the versions `.config/mise/config.toml` allows; commit it
