@@ -189,11 +189,17 @@ function step_packages() {
         # From Mozilla (Debian's is the older ESR), preferred over Debian's package
         apt_repo mozilla https://packages.mozilla.org/apt/repo-signing-key.gpg \
             'deb [signed-by={key}] https://packages.mozilla.org/apt mozilla main'
-        run_noeval 'pin packages.mozilla.org > /etc/apt/preferences.d/mozilla'
-        printf 'Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n' \
+        # Only Firefox: the repo also has firefox-esr, at versions that sort
+        # below Debian's, so pinning everything made upgrades want to downgrade it
+        run_noeval 'pin firefox to packages.mozilla.org > /etc/apt/preferences.d/mozilla'
+        printf 'Package: firefox firefox-l10n-*\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n' \
             | sudo tee /etc/apt/preferences.d/mozilla > /dev/null
     fi
     install firefox
+    # Debian's installer adds firefox-esr: keep one Firefox (GNOME accepts either)
+    if dpkg-query -W -f '${Status}' firefox-esr 2> /dev/null | grep -q 'ok installed'; then
+        run sudo apt-get purge -y firefox-esr
+    fi
 
     context 'Alacritty'
     if [[ $distro == fedora || $role == desktop ]]; then
