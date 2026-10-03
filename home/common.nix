@@ -62,8 +62,10 @@ in
       ANDROID_USER_HOME = "${dataHome}/android";
       AWS_CONFIG_FILE = "${configHome}/aws/config";
       AWS_SHARED_CREDENTIALS_FILE = "${configHome}/aws/credentials";
+      CODEX_HOME = "${configHome}/codex";
       CUDA_CACHE_PATH = "${cacheHome}/nv";
       DOTNET_CLI_HOME = "${dataHome}/dotnet";
+      GEMINI_CLI_HOME = "${configHome}/gemini"; # Gemini CLI adds .gemini/ inside
       GNUPGHOME = "${dataHome}/gnupg";
       IPYTHONDIR = "${configHome}/ipython";
       JUPYTER_CONFIG_DIR = "${configHome}/jupyter";
