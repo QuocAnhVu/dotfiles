@@ -41,10 +41,22 @@ else
     user_nix_sh=(${XDG_STATE_HOME:-$HOME/.local/state}/nix/profile/etc/profile.d/nix.sh(N) $HOME/.nix-profile/etc/profile.d/nix.sh(N))
     source $user_nix_sh[1]
 fi
-# Same as home/common.nix's nix.conf, which only exists after the first switch:
-# use-xdg-base-directories must already apply when home-manager installs packages
-export NIX_CONFIG='experimental-features = nix-command flakes
-use-xdg-base-directories = true'
+# home/common.nix enables flakes in ~/.config/nix/nix.conf, after the first switch
+export NIX_CONFIG='experimental-features = nix-command flakes'
+
+context 'Configuring Nix'
+# use-xdg-base-directories puts the profile in ~/.local/state/nix (home/common.nix
+# assumes it). It goes in the system config: as a user setting, every command
+# would forward it to the daemon, which warns that it's ignoring it.
+if ! grep -qsE '^\s*use-xdg-base-directories\s*=\s*true' /etc/nix/nix.conf /etc/nix/nix.custom.conf; then
+    nix_conf=/etc/nix/nix.conf
+    [[ -f /etc/nix/nix.custom.conf ]] && nix_conf=/etc/nix/nix.custom.conf # Determinate's installer owns nix.conf
+    run sudo mkdir -p /etc/nix
+    run_noeval "echo 'use-xdg-base-directories = true' | sudo tee -a $nix_conf"
+    echo 'use-xdg-base-directories = true' | sudo tee -a $nix_conf > /dev/null
+else
+    message 'use-xdg-base-directories is set.'
+fi
 
 context 'Removing symlinks into the dotfiles repo (home-manager recreates them)'
 repo=${DOTFILES:A}

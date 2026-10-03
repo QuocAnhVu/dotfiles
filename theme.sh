@@ -44,11 +44,24 @@ function select_line() {
     run_noeval "$file: $want"
 }
 
-# Install sassc/git and the User Themes extension if missing.
+# Install sassc/git and the User Themes extension if missing (Debian or Fedora).
 function install_prerequisites() {
-    rpm --quiet -q sassc git || run sudo dnf install -y sassc git
+    local pkgs=()
+    (( $+commands[sassc] )) || pkgs+=(sassc)
+    (( $+commands[git] )) || pkgs+=(git)
     if ! gnome-extensions info $USER_THEME &> /dev/null; then
-        run sudo dnf install -y gnome-shell-extension-user-theme
+        if (( $+commands[apt-get] )); then
+            pkgs+=(gnome-shell-extensions) # includes User Themes on Debian
+        else
+            pkgs+=(gnome-shell-extension-user-theme)
+        fi
+    fi
+    if (( $#pkgs )); then
+        if (( $+commands[apt-get] )); then
+            run sudo apt-get install -y $pkgs
+        else
+            run sudo dnf install -y $pkgs
+        fi
     fi
     if ! gnome-extensions enable $USER_THEME 2> /dev/null; then
         message "GNOME Shell doesn't see the User Themes extension yet: log out and back in, then rerun."
