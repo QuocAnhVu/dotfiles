@@ -1,0 +1,121 @@
+#! /usr/bin/zsh
+# Update everything that doesn't update itself: system packages, Flatpak apps,
+# cargo installs, mise tools, Rust, and the Nix packages (flake inputs). Shows
+# what changed in the Nix profile; committing flake.lock is left to you.
+#
+# Usage: update [--drivers] [--role ROLE]
+#   --drivers    also update the graphics driver (NVIDIA's packages), which
+#                otherwise stay at their version: a new driver means a rebuilt
+#                kernel module and a reboot
+#   --role ROLE  the home-manager role to switch to (default: the one setup.sh
+#                last applied, saved in ~/.local/state/dotfiles/role)
+setopt err_exit pipe_fail
+
+function usage() {
+    sed -n '/^# Usage/,/^[^#]/p' $SCRIPT | sed '$d; s/^# \{0,1\}//'
+    exit 1
+}
+function context() { print -P "\n%F{yellow}$*%f" }
+function message() { print -P "%F{yellow}update:%f $*" }
+function run() { print -P "%F{cyan}${(q-)@}%f"; "$@" }
+
+SCRIPT=$0
+DOTFILES=${0:A:h:h}
+STATE=${XDG_STATE_HOME:-$HOME/.local/state}
+role_file=$STATE/dotfiles/role
+drivers=0 role=
+while (( $# )); do
+    case $1 in
+        --drivers) drivers=1; shift ;;
+        --role) role=$2; shift 2 ;;
+        *) usage ;;
+    esac
+done
+[[ -n $role ]] || role=$(cat $role_file 2> /dev/null) || true
+if [[ -z $role ]]; then
+    message "Which role is this machine? Pass --role (workstation, desktop, dev, server)."
+    exit 1
+fi
+
+failed=()
+# Runs a section; a failure is reported at the end instead of stopping the rest
+function section() {
+    local name=$1; shift
+    context $name
+    "$@" || { failed+=($name); message "$name failed: continuing." }
+}
+
+# --- System packages
+held=()
+function release_holds() {
+    if (( $#held )); then sudo apt-mark unhold $held > /dev/null; fi
+    held=()
+}
+trap 'release_holds' EXIT
+trap 'release_holds; exit 130' INT TERM
+
+function system_packages() {
+    if (( $+commands[dnf] )); then
+        local exclude=()
+        (( drivers )) || exclude=(--exclude='*nvidia*')
+        run sudo dnf upgrade -y $exclude
+    else
+        run sudo apt-get update || return 1
+        if (( ! drivers )); then
+            # NVIDIA's repository (driver, container toolkit): hold them for
+            # this upgrade, except those already held
+            local already=(${(f)"$(apt-mark showhold)"})
+            local nvidia=(${(f)"$(apt list --installed '?origin(NVIDIA)' 2> /dev/null | awk -F/ '/\// { print $1 }')"})
+            held=(${nvidia:|already})
+            if (( $#held )); then sudo apt-mark hold $held > /dev/null; fi
+        fi
+        # --with-new-pkgs: kernel updates come as new packages (linux-image-<version>)
+        run sudo apt-get upgrade -y --with-new-pkgs || { release_holds; return 1 }
+        release_holds
+    fi
+}
+section 'System packages' system_packages
+
+# --- User-level tools
+(( $+commands[flatpak] )) && section 'Flatpak apps' run flatpak update -y
+(( $+commands[cargo-install-update] )) && section 'cargo installs' run cargo install-update -a
+(( $+commands[mise] )) && section 'mise tools' run mise upgrade
+(( $+commands[rustup] )) && section 'Rust' run rustup update
+
+# --- Nix packages: newer flake inputs, then switch (also applies home/*.nix changes)
+function nix_packages() {
+    local lock=$DOTFILES/flake.lock backup=$(mktemp) profile=$STATE/nix/profiles/home-manager
+    local old=$(readlink -f $profile)
+    cp $lock $backup
+    run nix flake update --flake $DOTFILES || { rm $backup; return 1 }
+    local changed=1
+    cmp -s $lock $backup && changed=0
+    (( changed )) || message 'Flake inputs are current.'
+    if ! run home-manager switch --flake $DOTFILES#$USER@$role; then
+        (( changed )) && { cp $backup $lock; message 'The switch failed: flake.lock restored.' }
+        rm $backup; return 1
+    fi
+    rm $backup
+    [[ $(readlink -f $profile) == $old ]] && return 0
+    run nix store diff-closures $old $(readlink -f $profile)
+    (( changed )) && message "If things work: git -C $DOTFILES commit flake.lock -m 'chore: Update flake inputs'"
+    message "If not: $old/activate${${changed:#0}:+, then git -C $DOTFILES checkout flake.lock}"
+}
+section "Nix packages ($USER@$role)" nix_packages
+
+# --- What's left to do
+context 'Done'
+if [[ -f /run/reboot-required ]]; then
+    message "Reboot to finish: ${(j:, :)${(fu)"$(cat /run/reboot-required.pkgs 2> /dev/null)"}}"
+elif (( $+commands[dnf] )) && ! dnf needs-restarting -r > /dev/null 2>&1; then
+    message 'Reboot to finish (dnf needs-restarting -r).'
+fi
+# The loaded driver differs from the installed one (Vulkan/CUDA fail until then)
+if [[ -r /sys/module/nvidia/version ]] &&
+    [[ $(< /sys/module/nvidia/version) != $(modinfo -F version nvidia 2> /dev/null) ]]; then
+    message 'Reboot to load the new NVIDIA driver.'
+fi
+if (( $#failed )); then
+    message "Failed: ${(j:, :)failed}"
+    exit 1
+fi

@@ -194,6 +194,11 @@ function step_packages() {
         run_noeval 'pin firefox to packages.mozilla.org > /etc/apt/preferences.d/mozilla'
         printf 'Package: firefox firefox-l10n-*\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n' \
             | sudo tee /etc/apt/preferences.d/mozilla > /dev/null
+        # Automatic updates (security fixes) for Firefox too: unattended-upgrades
+        # only takes Debian's repositories, and Firefox can't update itself
+        run_noeval 'allow packages.mozilla.org > /etc/apt/apt.conf.d/51unattended-upgrades-mozilla'
+        print -r -- 'Unattended-Upgrade::Origins-Pattern { "site=packages.mozilla.org"; };' \
+            | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-mozilla > /dev/null
     fi
     install firefox
     # Debian's installer adds firefox-esr: keep one Firefox (GNOME accepts either)
@@ -336,6 +341,9 @@ function step_home() {
         done
         exit 1
     fi
+    # For bin/update, which switches to the same profile
+    run mkdir -p $XDG_STATE_HOME/dotfiles
+    print $role > $XDG_STATE_HOME/dotfiles/role
 
     context 'Migrating ~/.nix-profile and ~/.nix-defexpr to ~/.local/state/nix'
     # home/common.nix sets use-xdg-base-directories. Nix's shell setup warns on

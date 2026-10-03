@@ -278,15 +278,34 @@ machine won't have it.
 
 ## Updating
 
-| What                     | How                                                                 |
-| ------------------------ | ------------------------------------------------------------------- |
-| These dotfiles           | `git pull`, then `home-manager switch --flake ~/.local/share/dotfiles#$USER@<role>` |
-| Nix packages             | `nix flake update`, switch, check things work, commit `flake.lock` (roll back if not) |
-| GTK themes               | `./theme.sh -u <theme>`                                             |
-| System packages          | automatic (`setup.sh` enables dnf-automatic / unattended-upgrades)  |
-| Flatpak apps, GNOME extensions | automatic (nix-flatpak weekly; GNOME Shell for extensions)    |
-| Nix itself               | `sudo -i nix upgrade-nix`; check first that it stays upstream Nix (the installer's `/etc/nix/nix.conf` points upgrades at a Determinate Systems URL) |
-| Toolchains               | `mise upgrade` (commit `.config/mise/config.toml` if versions change), `rustup update` |
+Run `update` (`bin/update`) now and then. It updates, in order: system
+packages, Flatpak apps, cargo installs (`cargo install-update -a`), mise tools,
+Rust, and the Nix packages (`nix flake update`, then a switch to the role
+`setup.sh` applied). Then it shows what changed and whether a reboot is needed.
+A failed step doesn't stop the rest. Afterwards:
+
+- If things work, commit `flake.lock`. If not, run the `activate` it prints
+  (the previous generation) and `git checkout flake.lock`.
+- The graphics driver stays at its version unless you pass `--drivers`: a new
+  NVIDIA driver means a rebuilt kernel module and a reboot.
+
+What updates on its own, and what waits for `update`:
+
+| What                     | Automatic                                                  | Otherwise                 |
+| ------------------------ | ---------------------------------------------------------- | ------------------------- |
+| Debian/Fedora packages   | security and stable updates (unattended-upgrades / dnf-automatic, from `setup.sh`) | `update` |
+| Firefox (Mozilla's repo on Debian) | daily (`setup.sh` adds the repo to unattended-upgrades; Firefox can't update itself, as its files belong to root) | `update` |
+| Mullvad (its repo on Debian) | no: unattended-upgrades only takes Debian's repos, and Mozilla's | `update` |
+| NVIDIA driver, container toolkit (Debian) | no                                        | `update --drivers`        |
+| Flatpak apps             | weekly (nix-flatpak)                                       | `update`                  |
+| GNOME extensions         | GNOME Shell                                                |                           |
+| Nix packages, mise tools, Rust, cargo installs | no                                   | `update`                  |
+| These dotfiles           | config files are live links: `git pull`                    | `update` switches for `home/*.nix` changes |
+| GTK themes               | no                                                         | `./theme.sh -u <theme>`   |
+| Nix itself               | no                                                         | `sudo -i nix upgrade-nix`; check first that it stays upstream Nix (the installer's `/etc/nix/nix.conf` points upgrades at a Determinate Systems URL) |
+
+mise upgrades within the versions `.config/mise/config.toml` allows; commit it
+if you change them.
 
 Old home-manager generations older than 30 days are deleted weekly
 (`nix.gc` in `home/common.nix`); `nix-collect-garbage -d` frees space now.
