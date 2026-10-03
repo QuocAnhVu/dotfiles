@@ -1,0 +1,123 @@
+#! /usr/bin/zsh
+# Keep third-party clones as a list instead of copies. `3p save` records each
+# clone's remote, branch and commit in 3p/.manifest/, with local changes saved
+# as patches and unpushed commits as bundles. `3p restore` clones them back.
+#
+# Usage:
+#   3p save              record every clone in the 3p directory
+#   3p list              show the recorded clones, and which are present
+#   3p restore NAME...   clone these back (--all: every recorded clone)
+#
+# The 3p directory is $WS_3P, or ~/ws/3p.
+setopt err_exit pipe_fail
+
+function usage() {
+    sed -n '/^# Usage/,/^[^#]/p' $SCRIPT | sed '$d; s/^# \{0,1\}//'
+    exit 1
+}
+function message() { print -P "%F{yellow}3p:%f $*" }
+
+SCRIPT=$0
+dir=${WS_3P:-$HOME/ws/3p}
+manifest=$dir/.manifest
+list=$manifest/manifest.tsv
+
+function save() {
+    mkdir -p $manifest/patches $manifest/bundles
+    rm -f $manifest/patches/*(N) $manifest/bundles/*(N)
+    local rows=() repo name url branch commit untracked rc
+    for repo in $dir/*(N/); do
+        name=${repo:t}
+        if [[ -e $repo/.git ]]; then
+            url=$(git -C $repo remote get-url origin 2> /dev/null || print -)
+            branch=$(git -C $repo symbolic-ref -q --short HEAD || print -)
+            commit=$(git -C $repo rev-parse -q --verify HEAD || print -)
+            [[ $url == - ]] && message "$name: no remote, so it can't be restored. Copy it by hand."
+            # 0: no changes, 1: changes, more: git can't read the repository
+            rc=0; git -C $repo diff --quiet HEAD 2> /dev/null || rc=$?
+            if (( rc == 1 )); then
+                git -C $repo diff --binary HEAD > $manifest/patches/$name.patch
+                message "$name: saved local changes ($(du -h $manifest/patches/$name.patch | cut -f1))"
+            elif (( rc > 1 )); then
+                message "$name: git can't read it (corrupt?), so local changes weren't saved"
+            fi
+            if [[ -n $(git -C $repo log --branches --not --remotes --oneline 2> /dev/null) ]]; then
+                git -C $repo bundle create -q $manifest/bundles/$name.bundle --branches --not --remotes
+                message "$name: saved unpushed commits"
+            fi
+            untracked=$(git -C $repo ls-files --others --exclude-standard | wc -l)
+            (( untracked )) && message "$name: $untracked untracked files not saved (git -C $repo status)"
+            rows+=("$name	git	$url	$branch	$commit")
+        elif [[ -d $repo/.hg ]]; then
+            url=$(awk -F' *= *' '/^default *=/ { print $2; exit }' $repo/.hg/hgrc 2> /dev/null)
+            rows+=("$name	hg	${url:--}	-	-")
+        else
+            message "$name: not a repository, so it can't be restored. Copy it by hand."
+            rows+=("$name	none	-	-	-")
+        fi
+    done
+    print -l "# name	vcs	url	branch	commit" $rows > $list
+    message "Recorded $#rows entries in $list"
+}
+
+function show() {
+    [[ -f $list ]] || { message "No $list: run 3p save first."; exit 1 }
+    local name vcs url branch commit
+    while IFS=$'\t' read name vcs url branch commit; do
+        [[ $name == \#* ]] && continue
+        printf '%-8s %-32s %s\n' $([[ -e $dir/$name ]] && print present || print -) $name $url
+    done < $list
+}
+
+function restore_one() {
+    local name=$1 vcs url branch commit repo=$dir/$1
+    IFS=$'\t' read name vcs url branch commit < <(awk -F'\t' -v n=$1 '$1 == n' $list) || true
+    if [[ -z $vcs ]]; then message "$1: not in $list"; return 1; fi
+    if [[ -e $repo ]]; then message "$name: already present"; return 0; fi
+    case $vcs in
+        git)
+            # Blobless clone: full history, file contents fetched when needed
+            local opts=(--filter=blob:none --recurse-submodules)
+            [[ $branch != - ]] && opts+=(--branch $branch)
+            git clone $opts $url $repo
+            local bundle=$manifest/bundles/$name.bundle patch=$manifest/patches/$name.patch
+            if [[ -f $bundle ]]; then
+                git -C $repo fetch -q $bundle 'refs/heads/*:refs/heads/saved/*'
+                if [[ $branch != - ]] && git -C $repo merge -q --ff-only saved/$branch 2> /dev/null; then
+                    message "$name: restored your unpushed commits"
+                else
+                    message "$name: your unpushed commits are on the saved/* branches (rebase them)"
+                fi
+            fi
+            if [[ -f $patch ]]; then
+                if git -C $repo apply --3way $patch 2> /dev/null; then
+                    message "$name: reapplied your local changes"
+                else
+                    message "$name: your local changes don't apply to the current upstream: see $patch (made against $commit)"
+                fi
+            fi
+            ;;
+        hg)
+            (( $+commands[hg] )) || { message "$name: install Mercurial (hg) first"; return 1 }
+            hg clone $url $repo
+            ;;
+        *) message "$name: nothing to restore from"; return 1 ;;
+    esac
+}
+
+case $1 in
+    save) save ;;
+    list) show ;;
+    restore)
+        shift
+        (( $# )) || usage
+        [[ -f $list ]] || { message "No $list"; exit 1 }
+        names=($@)
+        [[ $1 == --all ]] && names=(${(f)"$(awk -F'\t' '!/^#/ { print $1 }' $list)"})
+        mkdir -p $dir
+        failed=()
+        for n in $names; do restore_one $n || failed+=($n); done
+        if (( $#failed )); then message "Failed: $failed"; exit 1; fi
+        ;;
+    *) usage ;;
+esac

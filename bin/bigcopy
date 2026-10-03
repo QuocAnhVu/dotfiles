@@ -1,0 +1,139 @@
+#! /usr/bin/zsh
+# Copy to a flaky, overheating external drive: rsync with a write speed limit,
+# optional pauses to cool down, and automatic resume when the drive drops out
+# and comes back.
+#
+# Usage: bigcopy [options] SRC... DEST [-- RSYNC_ARGS...]
+#   -l, --limit RATE     write speed limit in rsync --bwlimit units (default 100M: 100 MiB/s)
+#   -c, --cool RUN:REST  pause for REST after every RUN of copying, e.g. 10m:3m
+#   -m, --mount DIR      the drive's mount point (default: the one DEST is on)
+#
+# Rerunning the same command continues where it stopped: rsync skips finished
+# files and resumes partial ones (kept in .rsync-partial/ directories). SRC
+# follows rsync's rule: a trailing slash copies the contents, not the directory.
+setopt err_exit pipe_fail
+
+function usage() {
+    sed -n '/^# Usage/,/^[^#]/p' $SCRIPT | sed '$d; s/^# \{0,1\}//'
+    exit 1
+}
+function message() { print -P "%F{yellow}bigcopy:%f $*" }
+
+# 90 -> 90, 10m -> 600, 1h -> 3600
+function seconds() {
+    case $1 in
+        <->) print $1 ;;
+        <->s) print ${1%s} ;;
+        <->m) print $(( ${1%m} * 60 )) ;;
+        <->h) print $(( ${1%h} * 3600 )) ;;
+        *) message "Not a duration: $1"; exit 1 ;;
+    esac
+}
+
+SCRIPT=$0
+limit=100M cool= mount= args=() extra=()
+while (( $# )); do
+    case $1 in
+        -l | --limit) limit=$2; shift 2 ;;
+        -c | --cool) cool=$2; shift 2 ;;
+        -m | --mount) mount=$2; shift 2 ;;
+        -h | --help) usage ;;
+        --) shift; extra=($@); break ;;
+        -*) usage ;;
+        *) args+=($1); shift ;;
+    esac
+done
+(( $#args >= 2 )) || usage
+dest=$args[-1]
+srcs=(${args[1,-2]})
+if [[ -n $cool ]]; then
+    [[ $cool == *:* ]] || usage
+    run_s=$(seconds ${cool%%:*}) rest_s=$(seconds ${cool#*:})
+fi
+
+if [[ -z $mount ]]; then
+    existing=${dest:a}
+    until [[ -e $existing ]]; do existing=${existing:h}; done
+    mount=$(findmnt -n -o TARGET -T $existing | head -1)
+fi
+if [[ $mount == / ]]; then
+    message "$dest is on the root filesystem, not a drive: pass --mount."
+    exit 1
+fi
+
+# Mounted (not just the automount point) and writable. A dropped drive can stay
+# mounted but fail every write, and I/O on it can hang: hence the timeouts.
+function drive_ok() {
+    timeout 10 ls $mount > /dev/null 2>&1 || return 1 # triggers systemd automount
+    findmnt -rn -o FSTYPE --mountpoint $mount | grep -qvx autofs || return 1
+    timeout 10 sh -c 'echo > "$1/.bigcopy-probe" && rm "$1/.bigcopy-probe"' sh $mount 2> /dev/null
+}
+
+function wait_for_drive() {
+    drive_ok && return
+    message "$mount is not available: reconnect the drive (and unlock/mount it if needed). Waiting..."
+    until drive_ok; do sleep 10; done
+    message "$mount is back."
+}
+
+rsync_pid= cooler_pid=
+function stop_all() {
+    [[ -n $cooler_pid ]] && kill $cooler_pid 2> /dev/null
+    if [[ -n $rsync_pid ]]; then
+        kill -CONT -- -$rsync_pid 2> /dev/null
+        kill -TERM -- -$rsync_pid 2> /dev/null
+    fi
+    return 0
+}
+trap 'stop_all; message "Stopped. Rerun the same command to continue."; exit 130' INT TERM
+
+# Pauses rsync (its whole process group) for rest_s after every run_s
+function cool_down() {
+    while sleep $run_s && kill -0 $1 2> /dev/null; do
+        print; message "Pausing ${rest_s}s to let the drive cool down"
+        kill -STOP -- -$1
+        sleep $rest_s
+        kill -CONT -- -$1
+    done
+}
+
+# -a: permissions, times, symlinks; -H: hard links; -A/-X: ACLs, xattrs.
+# --no-whole-file: resume partial files (local copies otherwise restart them).
+rsync_args=(-aHAX --partial-dir=.rsync-partial --no-whole-file --bwlimit=$limit
+    --info=progress2,stats1 --human-readable $extra)
+
+failures=0
+while true; do
+    wait_for_drive
+    mkdir -p $dest
+    message "rsync ${(j: :)srcs} -> $dest (limit $limit/s${cool:+, cool $cool})"
+    # Own process group, so pausing and stopping reach all of rsync's processes
+    setsid rsync $rsync_args $srcs $dest &
+    rsync_pid=$!
+    [[ -n $cool ]] && { cool_down $rsync_pid & cooler_pid=$! }
+    wait $rsync_pid && rc=0 || rc=$?
+    [[ -n $cooler_pid ]] && kill $cooler_pid 2> /dev/null
+    rsync_pid= cooler_pid=
+
+    if (( rc == 0 || rc == 24 )); then # 24: source files vanished during the copy
+        # Written data may still be in memory: flush it before calling it done
+        message 'Flushing to the drive...'
+        if timeout 600 sync -f $dest; then
+            message "Done: ${(j: :)srcs} -> $dest"
+            exit 0
+        fi
+        rc=1
+    fi
+    if drive_ok; then
+        # The drive is fine, so it's a real error (unreadable file, disk full...)
+        if (( ++failures >= 3 )); then
+            message "rsync failed (exit $rc) $failures times with the drive connected: see the errors above."
+            exit $rc
+        fi
+        message "rsync exited with $rc. Retrying in 30s."
+        sleep 30
+    else
+        message "The drive dropped out (rsync exit $rc)."
+        failures=0
+    fi
+done
