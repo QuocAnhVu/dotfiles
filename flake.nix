@@ -8,7 +8,7 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Declarative Flatpak apps (services.flatpak in home/desktop.nix)
+    # Declarative Flatpak apps (services.flatpak in home/workstation.nix)
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
 
@@ -26,6 +26,7 @@
     in
     {
       homeConfigurations = {
+        "quocanh@workstation" = mkHome { profile = "workstation"; };
         "quocanh@desktop" = mkHome { profile = "desktop"; };
         "quocanh@dev" = mkHome { profile = "full"; };
         # Store copies instead of links, so servers don't need a dotfiles checkout

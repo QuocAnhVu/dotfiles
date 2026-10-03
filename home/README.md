@@ -8,6 +8,7 @@ the modules here:
 | `quocanh@server`   | `minimal.nix` | `common.nix`                  |
 | `quocanh@dev`      | `full.nix`    | `minimal.nix`                 |
 | `quocanh@desktop`  | `desktop.nix` | `full.nix`                    |
+| `quocanh@workstation` | `workstation.nix` | `desktop.nix`          |
 
 - `common.nix`: user, XDG directories, environment variables (shells and the
   desktop session), the Nix profile location, garbage collection, `~/.zshenv`,
@@ -15,14 +16,15 @@ the modules here:
 - `minimal.nix`: shell configs and a small set of tools, for servers.
 - `full.nix`: the CLI/TUI suite, toolchain managers and language servers.
 - `desktop.nix`: terminal config, fonts, distrobox.
+- `workstation.nix`: the Flatpak apps (nix-flatpak).
 
 ## Changing a profile
 
 1. Edit the module.
 2. New files must be known to git (`git add`): flakes only see tracked files.
-3. Check it builds without switching: `home-manager build --flake .#quocanh@desktop`
+3. Check it builds without switching: `home-manager build --flake .#quocanh@workstation`
    (leaves a `result` link; delete it afterwards).
-4. Apply: `home-manager switch --flake .#quocanh@desktop`.
+4. Apply: `home-manager switch --flake .#quocanh@<role>`.
 
 ## Packages
 

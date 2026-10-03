@@ -1,14 +1,14 @@
 #! /usr/bin/zsh
 # Install Nix if needed, then apply a home-manager profile from this repo.
-# Usage: ./home.sh <desktop|dev|server>
+# Usage: ./home.sh <workstation|desktop|dev|server>
 source $(dirname $0)/_lib.sh
 setopt err_exit
 
 DOTFILES=$(cd $(dirname $0) && pwd)
 profile=$1
 case $profile in
-    desktop | dev | server) ;;
-    *) echo "Usage: $0 <desktop|dev|server>"; exit 1 ;;
+    workstation | desktop | dev | server) ;;
+    *) echo "Usage: $0 <workstation|desktop|dev|server>"; exit 1 ;;
 esac
 
 # Single-user installs: the profile is in ~/.local/state/nix once home-manager
