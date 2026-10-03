@@ -38,7 +38,7 @@ $env.config.keybindings ++= [
       ]
     }
     {
-        name: ide_completion_menu
+        name: ide_completion_menu_ctrl_n
         modifier: control
         keycode: char_n
         mode: [emacs vi_normal vi_insert]

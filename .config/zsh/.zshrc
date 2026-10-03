@@ -1,20 +1,6 @@
-# Environment variables (XDG fixes, EDITOR, PATH) come from home-manager:
-# home/common.nix and home/full.nix. This file is for interactive shells.
+# Interactive shells. Environment variables are set in .zshenv (from
+# home-manager: home/*.nix, plus ~/.config/environment.d/90-local.conf).
 export LANG=en_US.UTF-8
-
-# Nix and home-manager: packages on PATH, session variables
-if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
-    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-elif [ -e "${XDG_STATE_HOME:-$HOME/.local/state}/nix/profile/etc/profile.d/nix.sh" ]; then
-    . "${XDG_STATE_HOME:-$HOME/.local/state}/nix/profile/etc/profile.d/nix.sh"
-elif [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
-    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
-fi
-for hm_vars in "${XDG_STATE_HOME:-$HOME/.local/state}/nix/profile" "$HOME/.nix-profile"; do
-    hm_vars="$hm_vars/etc/profile.d/hm-session-vars.sh"
-    [ -r "$hm_vars" ] && { . "$hm_vars"; break; }
-done
-unset hm_vars
 
 # Custom functions in $ZDOTDIR/.zsh_functions
 fpath+=${ZDOTDIR:-~}/.zsh_functions
@@ -35,8 +21,14 @@ alias pn=pnpm
 (( $+commands[starship] )) && eval "$(starship init zsh)"
 (( $+commands[mise] )) && eval "$(mise activate zsh)"
 
-# Local (untracked) config: machine-specific settings and secrets
-[[ ! -r $XDG_CONFIG_HOME/localrc ]] || source $XDG_CONFIG_HOME/localrc
+# Secrets (API keys) for interactive shells only, so they stay out of the
+# desktop session: KEY=VALUE lines in an untracked file
+if [[ -r $XDG_CONFIG_HOME/secrets.env ]]; then
+    while IFS='=' read -r key value; do
+        [[ -z $key || $key == \#* ]] || export $key=$value
+    done < $XDG_CONFIG_HOME/secrets.env
+    unset key value
+fi
 
-# uv/cargo installer env, if present
-[ ! -r "$HOME/.local/bin/env" ] || . "$HOME/.local/bin/env"
+# Google Cloud SDK completion, if installed
+[[ ! -r $XDG_DATA_HOME/google-cloud-sdk/completion.zsh.inc ]] || source $XDG_DATA_HOME/google-cloud-sdk/completion.zsh.inc

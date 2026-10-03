@@ -1,5 +1,7 @@
 # Nushell environment: only what differs from the defaults (see `config env --doc`).
-# Environment variables (XDG locations, EDITOR) come from home-manager.
+# Environment variables come from the desktop session (home-manager's
+# environment.d plus ~/.config/environment.d/90-local.conf), or from zsh when
+# nu is started from it.
 
 use std "path add"
 path add ($env.HOME | path join ".local/share/android-studio/bin")
@@ -26,3 +28,14 @@ if (which starship | is-not-empty) {
 if (which mise | is-not-empty) {
     ^mise activate nu | save ($nu.default-config-dir | path join mise.nu) --force
 }
+
+# Secrets (API keys) for interactive shells only: KEY=VALUE lines, untracked
+let secrets = ($env.XDG_CONFIG_HOME? | default ($env.HOME | path join ".config") | path join "secrets.env")
+if ($secrets | path exists) {
+    open --raw $secrets | lines | where {|l| $l != "" and not ($l | str starts-with "#") }
+        | parse "{key}={value}" | reduce -f {} {|it, acc| $acc | insert $it.key $it.value }
+        | load-env
+}
+
+# gpg-agent's terminal passphrase prompt needs to know the terminal
+if (is-terminal --stdin) { $env.GPG_TTY = (^tty | str trim) }

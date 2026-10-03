@@ -1,6 +1,6 @@
 # .bashrc
-# Environment variables (XDG fixes, EDITOR, PATH) come from home-manager:
-# home/common.nix and home/full.nix. This file is for interactive shells.
+# Environment variables come from home-manager (home/*.nix) and
+# ~/.config/environment.d/90-local.conf, loaded below.
 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
@@ -20,6 +20,17 @@ for hm_vars in "${XDG_STATE_HOME:-$HOME/.local/state}/nix/profile" "$HOME/.nix-p
     [ -r "$hm_vars" ] && { . "$hm_vars"; break; }
 done
 unset hm_vars
+
+# Machine-specific variables (environment.d format, not in git). The desktop
+# session already has them; this covers TTY and SSH shells.
+local_env=${XDG_CONFIG_HOME:-$HOME/.config}/environment.d/90-local.conf
+if [ -r "$local_env" ]; then
+    while IFS='=' read -r key value; do
+        case $key in ''|\#*) continue ;; esac
+        export "$key=$(eval "printf '%s' \"$value\"")" # expand ${VAR} like systemd does
+    done < "$local_env"
+fi
+unset local_env key value
 
 # Uncomment the following line if you don't like systemctl's auto-paging feature:
 # export SYSTEMD_PAGER=
@@ -49,8 +60,10 @@ alias pn=pnpm
 command -v starship > /dev/null && eval "$(starship init bash)"
 command -v mise > /dev/null && eval "$(mise activate bash)"
 
-# Local (untracked) config
-# [[ ! -r $XDG_CONFIG_HOME/localrc ]] || source $XDG_CONFIG_HOME/localrc
-
-# uv/cargo installer env, if present
-[ ! -r "$HOME/.local/bin/env" ] || . "$HOME/.local/bin/env"
+# Secrets (API keys) for interactive shells only: KEY=VALUE lines, untracked
+if [ -r "$XDG_CONFIG_HOME/secrets.env" ]; then
+    while IFS='=' read -r key value; do
+        case $key in ''|\#*) ;; *) export "$key=$value" ;; esac
+    done < "$XDG_CONFIG_HOME/secrets.env"
+    unset key value
+fi

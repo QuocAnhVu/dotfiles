@@ -13,7 +13,8 @@ context 'Creating prerequisite directories'
 run mkdir -p $HOME/ws
 run mkdir -p $XDG_STATE_HOME/bash # for bash_history
 run mkdir -p $XDG_STATE_HOME/zsh  # for zsh_history
-run touch $XDG_CONFIG_HOME/localrc
+run mkdir -p $XDG_CONFIG_HOME/environment.d # machine-specific variables: 90-local.conf
+run "touch $XDG_CONFIG_HOME/secrets.env && chmod 600 $XDG_CONFIG_HOME/secrets.env"
 
 context 'Installing packages'
 if rg --quiet 'Fedora|Red Hat' /etc/os-release; then

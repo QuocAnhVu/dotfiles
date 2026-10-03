@@ -38,11 +38,19 @@ nix run github:QuocAnhVu/dotfiles#home-manager -- switch --flake github:QuocAnhV
 After changing `home/*.nix`: `home-manager switch --flake ~/.local/share/dotfiles#quocanh@<profile>`.
 Update pinned packages with `nix flake update`.
 
-Environment variables (XDG locations, `EDITOR`, `PATH`) are set in `home/*.nix`
-and reach both shells and the desktop session (`~/.config/environment.d`; log
-out and back in after changing them). zsh reads `~/.config/zsh/.zshrc`. Scripts
-in `bin/` are on `PATH` for `desktop` and `dev`. Machine-specific settings and
-secrets go in the untracked `~/.config/localrc`.
+## Environment variables
+
+| What                               | Where                                       | Read by                              |
+| ---------------------------------- | ------------------------------------------- | ------------------------------------ |
+| Shared (XDG locations, `EDITOR`…)  | `home/*.nix`                                | desktop session, zsh, bash           |
+| Machine-specific (CUDA, SDK paths) | `~/.config/environment.d/90-local.conf`     | desktop session, zsh, bash           |
+| Secrets (API keys)                 | `~/.config/secrets.env` (`KEY=VALUE`, 0600) | interactive zsh, bash, nushell only  |
+
+The two local files aren't in git. The desktop session reads
+`~/.config/environment.d` at login, so log out and back in after changing it;
+everything started from the desktop (Alacritty, zellij, nushell, GUI apps)
+inherits it. zsh loads the same variables in `~/.config/zsh/.zshenv`, for TTY
+and SSH shells. Scripts in `bin/` are on `PATH` for `desktop` and `dev`.
 
 GUI apps (alacritty, browsers, keepassxc), compilers, cmake/meson, clangd and
 `-dev` libraries come from the system package manager or Flatpak, not Nix.

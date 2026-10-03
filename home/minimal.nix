@@ -22,6 +22,7 @@
 
   home.file.".bashrc".source = link ".bashrc";
   # Link the file, not the directory, so zsh's own files (.zcompdump) stay out of the repo
+  xdg.configFile."zsh/.zshenv".source = link ".config/zsh/.zshenv";
   xdg.configFile."zsh/.zshrc".source = link ".config/zsh/.zshrc";
   xdg.configFile."helix".source = link ".config/helix";
   xdg.configFile."starship.toml".source = link ".config/starship.toml";

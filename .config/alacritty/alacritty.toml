@@ -19,10 +19,11 @@ size = 8
 [font.normal]
 family = "JetBrainsMono Nerd Font"
 
-# zellij's default_shell (nu) is set in zellij/config.kdl
+# Start zellij directly: environment variables come from the desktop session
+# (~/.config/environment.d), so no shell needs to set them up first. zellij's
+# default_shell (nu) is set in zellij/config.kdl.
 [terminal.shell]
-program = "/usr/bin/zsh"
-args = ["-i", "-c", "zellij"]
+program = "zellij"
 
 [colors]
 transparent_background_colors = true

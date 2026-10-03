@@ -81,9 +81,11 @@ in
         ++ [ "${config.home.profileDirectory}/bin" "/nix/var/nix/profiles/default/bin" "\${PATH}" ]);
     };
 
-    # zsh reads its config from ~/.config/zsh; ~/.zshenv only points there
+    # zsh reads its config from ~/.config/zsh; ~/.zshenv only points there. zsh
+    # doesn't reread .zshenv from the new ZDOTDIR, so source it explicitly.
     home.file.".zshenv".text = ''
       export ZDOTDIR="''${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+      [[ ! -r $ZDOTDIR/.zshenv ]] || source $ZDOTDIR/.zshenv
     '';
 
     # Weekly: delete home-manager generations older than 30 days, then
