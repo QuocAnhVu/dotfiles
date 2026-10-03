@@ -6,16 +6,18 @@ the modules here:
 | Configuration      | Module        | Imports                       |
 | ------------------ | ------------- | ----------------------------- |
 | `quocanh@server`   | `minimal.nix` | `common.nix`                  |
-| `quocanh@dev`      | `full.nix`    | `minimal.nix`                 |
-| `quocanh@desktop`  | `desktop.nix` | `full.nix`                    |
-| `quocanh@workstation` | `workstation.nix` | `desktop.nix`, `gnome.nix` |
+| `quocanh@dev`      | `full.nix`    | `minimal.nix`, `terminal.nix` |
+| `quocanh@desktop`  | `desktop.nix` | `minimal.nix`, `terminal.nix` |
+| `quocanh@workstation` | `workstation.nix` | `desktop.nix`, `full.nix`, `gnome.nix` |
 
 - `common.nix`: user, XDG directories, environment variables (shells and the
   desktop session), the Nix profile location, garbage collection, `~/.zshenv`,
   and the `link` helper.
-- `minimal.nix`: shell configs and a small set of tools, for servers.
+- `minimal.nix`: shell configs and a small set of tools, for servers (and
+  every other machine, for SSHing in).
+- `terminal.nix`: zellij and nushell, the terminal session.
 - `full.nix`: the CLI/TUI suite, toolchain managers and language servers.
-- `desktop.nix`: terminal config, fonts, distrobox.
+- `desktop.nix`: terminal config, fonts, distrobox. Not the dev suite.
 - `workstation.nix`: the Flatpak apps (nix-flatpak).
 - `gnome.nix`: enabled GNOME extensions and their settings (dconf).
 

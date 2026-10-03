@@ -19,7 +19,7 @@ the same everywhere.
 
 ```
 flake.nix, flake.lock   home-manager profiles and pinned package versions
-home/                   the profiles: minimal.nix -> full.nix -> desktop.nix (see home/README.md)
+home/                   the profiles: minimal.nix, full.nix, desktop.nix... (see home/README.md)
 .config/                config files, linked into ~/.config by home-manager
   alacritty/            terminal (themes/ holds the colour schemes)
   git/                  git config and global ignore (delta as pager, aliases)
@@ -44,25 +44,25 @@ _lib.sh                 helpers for the scripts above
 | Role               | OS            | `setup.sh` / home-manager    | SSH server | Notes                          |
 | ------------------ | ------------- | ---------------------------- | ---------- | ------------------------------ |
 | This workstation   | Fedora/Debian | `workstation`                | off        | GNOME, desktop apps, NVIDIA    |
-| Remote desktop     | Debian        | `desktop`                    | on         | GNOME, Firefox, terminal; RDP through an SSH tunnel |
+| Remote desktop     | Debian        | `desktop`                    | on         | GNOME, Firefox, terminal, server tools; RDP through an SSH tunnel |
 | Headless dev box   | Debian        | `dev`                        | on         | full toolset, no GUI           |
 | Headless server    | Debian        | `server` (optional)          | on         | a few debugging tools; no checkout needed |
 
-Each role includes the one before it:
+`dev` and `desktop` both build on `server`; `workstation` combines them:
 
 | Role          | home-manager adds                                                      | system packages (`setup.sh`) add                     |
 | ------------- | ---------------------------------------------------------------------- | ---------------------------------------------------- |
 | `server`      | zsh/bash and helix configs, starship, git, ripgrep, fd, bat, mosh…      | nothing                                              |
-| `dev`         | CLI/TUI suite, mise, rustup, uv, language servers, cargo tools, direnv  | compilers, cmake, meson, clangd, podman              |
-| `desktop`     | Alacritty config, JetBrainsMono Nerd Font, distrobox                   | GNOME (if missing), RDP server, Firefox, Alacritty   |
-| `workstation` | Flatpak apps (`home/workstation.nix`), GNOME extension settings (`home/gnome.nix`) | KeePassXC, virt-manager, nvtop, Steam's udev rules, Mullvad, NVIDIA driver and container toolkit |
+| `dev`         | `server` + CLI/TUI suite, zellij, nushell, mise, rustup, uv, language servers, cargo tools, direnv | compilers, cmake, meson, clangd, podman |
+| `desktop`     | `server` + zellij, nushell, Alacritty config, JetBrainsMono Nerd Font, distrobox | podman, GNOME (if missing), RDP server, Firefox, Alacritty (Debian's) |
+| `workstation` | `dev` + `desktop` + Flatpak apps (`home/workstation.nix`), GNOME extension settings (`home/gnome.nix`) | KeePassXC, virt-manager, nvtop, Steam's udev rules, Mullvad, NVIDIA driver and container toolkit |
 
 Where everything else comes from:
 
 | What                                   | From                                   | Why not Nix                                  |
 | -------------------------------------- | -------------------------------------- | -------------------------------------------- |
 | Desktop apps (Steam, Discord, Blender…) | Flatpak, listed in `home/workstation.nix` | Nix-built GUI apps can't use the system GPU drivers on non-NixOS |
-| Firefox, KeePassXC, Alacritty, Mullvad, virt-manager, nvtop | `setup.sh` (apt/dnf, vendor repos; Alacritty via cargo on Debian) | need system integration (browser↔KeePassXC, VPN service, libvirt) |
+| Firefox, KeePassXC, Alacritty, Mullvad, virt-manager, nvtop | `setup.sh` (apt/dnf, vendor repos; Alacritty via cargo on the Debian workstation) | need system integration (browser↔KeePassXC, VPN service, libvirt) |
 | Compilers, `cmake`, `meson`, `clangd`, `-dev` libraries | `setup.sh` / apt, dnf                | Nix's builds don't search `/usr`             |
 | NVIDIA driver, container toolkit       | `setup.sh` (RPM Fusion / NVIDIA's Debian repo)          | kernel module                     |
 | GNOME extensions                       | extensions.gnome.org (`setup.sh`), enabled and configured in `home/gnome.nix` | match the running GNOME Shell version |
@@ -117,9 +117,9 @@ only, name them: `./setup.sh dev home langs`. `./setup.sh` lists them:
 | Step         | Does                                                                 | Roles        |
 | ------------ | -------------------------------------------------------------------- | ------------ |
 | `base`       | XDG directories, curl/git/ripgrep, automatic updates, firewalld (incoming: only allowed services) | all |
-| `packages`   | system packages (see the tables above), podman                       | all but server |
+| `packages`   | system packages (see the tables above)                               | all but server |
 | `home`       | installs Nix (asks for sudo), applies the home-manager profile       | all          |
-| `langs`      | mise tools (`.config/mise/config.toml`), pnpm, Rust stable; Alacritty on Debian | all but server |
+| `langs`      | mise tools (`.config/mise/config.toml`), pnpm, Rust stable; Alacritty on Debian | workstation, dev |
 | `theme`      | reapplies the theme the configs select (`./theme.sh --current`)      | workstation, desktop |
 | `extensions` | installs the GNOME extensions `home/gnome.nix` enables               | workstation  |
 | `ssh`        | client key; a hardened sshd with the keys in `.ssh/authorized_keys`  | all (no sshd on the workstation) |
@@ -234,8 +234,8 @@ versions; run `<path from the list>/activate` to switch back to one.
 ## Customizing
 
 **Add a CLI tool**: find its name with `nix search nixpkgs <name>`, add it to
-`home.packages` in the right profile (`minimal.nix` for servers, `full.nix` for
-dev machines, `desktop.nix` for desktops), then switch. See `home/README.md`.
+`home.packages` in the right profile (`minimal.nix` for every machine, `full.nix`
+for dev machines and the workstation, `desktop.nix` for desktops), then switch. See `home/README.md`.
 
 **Neovim**: plugins and Treesitter grammars are listed in `programs.neovim.plugins`
 in `home/full.nix` (no plugin manager; versions pinned by `flake.lock`), and

@@ -2,7 +2,7 @@
 # Toolchains stay with mise (python, node, go) and rustup (rust), installed here.
 { config, pkgs, lib, link, ... }:
 {
-  imports = [ ./minimal.nix ];
+  imports = [ ./minimal.nix ./terminal.nix ];
 
   home.packages = with pkgs; [
     # CLI/TUI tools
@@ -16,7 +16,6 @@
     iftop
     just
     nmap
-    nushell
     pandoc
     parallel
     rink
@@ -26,7 +25,6 @@
     trash-cli
     typst
     yamllint
-    zellij
 
     # Build tools. Not cmake/meson: Nix's builds don't search /usr, so they
     # can't find apt's -dev libraries; install those (and clangd) with apt.
@@ -128,6 +126,4 @@
   };
 
   xdg.configFile."mise".source = link ".config/mise";
-  xdg.configFile."nushell".source = link ".config/nushell";
-  xdg.configFile."zellij".source = link ".config/zellij";
 }

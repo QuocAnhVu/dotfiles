@@ -1,11 +1,11 @@
-# The workstation (this desktop): desktop.nix plus the desktop apps.
+# The workstation (this desktop): desktop.nix, the dev suite and the desktop apps.
 { config, lib, ... }:
 let
   # The data drive: each machine's /etc/fstab mounts its drive here
   data = "/mnt/data";
 in
 {
-  imports = [ ./desktop.nix ./gnome.nix ];
+  imports = [ ./desktop.nix ./full.nix ./gnome.nix ];
 
   # Documents and media on the data drive; Desktop and Downloads (cleared by
   # hand) stay on the system drive. Public (GNOME file sharing) and Templates

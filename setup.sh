@@ -5,7 +5,8 @@
 # Usage: ./setup.sh <role> [step...]
 #   Roles:
 #     workstation  this desktop: GNOME, desktop apps, NVIDIA. No SSH server.
-#     desktop      remote desktops: GNOME with RDP, Firefox, Alacritty; SSH
+#     desktop      remote desktops: GNOME with RDP, Firefox, Alacritty, the
+#                  server tools; SSH
 #     dev          headless, all the tools; SSH
 #     server       headless, minimal tools; SSH
 #   Steps (default: all of the role's, in this order):
@@ -25,7 +26,7 @@ ALL_STEPS=(base packages home langs theme extensions ssh)
 typeset -A ROLE_STEPS
 ROLE_STEPS=(
     workstation "base packages home langs theme extensions ssh"
-    desktop     "base packages home langs theme ssh"
+    desktop     "base packages home theme ssh"
     dev         "base packages home langs ssh"
     server      "base home ssh"
 )
@@ -117,8 +118,8 @@ function step_base() {
 # --- packages ---------------------------------------------------------------
 # What doesn't come from Nix (home-manager) or Flatpak (nix-flatpak):
 #   dev:         build tools, podman
-#   desktop:     + GNOME (if missing) with RDP, Firefox, Alacritty
-#   workstation: + KeePassXC, virt-manager, nvtop, Steam udev rules, Mullvad, NVIDIA
+#   desktop:     podman, GNOME (if missing) with RDP, Firefox, Alacritty
+#   workstation: all of the above, KeePassXC, virt-manager, nvtop, Steam udev rules, Mullvad, NVIDIA
 
 # Adds an apt repository: name, key URL, "deb ..." line ({key} is replaced by the key path)
 function apt_repo() {
@@ -153,11 +154,13 @@ function nvidia_repo() {
 }
 
 function step_packages() {
-    context 'Build tools (Nix versions of cmake/meson/clangd do not see system libraries)'
-    if [[ $distro == fedora ]]; then
-        install gcc gcc-c++ make cmake meson pkgconf-pkg-config clang-tools-extra
-    else
-        install build-essential cmake meson pkg-config clangd
+    if [[ $role != desktop ]]; then
+        context 'Build tools (Nix versions of cmake/meson/clangd do not see system libraries)'
+        if [[ $distro == fedora ]]; then
+            install gcc gcc-c++ make cmake meson pkgconf-pkg-config clang-tools-extra
+        else
+            install build-essential cmake meson pkg-config clangd
+        fi
     fi
 
     context 'Podman (rootless containers; distrobox uses it)'
@@ -193,7 +196,8 @@ function step_packages() {
     install firefox
 
     context 'Alacritty'
-    if [[ $distro == fedora ]]; then
+    if [[ $distro == fedora || $role == desktop ]]; then
+        # Remote desktops have no Rust toolchain (no dev suite): Debian's, older
         install alacritty
     else
         # Built with cargo in the langs step (Debian's lags upstream);
@@ -367,7 +371,7 @@ function step_langs() {
         run rustup default stable
     fi
 
-    if [[ $distro == debian && $role == (workstation|desktop) ]] && ! (( $+commands[alacritty] )); then
+    if [[ $distro == debian && $role == workstation ]] && ! (( $+commands[alacritty] )); then
         context 'Alacritty (cargo build: no official Linux binaries, and Debian lags upstream)'
         run cargo install --locked alacritty
         # The desktop entry and icon from the release
