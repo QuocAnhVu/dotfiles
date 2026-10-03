@@ -8,14 +8,17 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Declarative Flatpak apps (services.flatpak in home/desktop.nix)
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = { nixpkgs, home-manager, nix-flatpak, ... }:
     let
       system = "x86_64-linux";
       mkHome = { profile, liveLinks ? true }: home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.${system};
         modules = [
+          nix-flatpak.homeManagerModules.nix-flatpak
           ./home/${profile}.nix
           { dotfiles.liveLinks = liveLinks; }
         ];
