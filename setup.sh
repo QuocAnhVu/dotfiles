@@ -118,7 +118,7 @@ function step_base() {
 # What doesn't come from Nix (home-manager) or Flatpak (nix-flatpak):
 #   dev:         build tools, podman
 #   desktop:     + GNOME (if missing) with RDP, Firefox, Alacritty
-#   workstation: + KeePassXC, virt-manager, nvtop, Performous, Mullvad, NVIDIA
+#   workstation: + KeePassXC, virt-manager, nvtop, Mullvad, NVIDIA
 
 # Adds an apt repository: name, key URL, "deb ..." line ({key} is replaced by the key path)
 function apt_repo() {
@@ -132,15 +132,12 @@ function apt_repo() {
     fi
 }
 
-# RPM Fusion: Performous, the NVIDIA driver, multimedia codecs
+# RPM Fusion: the NVIDIA driver
 function rpmfusion() {
     local v=$(rpm -E %fedora)
     rpm --quiet -q rpmfusion-nonfree-release || run sudo dnf install -y \
         https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$v.noarch.rpm \
         https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$v.noarch.rpm
-    # Fedora's codec-limited ffmpeg libraries conflict with RPM Fusion's, which
-    # its packages (Performous) need: switch to the full ffmpeg (RPM Fusion's documented step)
-    rpm --quiet -q ffmpeg || run sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing
 }
 
 # NVIDIA's Debian repository: the current driver and the container toolkit.
@@ -206,8 +203,7 @@ function step_packages() {
     [[ $role == desktop ]] && return
 
     context 'Workstation apps (Flatpak apps come from home/workstation.nix)'
-    [[ $distro == fedora ]] && rpmfusion
-    install flatpak keepassxc virt-manager nvtop performous
+    install flatpak keepassxc virt-manager nvtop
 
     context 'Mullvad VPN'
     if [[ $distro == fedora ]]; then
@@ -228,7 +224,9 @@ function step_packages() {
             # Only the driver (CUDA lives in the distrobox); built by DKMS and signed
             # for Secure Boot like Debian's. The open kernel modules: what NVIDIA
             # recommends from the RTX 20-series (Turing) on
+            # NVIDIA's packages don't pull in what DKMS needs to build the module
             nvidia_repo
+            install linux-headers-amd64 dkms
             install nvidia-open
         fi
         message 'With Secure Boot, the driver module must be signed (enroll the MOK key) before it loads.'
@@ -238,8 +236,11 @@ function step_packages() {
             [[ -f /etc/yum.repos.d/nvidia-container-toolkit.repo ]] ||
                 run "curl -fsSL https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo | sudo tee /etc/yum.repos.d/nvidia-container-toolkit.repo > /dev/null"
         fi # Debian: in NVIDIA's repository, added above
+        # Its nvidia-cdi-refresh units write the GPU's CDI spec (/var/run/cdi) at
+        # boot and when the driver changes: nothing to generate here (which would
+        # fail anyway until the driver is loaded, after a reboot)
         install nvidia-container-toolkit
-        run sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+        notes+=('NVIDIA: reboot to load the driver (with Secure Boot, enroll the MOK key first).')
     fi
     notes+=('VeraCrypt is not packaged anywhere: download it from veracrypt.io.')
 }
