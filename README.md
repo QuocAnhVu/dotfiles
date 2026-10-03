@@ -22,7 +22,8 @@ flake.nix, flake.lock   home-manager profiles and pinned package versions
 home/                   the profiles: minimal.nix -> full.nix -> desktop.nix (see home/README.md)
 .config/                config files, linked into ~/.config by home-manager
   alacritty/            terminal (themes/ holds the colour schemes)
-  helix/  nvim/         editors
+  helix/                main editor
+  nvim/                 occasional editor (plugins come from home/full.nix)
   nushell/              interactive shell
   zsh/                  login shell: .zshenv (environment), .zshrc (interactive)
   zellij/               terminal multiplexer
@@ -124,8 +125,7 @@ Two files aren't in git (`base.sh` creates empty ones):
   connect through SSH: `ssh -L 3389:localhost:3389 <host>`, then point the RDP
   client at `localhost`.
 - **Optional extras**: Tailscale (`curl -fsSL https://tailscale.com/install.sh | sh`),
-  Caps Lock as Escape (`gsettings set org.gnome.desktop.input-sources xkb-options "['caps:escape']"`),
-  Neovim Treesitter parsers (`nvim -c 'TSInstall all' -c 'qa!'`).
+  Caps Lock as Escape (`gsettings set org.gnome.desktop.input-sources xkb-options "['caps:escape']"`).
 
 ## Everyday use
 
@@ -145,7 +145,7 @@ checkout, so most edits apply right away. The rest:
 | `~/.config/secrets.env`                  | open a new shell                                                |
 
 **Themes**: `./theme.sh everforest` (or `gruvbox`, `nord`) switches Alacritty,
-helix, zellij, the GTK theme and the GNOME Shell theme. It installs a GTK theme
+helix, zellij, Neovim, the GTK theme and the GNOME Shell theme. It installs a GTK theme
 the first time; `./theme.sh -u <theme>` updates it.
 
 **Language versions**: mise manages Python, Node, Go and Lua (`mise use -g node@lts`,
@@ -170,6 +170,10 @@ versions; run `<path from the list>/activate` to switch back to one.
 **Add a CLI tool**: find its name with `nix search nixpkgs <name>`, add it to
 `home.packages` in the right profile (`minimal.nix` for servers, `full.nix` for
 dev machines, `desktop.nix` for desktops), then switch. See `home/README.md`.
+
+**Neovim**: plugins and Treesitter grammars are listed in `programs.neovim.plugins`
+in `home/full.nix` (no plugin manager; versions pinned by `flake.lock`), and
+configured in `.config/nvim/init.lua`. Language servers are the ones helix uses.
 
 **Add a config file**: put it under `.config/` and add a line such as
 `xdg.configFile."foo".source = link ".config/foo";` to the profile.

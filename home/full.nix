@@ -82,7 +82,37 @@
     "${dataHome}/go/bin"
   ];
 
+  # Neovim plugins (configured in .config/nvim/init.lua), pinned by flake.lock
+  programs.neovim.plugins = with pkgs.vimPlugins; [
+    (nvim-treesitter.withPlugins (p: with p; [
+      bash c cpp css diff dockerfile gitcommit go html javascript json kdl lua
+      make markdown markdown_inline nix nu python query regex rust starlark
+      svelte toml tsx typescript typst vim vimdoc wgsl yaml
+    ]))
+    nvim-treesitter-context
+    nvim-treesitter-textobjects
+    nvim-lspconfig # default settings for the language servers installed above
+
+    telescope-nvim
+    telescope-fzf-native-nvim
+    telescope-ui-select-nvim
+    plenary-nvim
+    nvim-web-devicons
+
+    gitsigns-nvim
+    indent-blankline-nvim
+    lualine-nvim
+    marks-nvim
+    oil-nvim
+    vim-easymotion
+    which-key-nvim
+
+    # Themes, switched by theme.sh
+    everforest
+    gruvbox-nvim
+    nord-nvim
+  ];
+
   xdg.configFile."nushell".source = link ".config/nushell";
-  xdg.configFile."nvim".source = link ".config/nvim";
   xdg.configFile."zellij".source = link ".config/zellij";
 }

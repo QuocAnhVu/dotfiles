@@ -1,5 +1,5 @@
 # Headless servers: shell config and a small set of tools for debugging.
-{ pkgs, link, ... }:
+{ lib, pkgs, link, ... }:
 {
   imports = [ ./common.nix ];
 
@@ -14,7 +14,6 @@
     helix
     jq
     mosh # mosh-server, for connecting with mosh
-    neovim
     procs
     ripgrep
     starship
@@ -25,5 +24,19 @@
   xdg.configFile."zsh/.zshenv".source = link ".config/zsh/.zshenv";
   xdg.configFile."zsh/.zshrc".source = link ".config/zsh/.zshrc";
   xdg.configFile."helix".source = link ".config/helix";
+
+  # Neovim without plugins here; full.nix adds them. init.lua skips plugin
+  # setup when a plugin isn't installed.
+  programs.neovim = {
+    enable = true;
+    withPython3 = false;
+    withRuby = false;
+    sideloadInitLua = true; # keep ~/.config/nvim/init.lua ours (linked below)
+  };
+  xdg.configFile."nvim/init.lua" = {
+    source = link ".config/nvim/init.lua";
+    # The neovim module disables this entry when sideloading its own init.lua
+    enable = lib.mkForce true;
+  };
   xdg.configFile."starship.toml".source = link ".config/starship.toml";
 }
