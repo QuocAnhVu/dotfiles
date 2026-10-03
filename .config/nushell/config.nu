@@ -83,7 +83,5 @@ $env.config.hooks.pre_prompt ++= [{||
     if ($env.PATH | describe) == "string" { $env.PATH = ($env.PATH | split row (char esep)) }
 }]
 
-# mise.nu is generated in env.nu
-if (which mise | is-not-empty) {
-    use ($nu.default-config-dir | path join mise.nu)
-}
+# mise.nu is generated in env.nu (empty without mise)
+use ($nu.default-config-dir | path join mise.nu)
