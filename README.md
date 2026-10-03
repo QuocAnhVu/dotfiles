@@ -175,7 +175,7 @@ clones you want. Check the last run with `journalctl --user -u ws-backup`.
 - **Headless server without a checkout**: skip the clone and apply the profile
   straight from GitHub (needs Nix with flakes; uses what's pushed):
   ```shell
-  nix run github:QuocAnhVu/dotfiles#home-manager -- switch --flake github:QuocAnhVu/dotfiles#quocanh@server
+  nix run github:QuocAnhVu/dotfiles#home-manager -- switch --flake github:QuocAnhVu/dotfiles#$USER@server
   ```
 - **Remote desktop**: `setup.sh desktop` installs the RDP server and an SSH server; turn on RDP in GNOME Settings →
   System → Remote Desktop (or with `grdctl`), but keep port 3389 closed and
@@ -197,7 +197,7 @@ checkout, so most edits apply right away. The rest:
 | You changed                              | To apply                                                        |
 | ---------------------------------------- | --------------------------------------------------------------- |
 | A file under `.config/`                  | nothing (restart the program, or reload: `:config-reload` in helix) |
-| `home/*.nix` or `flake.lock`             | `home-manager switch --flake ~/.local/share/dotfiles#quocanh@<role>` |
+| `home/*.nix` or `flake.lock`             | `home-manager switch --flake ~/.local/share/dotfiles#$USER@<role>` |
 | Shared variables in `home/*.nix`         | the switch above, then log out and back in                      |
 | `~/.config/environment.d/90-local.conf`  | log out and back in (new zsh/bash shells pick it up right away) |
 | `~/.config/secrets.env`                  | open a new shell                                                |
@@ -280,7 +280,7 @@ machine won't have it.
 
 | What                     | How                                                                 |
 | ------------------------ | ------------------------------------------------------------------- |
-| These dotfiles           | `git pull`, then `home-manager switch --flake ~/.local/share/dotfiles#quocanh@<profile>` |
+| These dotfiles           | `git pull`, then `home-manager switch --flake ~/.local/share/dotfiles#$USER@<role>` |
 | Nix packages             | `nix flake update`, switch, check things work, commit `flake.lock` (roll back if not) |
 | GTK themes               | `./theme.sh -u <theme>`                                             |
 | System packages          | automatic (`setup.sh` enables dnf-automatic / unattended-upgrades)  |

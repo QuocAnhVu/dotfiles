@@ -12,7 +12,7 @@
 #   Steps (default: all of the role's, in this order):
 #     base        XDG directories, curl/git, automatic updates, firewall
 #     packages    system packages (apt/dnf and vendor repos)
-#     home        Nix and the home-manager profile quocanh@<role>
+#     home        Nix and the home-manager profile $USER@<role>
 #     langs       mise tools, pnpm, Rust (and Alacritty on Debian, through cargo)
 #     theme       reapply the theme selected in the configs (./theme.sh)
 #     extensions  install the GNOME extensions enabled in home/gnome.nix
@@ -301,6 +301,12 @@ function step_home() {
         message 'use-xdg-base-directories is set.'
     fi
 
+    local config=$USER@$role
+    if [[ $(nix eval $DOTFILES#homeConfigurations --apply "c: c ? \"$config\"") != true ]]; then
+        message "No home-manager profile $config: add $USER to users in flake.nix."
+        exit 1
+    fi
+
     context 'Removing symlinks into the dotfiles repo (home-manager recreates them)'
     local repo=${DOTFILES:A} target
     typeset -A removed # link -> its target, to restore if the switch fails
@@ -315,9 +321,9 @@ function step_home() {
         fi
     done
 
-    context "Applying home-manager profile quocanh@$role"
+    context "Applying home-manager profile $config"
     message 'Existing files in the way are renamed with a .pre-hm suffix.'
-    if ! run nix run $DOTFILES#home-manager -- switch -b pre-hm --flake $DOTFILES#quocanh@$role; then
+    if ! run nix run $DOTFILES#home-manager -- switch -b pre-hm --flake $DOTFILES#$config; then
         message 'home-manager failed: restoring the removed symlinks.'
         for f target in ${(kv)removed}; do
             [[ -e $f || -L $f ]] || ln -s $target $f

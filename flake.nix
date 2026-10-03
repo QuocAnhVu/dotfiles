@@ -15,23 +15,34 @@
   outputs = { nixpkgs, home-manager, nix-flatpak, ... }:
     let
       system = "x86_64-linux";
-      mkHome = { profile, liveLinks ? true }: home-manager.lib.homeManagerConfiguration {
+      # Login names: each gets every role below, as <user>@<role>
+      users = [ "quocanh" "user" ];
+      roles = {
+        workstation = { profile = "workstation"; };
+        desktop = { profile = "desktop"; };
+        dev = { profile = "full"; };
+        # Store copies instead of links, so servers don't need a dotfiles checkout
+        server = { profile = "minimal"; liveLinks = false; };
+      };
+      mkHome = user: { profile, liveLinks ? true }: home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.${system};
         modules = [
           nix-flatpak.homeManagerModules.nix-flatpak
           ./home/${profile}.nix
-          { dotfiles.liveLinks = liveLinks; }
+          {
+            home.username = user;
+            home.homeDirectory = "/home/${user}";
+            dotfiles.liveLinks = liveLinks;
+          }
         ];
       };
     in
     {
-      homeConfigurations = {
-        "quocanh@workstation" = mkHome { profile = "workstation"; };
-        "quocanh@desktop" = mkHome { profile = "desktop"; };
-        "quocanh@dev" = mkHome { profile = "full"; };
-        # Store copies instead of links, so servers don't need a dotfiles checkout
-        "quocanh@server" = mkHome { profile = "minimal"; liveLinks = false; };
-      };
+      homeConfigurations = builtins.listToAttrs (nixpkgs.lib.concatMap
+        (user: nixpkgs.lib.mapAttrsToList
+          (role: args: { name = "${user}@${role}"; value = mkHome user args; })
+          roles)
+        users);
 
       # Pinned home-manager CLI for the first switch (see home.sh)
       packages.${system}.home-manager = home-manager.packages.${system}.home-manager;

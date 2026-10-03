@@ -1,4 +1,5 @@
-# Shared by every profile: user, XDG, and how config files are linked.
+# Shared by every profile: XDG, environment, and how config files are linked.
+# The user name and home directory come from flake.nix.
 { config, lib, ... }:
 let
   cfg = config.dotfiles;
@@ -27,8 +28,6 @@ in
       then config.lib.file.mkOutOfStoreSymlink "${cfg.path}/${path}"
       else ../. + "/${path}";
 
-    home.username = "quocanh";
-    home.homeDirectory = "/home/quocanh";
     home.stateVersion = "26.05";
 
     # Not NixOS: set up XDG_DATA_DIRS etc. for Nix-installed apps

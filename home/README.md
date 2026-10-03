@@ -1,16 +1,17 @@
 # home-manager profiles
 
-`flake.nix` defines one home-manager configuration per role, each built from
-the modules here:
+`flake.nix` defines one home-manager configuration per user and role,
+`<user>@<role>`, each built from the modules here. The users are listed in
+`flake.nix` (`users`): to use another login name, add it there and commit.
 
 | Configuration      | Module        | Imports                       |
 | ------------------ | ------------- | ----------------------------- |
-| `quocanh@server`   | `minimal.nix` | `common.nix`                  |
-| `quocanh@dev`      | `full.nix`    | `minimal.nix`, `terminal.nix` |
-| `quocanh@desktop`  | `desktop.nix` | `minimal.nix`, `terminal.nix`, `gnome.nix` |
-| `quocanh@workstation` | `workstation.nix` | `desktop.nix`, `full.nix` |
+| `<user>@server`    | `minimal.nix` | `common.nix`                  |
+| `<user>@dev`       | `full.nix`    | `minimal.nix`, `terminal.nix` |
+| `<user>@desktop`   | `desktop.nix` | `minimal.nix`, `terminal.nix`, `gnome.nix` |
+| `<user>@workstation` | `workstation.nix` | `desktop.nix`, `full.nix` |
 
-- `common.nix`: user, XDG directories, environment variables (shells and the
+- `common.nix`: XDG directories, environment variables (shells and the
   desktop session), the Nix profile location, garbage collection, `~/.zshenv`,
   and the `link` helper.
 - `minimal.nix`: shell configs and a small set of tools, for servers (and
@@ -25,9 +26,9 @@ the modules here:
 
 1. Edit the module.
 2. New files must be known to git (`git add`): flakes only see tracked files.
-3. Check it builds without switching: `home-manager build --flake .#quocanh@workstation`
+3. Check it builds without switching: `home-manager build --flake .#$USER@workstation`
    (leaves a `result` link; delete it afterwards).
-4. Apply: `home-manager switch --flake .#quocanh@<role>`.
+4. Apply: `home-manager switch --flake .#$USER@<role>`.
 
 ## Packages
 
