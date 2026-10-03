@@ -108,7 +108,7 @@ function step_base() {
 
 # --- packages ---------------------------------------------------------------
 # What doesn't come from Nix (home-manager) or Flatpak (nix-flatpak):
-#   dev:         build tools
+#   dev:         build tools, podman
 #   desktop:     + GNOME (if missing) with RDP, Firefox, Alacritty
 #   workstation: + KeePassXC, virt-manager, nvtop, Performous, Mullvad, NVIDIA
 
@@ -135,12 +135,35 @@ function rpmfusion() {
     rpm --quiet -q ffmpeg || run sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing
 }
 
+# Debian's contrib, non-free and non-free-firmware components (the NVIDIA driver)
+function debian_components() {
+    local components='main contrib non-free non-free-firmware' f
+    # deb822 (.sources) and one-line (sources.list) formats; only Debian's own entries
+    for f in /etc/apt/sources.list.d/*.sources(N); do
+        if grep -q '^URIs:.*debian\.org' $f; then
+            run sudo sed -i -E "'s/^Components:.*/Components: $components/'" $f
+        fi
+    done
+    if [[ -f /etc/apt/sources.list ]]; then
+        run sudo sed -i -E "'/^deb(-src)? .*debian\.org/ s/^((deb|deb-src)( \[[^]]*\])? [^ ]+ [^ ]+) .*/\1 $components/'" /etc/apt/sources.list
+    fi
+    run sudo apt-get update
+}
+
 function step_packages() {
     context 'Build tools (Nix versions of cmake/meson/clangd do not see system libraries)'
     if [[ $distro == fedora ]]; then
         install gcc gcc-c++ make cmake meson pkgconf-pkg-config clang-tools-extra
     else
         install build-essential cmake meson pkg-config clangd
+    fi
+
+    context 'Podman (rootless containers; distrobox uses it)'
+    install podman
+    # Rootless containers need subordinate user/group IDs: users created
+    # before uidmap/shadow tooling was installed may have none
+    if ! grep -q "^$USER:" /etc/subuid 2> /dev/null; then
+        run sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 $USER
     fi
     [[ $role == dev ]] && return
 
@@ -197,7 +220,7 @@ function step_packages() {
             rpmfusion
             install akmod-nvidia xorg-x11-drv-nvidia-cuda
         else
-            # Needs the contrib, non-free and non-free-firmware components enabled
+            debian_components
             install nvidia-driver firmware-misc-nonfree
         fi
         message 'With Secure Boot, the driver module must be signed (enroll the MOK key) before it loads.'

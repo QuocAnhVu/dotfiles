@@ -53,7 +53,7 @@ Each role includes the one before it:
 | Role          | home-manager adds                                                      | system packages (`setup.sh`) add                     |
 | ------------- | ---------------------------------------------------------------------- | ---------------------------------------------------- |
 | `server`      | zsh/bash and helix configs, starship, git, ripgrep, fd, bat, mosh…      | nothing                                              |
-| `dev`         | CLI/TUI suite, mise, rustup, uv, language servers, cargo tools, direnv  | compilers, cmake, meson, clangd                      |
+| `dev`         | CLI/TUI suite, mise, rustup, uv, language servers, cargo tools, direnv  | compilers, cmake, meson, clangd, podman              |
 | `desktop`     | Alacritty config, JetBrainsMono Nerd Font, distrobox                   | GNOME (if missing), RDP server, Firefox, Alacritty   |
 | `workstation` | Flatpak apps (`home/workstation.nix`), GNOME extension settings (`home/gnome.nix`) | KeePassXC, virt-manager, nvtop, Performous, Mullvad, NVIDIA driver and container toolkit |
 
@@ -70,6 +70,24 @@ Where everything else comes from:
 | VeraCrypt                              | manual download (veracrypt.io)         | not packaged                                 |
 
 ## Setting up a machine
+
+### 0. Installing Debian
+
+Use the Debian 13 (trixie) amd64 **netinst** image (debian.org → "Download";
+the small image that fetches packages during the install). In the installer:
+
+- **Leave the root password empty.** Your user then gets `sudo`, which
+  `setup.sh` needs. (With a root password, add yourself to the `sudo` group.)
+- **Software selection**: workstation and remote desktops: *GNOME* and
+  *standard system utilities* (GNOME brings NetworkManager, for Wi-Fi). Headless
+  machines: *SSH server* and *standard system utilities*, so you can log in to
+  run `setup.sh`, which then hardens sshd.
+- With Secure Boot and an NVIDIA card: after `setup.sh` installs the driver,
+  enroll the module signing key (`sudo mokutil --import /var/lib/dkms/mok.pub`)
+  and confirm it in the blue MOK screen on the next boot.
+
+`setup.sh` enables the contrib/non-free components when it installs the NVIDIA
+driver, and adds Mozilla's, Mullvad's and NVIDIA's repositories itself.
 
 ### 1. Prerequisites and checkout
 
@@ -97,7 +115,7 @@ only, name them: `./setup.sh dev home langs`. `./setup.sh` lists them:
 | Step         | Does                                                                 | Roles        |
 | ------------ | -------------------------------------------------------------------- | ------------ |
 | `base`       | XDG directories, curl/git/ripgrep, automatic updates                 | all          |
-| `packages`   | system packages (see the tables above)                               | all but server |
+| `packages`   | system packages (see the tables above), podman                       | all but server |
 | `home`       | installs Nix (asks for sudo), applies the home-manager profile       | all          |
 | `langs`      | mise tools (`.config/mise/config.toml`), pnpm, Rust stable; Alacritty on Debian | all but server |
 | `theme`      | reapplies the theme the configs select (`./theme.sh --current`)      | workstation, desktop |
