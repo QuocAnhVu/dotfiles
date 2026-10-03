@@ -55,7 +55,7 @@ Each role includes the one before it:
 | `server`      | zsh/bash and helix configs, starship, git, ripgrep, fd, bat, mosh…      | nothing                                              |
 | `dev`         | CLI/TUI suite, mise, rustup, uv, language servers, cargo tools, direnv  | compilers, cmake, meson, clangd, podman              |
 | `desktop`     | Alacritty config, JetBrainsMono Nerd Font, distrobox                   | GNOME (if missing), RDP server, Firefox, Alacritty   |
-| `workstation` | Flatpak apps (`home/workstation.nix`), GNOME extension settings (`home/gnome.nix`) | KeePassXC, virt-manager, nvtop, Mullvad, NVIDIA driver and container toolkit |
+| `workstation` | Flatpak apps (`home/workstation.nix`), GNOME extension settings (`home/gnome.nix`) | KeePassXC, virt-manager, nvtop, Steam's udev rules, Mullvad, NVIDIA driver and container toolkit |
 
 Where everything else comes from:
 

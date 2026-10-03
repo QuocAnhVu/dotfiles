@@ -118,7 +118,7 @@ function step_base() {
 # What doesn't come from Nix (home-manager) or Flatpak (nix-flatpak):
 #   dev:         build tools, podman
 #   desktop:     + GNOME (if missing) with RDP, Firefox, Alacritty
-#   workstation: + KeePassXC, virt-manager, nvtop, Mullvad, NVIDIA
+#   workstation: + KeePassXC, virt-manager, nvtop, Steam udev rules, Mullvad, NVIDIA
 
 # Adds an apt repository: name, key URL, "deb ..." line ({key} is replaced by the key path)
 function apt_repo() {
@@ -203,7 +203,9 @@ function step_packages() {
     [[ $role == desktop ]] && return
 
     context 'Workstation apps (Flatpak apps come from home/workstation.nix)'
-    install flatpak keepassxc virt-manager nvtop
+    # steam-devices: udev rules for controllers and VR, which the Steam Flatpak
+    # can't install from inside its sandbox
+    install flatpak keepassxc virt-manager nvtop steam-devices
 
     context 'Mullvad VPN'
     if [[ $distro == fedora ]]; then
