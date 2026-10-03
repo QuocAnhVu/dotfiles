@@ -37,12 +37,14 @@
     sccache
 
     # Cargo subcommands
+    cargo-binstall # prebuilt binaries for crates not in nixpkgs
     cargo-bloat
     cargo-deny
     cargo-flamegraph
     cargo-machete
     cargo-tarpaulin
     cargo-udeps
+    cargo-update # `cargo install-update -a` updates what's installed with cargo
     cargo-watch
 
     # Toolchain managers
