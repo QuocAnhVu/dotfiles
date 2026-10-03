@@ -6,6 +6,7 @@
   imports = [ ./full.nix ];
 
   home.packages = with pkgs; [
+    distrobox # containers with a different distro, sharing $HOME (uses the system podman)
     nerd-fonts.jetbrains-mono
   ];
   fonts.fontconfig.enable = true;
