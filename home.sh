@@ -11,8 +11,12 @@ case $profile in
     *) echo "Usage: $0 <desktop|dev|server>"; exit 1 ;;
 esac
 
+# Single-user installs: the profile is in ~/.local/state/nix once home-manager
+# has set use-xdg-base-directories, ~/.nix-profile before that
+user_nix_sh=(${XDG_STATE_HOME:-$HOME/.local/state}/nix/profile/etc/profile.d/nix.sh(N) $HOME/.nix-profile/etc/profile.d/nix.sh(N))
+
 context 'Installing Nix'
-if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh || -e $HOME/.nix-profile/etc/profile.d/nix.sh ]]; then
+if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh || -n $user_nix_sh ]]; then
     message 'Nix detected. No need to install.'
 elif [[ -d /run/systemd/system ]]; then
     # Determinate Systems' installer: unlike the official one it supports
@@ -34,14 +38,18 @@ fi
 if [[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
     source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 else
-    source $HOME/.nix-profile/etc/profile.d/nix.sh
+    user_nix_sh=(${XDG_STATE_HOME:-$HOME/.local/state}/nix/profile/etc/profile.d/nix.sh(N) $HOME/.nix-profile/etc/profile.d/nix.sh(N))
+    source $user_nix_sh[1]
 fi
-export NIX_CONFIG='experimental-features = nix-command flakes'
+# Same as home/common.nix's nix.conf, which only exists after the first switch:
+# use-xdg-base-directories must already apply when home-manager installs packages
+export NIX_CONFIG='experimental-features = nix-command flakes
+use-xdg-base-directories = true'
 
 context 'Removing symlinks into the dotfiles repo (home-manager recreates them)'
 repo=${DOTFILES:A}
 typeset -A removed # link -> its target, to restore if the switch fails
-for f in $HOME/.config/*(N@) $HOME/.bashrc(N@) $HOME/.zshrc(N@); do
+for f in $HOME/.config/*(N@) $HOME/.config/zsh/*(N@) $HOME/.bashrc(N@) $HOME/.zshrc(N@); do
     target=$(readlink $f)
     [[ $target == /* ]] || target=${f:h}/$target
     # Resolve only the parent, so links to files deleted from the repo still match.
@@ -60,6 +68,26 @@ if ! run nix run $DOTFILES#home-manager -- switch -b pre-hm --flake $DOTFILES#qu
         [[ -e $f || -L $f ]] || ln -s $target $f
     done
     exit 1
+fi
+
+context 'Migrating ~/.nix-profile and ~/.nix-defexpr to ~/.local/state/nix'
+# home/common.nix sets use-xdg-base-directories. Nix's shell setup warns on
+# every new shell while the legacy profile link still exists.
+state=${XDG_STATE_HOME:-$HOME/.local/state}/nix
+legacy=$HOME/.nix-profile
+if [[ -L $legacy && -e $state/profile && ${legacy:A} == ${${:-$state/profile}:A} ]]; then
+    run rm $legacy
+fi
+# Nix may already have created the XDG defexpr, so merge into it
+if [[ -d $HOME/.nix-defexpr && ! -L $HOME/.nix-defexpr ]]; then
+    run mkdir -p $state/defexpr
+    for f in $HOME/.nix-defexpr/*(ND); do
+        [[ -e $state/defexpr/${f:t} || -L $state/defexpr/${f:t} ]] || run mv $f $state/defexpr/
+    done
+    run rm -rf $HOME/.nix-defexpr
+fi
+if [[ -f $HOME/.nix-channels && ! -e $state/channels ]]; then
+    run mv $HOME/.nix-channels $state/channels
 fi
 
 context 'Done'

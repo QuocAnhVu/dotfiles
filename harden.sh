@@ -1,132 +1,91 @@
 #! /usr/bin/zsh
+# Set up SSH: client key, and (only on machines that should accept SSH) a
+# hardened sshd. Safe to rerun.
 source $(dirname $0)/_lib.sh
+setopt err_exit
 
-DOTFILES=$(dirname $0)
+DOTFILES=$(cd $(dirname $0) && pwd)
+DROPIN=/etc/ssh/sshd_config.d/00-hardening.conf
 
-# https://stribika.github.io/2015/01/04/secure-secure-shell.html
-context 'Setting up dotfiles directory'
+function confirm() {
+    prompt "$1 (yes/no): "
+    read response
+    [[ ${response:l} == (y|yes) ]]
+}
+
+context 'Setting up ~/.ssh'
 run mkdir -p $HOME/.ssh
 run chmod 700 $HOME/.ssh
 
-context 'Granting SSH access to @quocanh'
-prompt 'Would you like to allow @quocanh to access your computer? (yes/no): '
-read response
-case "$response" in
-    [Yy]|[Yy][Ee][Ss])
-        if [ ! -f $HOME/.ssh/authorized_keys ]; then
-            run touch $HOME/.ssh/authorized_keys
-            run chmod 644 $HOME/.ssh/authorized_keys
-        else
-            message 'Authorized keys file detected'
-        fi
-        while read key ; do
-            if ! rg -qF $key $HOME/.ssh/authorized_keys ; then
-                run echo $key >> $HOME/.ssh/authorized_keys
-            else
-                message 'Authorized key detected' $key
-            fi
-        done < $DOTFILES/.ssh/authorized_keys
-        ;;
-    *)
-        message 'Skipping access grant to @quocanh'
-        ;;
-esac
-
-context 'Hardening host keys'
-pushd /etc/ssh
-if [[ ! -n /etc/ssh/ssh_host_*key*(#qN) ]]; then
-    prompt 'Would you like to remove any existing host SSH keys? (yes/no): '
-    read response
-    case "$response" in
-        [Yy]|[Yy][Ee][Ss])
-            run sudo rm -f ssh_host_*key*
-            ;;
-        *)
-            message 'Skipping removal of host SSH keys'
-            ;;
-    esac
-fi
-if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
-    run 'sudo ssh-keygen -t ed25519 -f ssh_host_ed25519_key -N "" < /dev/null'
+context 'Client key'
+if [[ ! -f $HOME/.ssh/id_ed25519 ]]; then
+    run ssh-keygen -t ed25519 -a 100 -f $HOME/.ssh/id_ed25519
 else
-    message 'Skipping ssh_host_ed25519_key generation'
-fi
-if [ ! -f /etc/ssh/ssh_host_rsa_key ] || [ $(sudo ssh-keygen -lf /etc/ssh/ssh_host_rsa_key | awk '{print $1}') -ne 4096 ]; then
-    run 'sudo ssh-keygen -t rsa -b 4096 -f ssh_host_rsa_key -N "" < /dev/null'
-else
-    message 'Skipping ssh_host_rsa_key generation'
-fi
-popd
-
-context 'Hardening client keys'
-
-prompt 'Would you like to remove any existing client SSH keys? (yes/no): '
-read response
-case "$response" in
-    [Yy]|[Yy][Ee][Ss])
-        run rm -f $HOME/.ssh/id_ed25519 $HOME/.ssh/id_rsa
-        ;;
-    *)
-        message 'Skipping removal of existing client SSH keys'
-        ;;
-esac
-if [ ! -f $HOME/.ssh/id_ed25519 ]; then
-    run ssh-keygen -t ed25519 -o -a 100 -f $HOME/.ssh/id_ed25519
-else
-    message 'Skipping id_ed25519 key generation'
-fi
-if [ ! -f $HOME/.ssh/id_rsa ] || [ $(ssh-keygen -lf $HOME/.ssh/id_rsa | awk '{print $1}') -ne 4096 ]; then
-    run ssh-keygen -t rsa -b 4096 -o -a 100 -f $HOME/.ssh/id_rsa
-else
-    message 'Skipping id_rsa key generation'
+    message 'id_ed25519 exists'
 fi
 
-context 'Installing sshd and mosh'
-if command -v apt &> /dev/null; then
-    run sudo apt update; run sudo apt -y install openssh-server mosh
-elif command -v dnf &> /dev/null; then
-    run sudo dnf install -y openssh-server mosh
-else
-    message "Distro's package manager is not supported."
-    exit
-fi
-
-context 'Restricting SSH access to ssh-user group'
-run sudo groupadd ssh-user
-run sudo usermod -a -G ssh-user $USER
-
-context 'Configuring ssh with hardened config'
-if [ -f /etc/ssh/ssh_config ]; then
-    run sudo mv /etc/ssh/ssh_config /etc/ssh/ssh_config.orig
-fi
-run sudo cp $DOTFILES/.ssh/ssh_config.default /etc/ssh/ssh_config
-
-context 'Configuring sshd with hardened config'
-if [ -f /etc/ssh/sshd_config ]; then
-    run sudo mv /etc/ssh/sshd_config /etc/ssh/sshd_config.orig
-fi
-run sudo cp $DOTFILES/.ssh/sshd_config.default /etc/ssh/sshd_config
-
-context 'Generating custom moduli... this may take a while'
-function cleanup {
-    if [ -f moduli-2048.candidates ]; then
-        echo ""
-        run rm -f moduli-2048.candidates
+context 'SSH server'
+if ! confirm 'Should this machine accept SSH connections?'; then
+    message 'Leaving sshd off. (Rerun to change this.)'
+    if systemctl is-enabled --quiet sshd 2> /dev/null; then
+        message "Note: sshd is currently enabled. Disable it with: sudo systemctl disable --now sshd"
     fi
-}
-trap 'cleanup; exit' SIGINT
-run ssh-keygen -M generate -O bits=2048 moduli-2048.candidates
-run ssh-keygen -M screen -f moduli-2048.candidates moduli-2048
-run sudo mv moduli-2048 /etc/ssh/moduli
-run rm -f moduli-2048.candidates
-trap - SIGINT
+    exit 0
+fi
 
-context 'Starting sshd service'
-run sudo systemctl enable sshd
-run sudo systemctl start sshd
+if confirm 'Allow @quocanh (keys in .ssh/authorized_keys) to log in?'; then
+    run touch $HOME/.ssh/authorized_keys
+    run chmod 600 $HOME/.ssh/authorized_keys
+    while read key; do
+        [[ -n $key ]] || continue
+        if ! grep -qxF $key $HOME/.ssh/authorized_keys; then
+            run_noeval "append key: ${key##* }"
+            print -r -- $key >> $HOME/.ssh/authorized_keys
+        fi
+    done < $DOTFILES/.ssh/authorized_keys
+fi
 
-if grep -q "Fedora" /etc/os-release; then
-    context 'Whitelist mosh ports in firewall'
-    run sudo firewall-cmd --add-service=mosh --permanent
+if command -v apt > /dev/null; then
+    run sudo apt-get install -y openssh-server mosh
+elif command -v dnf > /dev/null; then
+    run sudo dnf install -y openssh-server mosh
+fi
+
+getent group ssh-user > /dev/null || run sudo groupadd ssh-user
+id -nG $USER | grep -qw ssh-user || run sudo usermod -a -G ssh-user $USER
+
+# A drop-in, not a replacement sshd_config: the distro's defaults (sftp
+# subsystem, PAM, crypto policy) stay intact. sshd uses the first value it reads
+# for each option, and drop-ins are read in name order, so 00- takes precedence
+# over distro and cloud-init drop-ins (e.g. 50-cloud-init.conf enabling
+# passwords). Algorithms are left at OpenSSH's defaults, which include
+# post-quantum key exchange.
+context "Writing $DROPIN"
+run sudo mkdir -p /etc/ssh/sshd_config.d
+run_noeval "sudo tee $DROPIN"
+sudo tee $DROPIN > /dev/null << 'END'
+# Managed by dotfiles/harden.sh
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+AuthenticationMethods publickey
+AllowGroups ssh-user
+END
+if ! sudo grep -qE '^\s*Include\s+/etc/ssh/sshd_config.d/\*\.conf' /etc/ssh/sshd_config; then
+    message "Warning: /etc/ssh/sshd_config doesn't include sshd_config.d/*.conf, so $DROPIN has no effect."
+fi
+run sudo sshd -t # validate before (re)starting
+
+# Debian names the unit ssh, Fedora sshd
+unit=sshd
+systemctl list-unit-files ssh.service > /dev/null 2>&1 && unit=ssh
+run sudo systemctl enable --now $unit
+run sudo systemctl reload $unit
+
+if command -v firewall-cmd > /dev/null; then
+    context 'Opening ssh and mosh in firewalld'
+    run sudo firewall-cmd --permanent --add-service=ssh --add-service=mosh
     run sudo firewall-cmd --reload
 fi
+
+message "Log in again for the ssh-user group to apply to $USER."

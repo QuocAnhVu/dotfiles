@@ -69,11 +69,18 @@
   ];
 
   # Absolute paths: hm-session-vars.sh sets these before XDG_DATA_HOME
-  home.sessionVariables = {
-    GOPATH = "${config.xdg.dataHome}/go";
-    CARGO_HOME = "${config.xdg.dataHome}/cargo";
-    RUSTUP_HOME = "${config.xdg.dataHome}/rustup";
+  home.sessionVariables = with config.xdg; {
+    CARGO_HOME = "${dataHome}/cargo";
+    GOPATH = "${dataHome}/go";
+    PNPM_HOME = "${dataHome}/pnpm";
+    RUSTUP_HOME = "${dataHome}/rustup";
   };
+  # Tools installed outside Nix (cargo install, pnpm add -g, go install)
+  home.sessionPath = with config.xdg; [
+    "${dataHome}/cargo/bin"
+    "${dataHome}/pnpm"
+    "${dataHome}/go/bin"
+  ];
 
   xdg.configFile."nushell".source = link ".config/nushell";
   xdg.configFile."nvim".source = link ".config/nvim";

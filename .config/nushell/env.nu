@@ -45,8 +45,11 @@ path add ($env.HOME | path join ".local/share/google-cloud-sdk/bin")
 
 # Nix and home-manager packages, for when nu isn't started from zsh/bash (which
 # already set these up). Only added if missing, so zsh's PATH order is kept.
-# `path add` prepends, so list in reverse: ~/.nix-profile/bin ends up first.
-for p in ["/nix/var/nix/profiles/default/bin" ($env.HOME | path join ".nix-profile/bin")] {
+# `path add` prepends, so list in reverse: the user profile ends up first.
+# The profile is in ~/.local/state/nix with use-xdg-base-directories, else ~/.nix-profile.
+let user_profile = [($env.HOME | path join ".local/state/nix/profile/bin") ($env.HOME | path join ".nix-profile/bin")]
+    | where {|p| $p | path exists } | first 1
+for p in (["/nix/var/nix/profiles/default/bin"] | append $user_profile) {
     if ($p | path exists) and ($p not-in $env.PATH) { path add $p }
 }
 

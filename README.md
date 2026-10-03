@@ -10,9 +10,9 @@ git clone https://github.com/QuocAnhVu/dotfiles.git $XDG_DATA_HOME/dotfiles
 
 cd $XDG_DATA_HOME/dotfiles
 ./base.sh
-./home.sh desktop      # or dev, server (see below)
+./home.sh desktop      # or dev, server (see below); then open a new shell
 ./langs.sh
-./harden.sh
+./harden.sh            # SSH key; asks before enabling sshd (only for remote hosts)
 ./theme.sh everforest  # or gruvbox, nord
 ```
 
@@ -38,8 +38,14 @@ nix run github:QuocAnhVu/dotfiles#home-manager -- switch --flake github:QuocAnhV
 After changing `home/*.nix`: `home-manager switch --flake ~/.local/share/dotfiles#quocanh@<profile>`.
 Update pinned packages with `nix flake update`.
 
+Environment variables (XDG locations, `EDITOR`, `PATH`) are set in `home/*.nix`
+and reach both shells and the desktop session (`~/.config/environment.d`; log
+out and back in after changing them). zsh reads `~/.config/zsh/.zshrc`. Scripts
+in `bin/` are on `PATH` for `desktop` and `dev`. Machine-specific settings and
+secrets go in the untracked `~/.config/localrc`.
+
 GUI apps (alacritty, browsers, keepassxc), compilers, cmake/meson, clangd and
-`-dev` libraries come from the system package manager or Flatpak, not Nix. `tools.sh` predates home-manager and is superseded by it.
+`-dev` libraries come from the system package manager or Flatpak, not Nix.
 
 # Manual post-install tasks
 

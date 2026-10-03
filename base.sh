@@ -7,10 +7,7 @@ run mkdir -p $XDG_CACHE_HOME
 run mkdir -p $XDG_DATA_HOME
 run mkdir -p $XDG_STATE_HOME
 
-context 'Symlinking config files'
-run ln -s $XDG_DATA_HOME/dotfiles/.config/* $HOME/.config/
-run "rm $HOME/.bashrc > /dev/null; ln -s $XDG_DATA_HOME/dotfiles/.bashrc $HOME/"
-run "rm $HOME/.zshrc > /dev/null; ln -s $XDG_DATA_HOME/dotfiles/.zshrc $HOME/"
+# Config files are linked by home-manager: see home.sh
 
 context 'Creating prerequisite directories'
 run mkdir -p $HOME/ws
