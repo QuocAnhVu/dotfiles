@@ -88,7 +88,11 @@ else
 fi
 
 context 'Installing Rust'
-if ! rustc --version | rg '\d+\.\d+\.\d+' ; then
+if command -v rustup > /dev/null && ! rustc --version > /dev/null 2>&1; then
+    # rustup from home-manager (home.sh) has no toolchain yet
+    context 'Installing rust stable toolchain'
+    run rustup default stable
+elif ! rustc --version | rg '\d+\.\d+\.\d+' ; then
     context 'Installing rust with rustup'
     run_noeval "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --no-modify-path

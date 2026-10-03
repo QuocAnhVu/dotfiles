@@ -1,4 +1,12 @@
 export LANG=en_US.UTF-8
+# Nix and home-manager: packages on PATH, session variables
+if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+    . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+elif [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+    . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+fi
+[ ! -r "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ] || . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+
 # User specific environment
 if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
 then
@@ -37,4 +45,5 @@ alias l=ls -al
 # Local (untracked) config
 [[ ! -r $XDG_CONFIG_HOME/localrc ]] || source $XDG_CONFIG_HOME/localrc
 
-. "$HOME/.local/share/../bin/env"
+# uv/cargo installer env, if present
+[ ! -r "$HOME/.local/bin/env" ] || . "$HOME/.local/bin/env"

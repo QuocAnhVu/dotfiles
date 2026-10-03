@@ -275,7 +275,7 @@ theme "everforest-dark"
 // Choose the path to the default shell that zellij will use for opening new panes
 // Default: $SHELL
 // 
-default_shell "/home/quocanh/.local/share/cargo/bin/nu"
+default_shell "nu"
  
 // Choose the path to override cwd that zellij will use for opening new panes
 // 

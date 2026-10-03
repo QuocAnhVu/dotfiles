@@ -1,57 +1,35 @@
 {
-  description = "NixOS configuration based on dotfiles";
+  description = "Dotfiles: home-manager profiles for desktops, dev environments and servers";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # nixpkgs-unstable (not nixos-unstable): these profiles run on Debian/Fedora, not NixOS
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nur.url = "github:nix-community/NUR"; # Add NUR input
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, nur, ... }:
+  outputs = { nixpkgs, home-manager, ... }:
     let
       system = "x86_64-linux";
+      mkHome = { profile, liveLinks ? true }: home-manager.lib.homeManagerConfiguration {
+        pkgs = nixpkgs.legacyPackages.${system};
+        modules = [
+          ./home/${profile}.nix
+          { dotfiles.liveLinks = liveLinks; }
+        ];
+      };
     in
     {
-      nixosConfigurations = {
-        "vm-core" = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit disko; enableSsh = true; };
-          modules = [
-            disko.nixosModules.disko
-            ./hosts/vm
-            ./profiles/core
-            home-manager.nixosModules.home-manager
-            ({ pkgs, ... }: { nixpkgs.overlays = [ nur.overlays.default ]; })
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { pkgs = nixpkgs.legacyPackages.${system}; };
-            }
-          ];
-        };
-        "desktop-full" = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit disko; enableSsh = false; }; # Remove nur from specialArgs
-          modules = [
-            disko.nixosModules.disko
-            ./hosts/vm
-            ./profiles/desktop
-            home-manager.nixosModules.home-manager
-            ({ pkgs, ... }: { nixpkgs.overlays = [ nur.overlays.default ]; })
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { pkgs = nixpkgs.legacyPackages.${system}; };
-            }
-          ];
-        };
+      homeConfigurations = {
+        "quocanh@desktop" = mkHome { profile = "desktop"; };
+        "quocanh@dev" = mkHome { profile = "full"; };
+        # Store copies instead of links, so servers don't need a dotfiles checkout
+        "quocanh@server" = mkHome { profile = "minimal"; liveLinks = false; };
       };
+
+      # Pinned home-manager CLI for the first switch (see home.sh)
+      packages.${system}.home-manager = home-manager.packages.${system}.home-manager;
     };
 }
