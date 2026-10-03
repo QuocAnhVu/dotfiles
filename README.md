@@ -180,8 +180,9 @@ clones you want. Check the last run with `journalctl --user -u ws-backup`.
   System → Remote Desktop (or with `grdctl`), but keep port 3389 closed and
   connect through SSH: `ssh -L 3389:localhost:3389 <host>`, then point the RDP
   client at `localhost`.
-- **Optional extras**: Tailscale (`curl -fsSL https://tailscale.com/install.sh | sh`),
-  Caps Lock as Escape (`gsettings set org.gnome.desktop.input-sources xkb-options "['caps:escape']"`).
+- **Optional extras**: Tailscale (`curl -fsSL https://tailscale.com/install.sh | sh`).
+  (Caps Lock as Esc is set on the workstation by `home/gnome.nix`; elsewhere:
+  `gsettings set org.gnome.desktop.input-sources xkb-options "['caps:escape_shifted_capslock']"`.)
 
 ## Everyday use
 
