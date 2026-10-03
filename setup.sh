@@ -9,7 +9,7 @@
 #     dev          headless, all the tools; SSH
 #     server       headless, minimal tools; SSH
 #   Steps (default: all of the role's, in this order):
-#     base        XDG directories, curl/git, automatic updates
+#     base        XDG directories, curl/git, automatic updates, firewall
 #     packages    system packages (apt/dnf and vendor repos)
 #     home        Nix and the home-manager profile quocanh@<role>
 #     langs       mise tools, pnpm, Rust (and Alacritty on Debian, through cargo)
@@ -104,6 +104,14 @@ function step_base() {
         echo 'unattended-upgrades unattended-upgrades/enable_auto_updates boolean true' | sudo debconf-set-selections
         run sudo dpkg-reconfigure -f noninteractive unattended-upgrades
     fi
+
+    # firewalld: Fedora's default, and on Debian (which has no firewall) so both
+    # work the same. podman and libvirt integrate with it. Default zone: incoming
+    # connections only for the services it lists (ssh: decided in the ssh step).
+    context 'Firewall'
+    (( $+commands[firewall-cmd] )) || install firewalld
+    run sudo systemctl enable --now firewalld
+    message "Zone $(sudo firewall-cmd --get-default-zone), allowing: $(sudo firewall-cmd --list-services)"
 }
 
 # --- packages ---------------------------------------------------------------
@@ -438,6 +446,11 @@ function step_ssh() {
 
     if [[ $role == workstation ]]; then
         message "The workstation doesn't accept SSH connections."
+        # Debian's default zone allows ssh
+        if (( $+commands[firewall-cmd] )) && sudo firewall-cmd --permanent --query-service=ssh > /dev/null; then
+            run sudo firewall-cmd --permanent --remove-service=ssh
+            run sudo firewall-cmd --reload
+        fi
         if systemctl is-enabled --quiet sshd 2> /dev/null; then
             notes+=('sshd is enabled on this workstation. Disable it with: sudo systemctl disable --now sshd')
         fi
@@ -499,6 +512,12 @@ END
 }
 
 # --- main -------------------------------------------------------------------
+
+# Debian's installer gives the first user sudo only when the root password is left empty
+if ! sudo -v; then
+    message "$USER can't use sudo. As root (su -): usermod -aG sudo $USER (Fedora: wheel), then log in again."
+    exit 1
+fi
 
 notes=()
 for step in $steps; do

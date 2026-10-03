@@ -77,7 +77,8 @@ Use the Debian 13 (trixie) amd64 **netinst** image (debian.org → "Download";
 the small image that fetches packages during the install). In the installer:
 
 - **Leave the root password empty.** Your user then gets `sudo`, which
-  `setup.sh` needs. (With a root password, add yourself to the `sudo` group.)
+  `setup.sh` needs (it stops and says so otherwise). With a root password:
+  `su -c 'usermod -aG sudo <user>'`, then log in again.
 - **Software selection**: workstation and remote desktops: *GNOME* and
   *standard system utilities* (GNOME brings NetworkManager, for Wi-Fi). Headless
   machines: *SSH server* and *standard system utilities*, so you can log in to
@@ -114,7 +115,7 @@ only, name them: `./setup.sh dev home langs`. `./setup.sh` lists them:
 
 | Step         | Does                                                                 | Roles        |
 | ------------ | -------------------------------------------------------------------- | ------------ |
-| `base`       | XDG directories, curl/git/ripgrep, automatic updates                 | all          |
+| `base`       | XDG directories, curl/git/ripgrep, automatic updates, firewalld (incoming: only allowed services) | all |
 | `packages`   | system packages (see the tables above), podman                       | all but server |
 | `home`       | installs Nix (asks for sudo), applies the home-manager profile       | all          |
 | `langs`      | mise tools (`.config/mise/config.toml`), pnpm, Rust stable; Alacritty on Debian | all but server |
