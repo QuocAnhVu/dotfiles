@@ -8,7 +8,7 @@ the modules here:
 | `quocanh@server`   | `minimal.nix` | `common.nix`                  |
 | `quocanh@dev`      | `full.nix`    | `minimal.nix`                 |
 | `quocanh@desktop`  | `desktop.nix` | `full.nix`                    |
-| `quocanh@workstation` | `workstation.nix` | `desktop.nix`          |
+| `quocanh@workstation` | `workstation.nix` | `desktop.nix`, `gnome.nix` |
 
 - `common.nix`: user, XDG directories, environment variables (shells and the
   desktop session), the Nix profile location, garbage collection, `~/.zshenv`,
@@ -17,6 +17,7 @@ the modules here:
 - `full.nix`: the CLI/TUI suite, toolchain managers and language servers.
 - `desktop.nix`: terminal config, fonts, distrobox.
 - `workstation.nix`: the Flatpak apps (nix-flatpak).
+- `gnome.nix`: enabled GNOME extensions and their settings (dconf).
 
 ## Changing a profile
 
@@ -40,7 +41,7 @@ the modules here:
 
 `link ".config/foo"` returns the source for `home.file` or `xdg.configFile`:
 
-- `desktop` and `dev` (`dotfiles.liveLinks = true`): a link to the checkout at
+- `workstation`, `desktop` and `dev` (`dotfiles.liveLinks = true`): a link to the checkout at
   `~/.local/share/dotfiles`, so edits apply without switching and `theme.sh`
   can rewrite files.
 - `server` (`liveLinks = false`): a copy in the Nix store, so the profile works

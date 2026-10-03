@@ -1,7 +1,8 @@
 #! /usr/bin/zsh
 # Switch the desktop theme: alacritty, helix, zellij, GTK and GNOME Shell.
 # Installs the GTK/GNOME Shell theme into $XDG_DATA_HOME/themes first if it is
-# missing (or always, with --update).
+# missing (or always, with --update). --current reapplies the theme the configs
+# select (setup.sh uses it on new machines).
 source $(dirname $0)/_lib.sh
 setopt err_exit
 
@@ -25,8 +26,9 @@ TWEAK=(                            gruvbox soft                               ev
 
 function usage() {
     local themes=(${(ko)GTK})
-    echo "Usage: $SCRIPT [-u|--update] <${(j:|:)themes}>"
+    echo "Usage: $SCRIPT [-u|--update] <${(j:|:)themes}|--current>"
     echo "  -u, --update  Pull and reinstall the GTK/GNOME Shell theme even if installed"
+    echo "  --current     The theme the configs select now (the alacritty import)"
     exit 1
 }
 
@@ -118,6 +120,14 @@ case $1 in
     -u | --update) update=true; shift ;;
 esac
 theme=$1
+if [[ $theme == --current ]]; then
+    theme=
+    for t in ${(k)ALACRITTY}; do
+        if grep -qxF "import = [\"themes/${ALACRITTY[$t]}.toml\"]" $DOTFILES/.config/alacritty/alacritty.toml; then
+            theme=$t
+        fi
+    done
+fi
 [[ -n $theme && -n ${GTK[$theme]} ]] || usage
 
 context "Terminal and editor: $theme"

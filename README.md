@@ -32,11 +32,8 @@ home/                   the profiles: minimal.nix -> full.nix -> desktop.nix (se
   starship.toml         prompt
 .bashrc                 bash (rarely used)
 bin/                    personal scripts, on PATH
-base.sh                 system setup: XDG directories, base packages, automatic updates
-home.sh                 installs Nix and applies a home-manager profile
-langs.sh                installs the mise tool versions, pnpm and the Rust toolchain
-packages.sh             system packages: build tools, GUI apps that need the system, NVIDIA
-harden.sh               SSH: client key, and optionally a hardened sshd
+setup.sh                sets up a machine for its role: packages, Nix and home-manager,
+                        toolchains, theme, GNOME extensions, SSH
 theme.sh                switches the terminal, editor and GNOME theme
 _lib.sh                 helpers for the scripts above
 .ssh/                   my public keys (authorized_keys)
@@ -44,7 +41,7 @@ _lib.sh                 helpers for the scripts above
 
 ## Machine roles
 
-| Role               | OS            | home-manager / `packages.sh` | SSH server | Notes                          |
+| Role               | OS            | `setup.sh` / home-manager    | SSH server | Notes                          |
 | ------------------ | ------------- | ---------------------------- | ---------- | ------------------------------ |
 | This workstation   | Fedora/Debian | `workstation`                | off        | GNOME, desktop apps, NVIDIA    |
 | Remote desktop     | Debian        | `desktop`                    | on         | GNOME, Firefox, terminal; RDP through an SSH tunnel |
@@ -53,21 +50,22 @@ _lib.sh                 helpers for the scripts above
 
 Each role includes the one before it:
 
-| Role          | home-manager adds                                                      | `packages.sh` adds                                   |
+| Role          | home-manager adds                                                      | system packages (`setup.sh`) add                     |
 | ------------- | ---------------------------------------------------------------------- | ---------------------------------------------------- |
 | `server`      | zsh/bash and helix configs, starship, git, ripgrep, fd, bat, mosh…      | nothing                                              |
 | `dev`         | CLI/TUI suite, mise, rustup, uv, language servers, cargo tools, direnv  | compilers, cmake, meson, clangd                      |
 | `desktop`     | Alacritty config, JetBrainsMono Nerd Font, distrobox                   | GNOME (if missing), RDP server, Firefox, Alacritty   |
-| `workstation` | Flatpak apps (`home/workstation.nix`)                                  | KeePassXC, virt-manager, nvtop, Performous, Mullvad, NVIDIA driver and container toolkit |
+| `workstation` | Flatpak apps (`home/workstation.nix`), GNOME extension settings (`home/gnome.nix`) | KeePassXC, virt-manager, nvtop, Performous, Mullvad, NVIDIA driver and container toolkit |
 
 Where everything else comes from:
 
 | What                                   | From                                   | Why not Nix                                  |
 | -------------------------------------- | -------------------------------------- | -------------------------------------------- |
 | Desktop apps (Steam, Discord, Blender…) | Flatpak, listed in `home/workstation.nix` | Nix-built GUI apps can't use the system GPU drivers on non-NixOS |
-| Firefox, KeePassXC, Alacritty, Mullvad, virt-manager, nvtop | `packages.sh` (apt/dnf, vendor repos; Alacritty via cargo on Debian) | need system integration (browser↔KeePassXC, VPN service, libvirt) |
-| Compilers, `cmake`, `meson`, `clangd`, `-dev` libraries | `packages.sh` / apt, dnf             | Nix's builds don't search `/usr`             |
-| NVIDIA driver, container toolkit       | `packages.sh` (RPM Fusion / Debian non-free, NVIDIA repo) | kernel module                     |
+| Firefox, KeePassXC, Alacritty, Mullvad, virt-manager, nvtop | `setup.sh` (apt/dnf, vendor repos; Alacritty via cargo on Debian) | need system integration (browser↔KeePassXC, VPN service, libvirt) |
+| Compilers, `cmake`, `meson`, `clangd`, `-dev` libraries | `setup.sh` / apt, dnf                | Nix's builds don't search `/usr`             |
+| NVIDIA driver, container toolkit       | `setup.sh` (RPM Fusion / Debian non-free, NVIDIA repo) | kernel module                     |
+| GNOME extensions                       | extensions.gnome.org (`setup.sh`), enabled and configured in `home/gnome.nix` | match the running GNOME Shell version |
 | CUDA toolkit                           | the `cuda` distrobox (see below)       | needs an older GCC than Fedora's             |
 | VeraCrypt                              | manual download (veracrypt.io)         | not packaged                                 |
 
@@ -76,8 +74,8 @@ Where everything else comes from:
 ### 1. Prerequisites and checkout
 
 ```shell
-sudo apt install -y zsh git ripgrep curl   # Debian
-sudo dnf install -y zsh git ripgrep curl   # Fedora
+sudo apt install -y zsh git   # Debian
+sudo dnf install -y zsh git   # Fedora
 
 git clone https://github.com/QuocAnhVu/dotfiles.git ~/.local/share/dotfiles
 cd ~/.local/share/dotfiles
@@ -87,32 +85,36 @@ chsh -s "$(command -v zsh)"
 The checkout must be at `~/.local/share/dotfiles`; config files link there. If
 you keep it elsewhere (I use `~/ws/dotfiles`), symlink it to that path.
 
-### 2. Run the setup scripts
+### 2. Run setup.sh
 
 ```shell
-./base.sh            # XDG directories, base packages, automatic updates
-./home.sh workstation  # or: desktop, dev, server. Installs Nix (asks for sudo) and applies the profile
+./setup.sh workstation   # or: desktop, dev, server
 ```
 
-Open a new shell, then:
+It runs the role's steps in order, and is safe to rerun. To run some steps
+only, name them: `./setup.sh dev home langs`. `./setup.sh` lists them:
 
-```shell
-./langs.sh                # mise tools (.config/mise/config.toml), pnpm, Rust stable
-./packages.sh workstation # or desktop, dev, server: system packages (see above)
-./harden.sh               # SSH key; asks whether this machine should accept SSH
-./theme.sh everforest     # workstation and desktops: or gruvbox, nord
-```
+| Step         | Does                                                                 | Roles        |
+| ------------ | -------------------------------------------------------------------- | ------------ |
+| `base`       | XDG directories, curl/git/ripgrep, automatic updates                 | all          |
+| `packages`   | system packages (see the tables above)                               | all but server |
+| `home`       | installs Nix (asks for sudo), applies the home-manager profile       | all          |
+| `langs`      | mise tools (`.config/mise/config.toml`), pnpm, Rust stable; Alacritty on Debian | all but server |
+| `theme`      | reapplies the theme the configs select (`./theme.sh --current`)      | workstation, desktop |
+| `extensions` | installs the GNOME extensions `home/gnome.nix` enables               | workstation  |
+| `ssh`        | client key; a hardened sshd with the keys in `.ssh/authorized_keys`  | all (no sshd on the workstation) |
 
-On desktops, log out and back in so GNOME picks up the environment.
+Afterwards, open a new shell; on desktops, log out and back in so GNOME picks
+up the environment and loads new extensions.
 
-`home.sh` installs Nix with the Determinate Systems installer when systemd is
+The `home` step installs Nix with the Determinate Systems installer when systemd is
 running (it supports SELinux, unlike the official installer) and as a
 single-user install otherwise (containers). It moves aside existing files that
 are in the way with a `.pre-hm` suffix.
 
 ### 3. Machine-specific files
 
-Two files aren't in git (`base.sh` creates empty ones):
+Two files aren't in git (`setup.sh` creates empty ones):
 
 - `~/.config/environment.d/90-local.conf`: variables for this machine only,
   such as SDK paths. systemd `environment.d` format, `${VAR}` expansion works:
@@ -130,7 +132,7 @@ Two files aren't in git (`base.sh` creates empty ones):
   ```shell
   nix run github:QuocAnhVu/dotfiles#home-manager -- switch --flake github:QuocAnhVu/dotfiles#quocanh@server
   ```
-- **Remote desktop**: answer yes in `harden.sh`. `packages.sh desktop` installs the RDP server; turn on RDP in GNOME Settings →
+- **Remote desktop**: `setup.sh desktop` installs the RDP server and an SSH server; turn on RDP in GNOME Settings →
   System → Remote Desktop (or with `grdctl`), but keep port 3389 closed and
   connect through SSH: `ssh -L 3389:localhost:3389 <host>`, then point the RDP
   client at `localhost`.
@@ -220,6 +222,14 @@ one, add a column there and the option lines in `alacritty.toml` (plus a file in
 
 **GUI apps**: apt/dnf or Flatpak, not Nix.
 
+**GNOME extensions**: add the UUID (shown on the extension's
+extensions.gnome.org page or by `gnome-extensions list`) to `enabled-extensions`
+in `home/gnome.nix`, switch, then `./setup.sh workstation extensions` installs
+it. To keep a setting, change it in the extension's preferences, find the key
+with `dconf watch /org/gnome/shell/extensions/` (or `dconf dump`), and add it
+to `home/gnome.nix`; otherwise the next switch leaves it alone, but a new
+machine won't have it.
+
 ## Updating
 
 | What                     | How                                                                 |
@@ -227,7 +237,8 @@ one, add a column there and the option lines in `alacritty.toml` (plus a file in
 | These dotfiles           | `git pull`, then `home-manager switch --flake ~/.local/share/dotfiles#quocanh@<profile>` |
 | Nix packages             | `nix flake update`, switch, check things work, commit `flake.lock` (roll back if not) |
 | GTK themes               | `./theme.sh -u <theme>`                                             |
-| System packages          | automatic (`base.sh` enables dnf-automatic / unattended-upgrades)   |
+| System packages          | automatic (`setup.sh` enables dnf-automatic / unattended-upgrades)  |
+| Flatpak apps, GNOME extensions | automatic (nix-flatpak weekly; GNOME Shell for extensions)    |
 | Nix itself               | `sudo -i nix upgrade-nix`; check first that it stays upstream Nix (the installer's `/etc/nix/nix.conf` points upgrades at a Determinate Systems URL) |
 | Toolchains               | `mise upgrade` (commit `.config/mise/config.toml` if versions change), `rustup update` |
 
@@ -239,14 +250,14 @@ Old home-manager generations older than 30 days are deleted weekly
 - **A new terminal lacks a tool or variable**: variables come from the desktop
   session, which is set at login; log out and back in. Long-running programs
   (an old zellij session) keep the environment they started with: close them.
-- **`home.sh` or `home-manager switch` says a file is in the way**: `home.sh`
+- **`setup.sh` or `home-manager switch` says a file is in the way**: `setup.sh`
   renames such files to `*.pre-hm`; with plain `home-manager switch`, add
   `-b pre-hm`. Compare and delete the backup.
 - **Check the editor setup**: `hx --health <language>` shows which language
   servers helix finds.
-- **The Nix installer refuses to run on Fedora (SELinux)**: use `home.sh`, which
+- **The Nix installer refuses to run on Fedora (SELinux)**: use `setup.sh`, which
   uses the installer that supports SELinux. Uninstall with
   `sudo /nix/nix-installer uninstall`, never by deleting `/nix`.
 - **Nix warns "ignoring the client-specified setting 'use-xdg-base-directories'"**:
-  the setting is in `~/.config/nix/nix.conf` instead of the system config; rerun
-  `home.sh`, which moves it to `/etc/nix`.
+  the setting is in `~/.config/nix/nix.conf` instead of the system config; run
+  `./setup.sh <role> home`, which puts it in `/etc/nix`.
