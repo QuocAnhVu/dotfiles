@@ -143,18 +143,15 @@ function rpmfusion() {
     rpm --quiet -q ffmpeg || run sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing
 }
 
-# Debian's contrib, non-free and non-free-firmware components (the NVIDIA driver)
-function debian_components() {
-    local components='main contrib non-free non-free-firmware' f
-    # deb822 (.sources) and one-line (sources.list) formats; only Debian's own entries
-    for f in /etc/apt/sources.list.d/*.sources(N); do
-        if grep -q '^URIs:.*debian\.org' $f; then
-            run sudo sed -i -E "'s/^Components:.*/Components: $components/'" $f
-        fi
-    done
-    if [[ -f /etc/apt/sources.list ]]; then
-        run sudo sed -i -E "'/^deb(-src)? .*debian\.org/ s/^((deb|deb-src)( \[[^]]*\])? [^ ]+ [^ ]+) .*/\1 $components/'" /etc/apt/sources.list
-    fi
+# NVIDIA's Debian repository: the current driver and the container toolkit.
+# Debian's own driver lags far behind (no Wayland explicit sync before 555,
+# which XWayland games under Proton need to run smoothly).
+function nvidia_repo() {
+    dpkg -s cuda-keyring > /dev/null 2>&1 && return 0
+    local deb=$(mktemp --suffix=.deb) v=$(. /etc/os-release && print $VERSION_ID)
+    run curl -fsSLo $deb https://developer.download.nvidia.com/compute/cuda/repos/debian$v/x86_64/cuda-keyring_1.1-1_all.deb
+    run sudo dpkg -i $deb
+    rm -f $deb
     run sudo apt-get update
 }
 
@@ -228,8 +225,11 @@ function step_packages() {
             rpmfusion
             install akmod-nvidia xorg-x11-drv-nvidia-cuda
         else
-            debian_components
-            install nvidia-driver firmware-misc-nonfree
+            # Only the driver (CUDA lives in the distrobox); built by DKMS and signed
+            # for Secure Boot like Debian's. The open kernel modules: what NVIDIA
+            # recommends from the RTX 20-series (Turing) on
+            nvidia_repo
+            install nvidia-open
         fi
         message 'With Secure Boot, the driver module must be signed (enroll the MOK key) before it loads.'
 
@@ -237,10 +237,7 @@ function step_packages() {
         if [[ $distro == fedora ]]; then
             [[ -f /etc/yum.repos.d/nvidia-container-toolkit.repo ]] ||
                 run "curl -fsSL https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo | sudo tee /etc/yum.repos.d/nvidia-container-toolkit.repo > /dev/null"
-        else
-            apt_repo nvidia-container-toolkit https://nvidia.github.io/libnvidia-container/gpgkey \
-                'deb [signed-by={key}] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /'
-        fi
+        fi # Debian: in NVIDIA's repository, added above
         install nvidia-container-toolkit
         run sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
     fi

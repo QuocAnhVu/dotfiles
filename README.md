@@ -64,7 +64,7 @@ Where everything else comes from:
 | Desktop apps (Steam, Discord, Blender…) | Flatpak, listed in `home/workstation.nix` | Nix-built GUI apps can't use the system GPU drivers on non-NixOS |
 | Firefox, KeePassXC, Alacritty, Mullvad, virt-manager, nvtop | `setup.sh` (apt/dnf, vendor repos; Alacritty via cargo on Debian) | need system integration (browser↔KeePassXC, VPN service, libvirt) |
 | Compilers, `cmake`, `meson`, `clangd`, `-dev` libraries | `setup.sh` / apt, dnf                | Nix's builds don't search `/usr`             |
-| NVIDIA driver, container toolkit       | `setup.sh` (RPM Fusion / Debian non-free, NVIDIA repo) | kernel module                     |
+| NVIDIA driver, container toolkit       | `setup.sh` (RPM Fusion / NVIDIA's Debian repo)          | kernel module                     |
 | GNOME extensions                       | extensions.gnome.org (`setup.sh`), enabled and configured in `home/gnome.nix` | match the running GNOME Shell version |
 | CUDA toolkit                           | the `cuda` distrobox (see below)       | needs an older GCC than Fedora's             |
 | VeraCrypt                              | manual download (veracrypt.io)         | not packaged                                 |
@@ -87,8 +87,9 @@ the small image that fetches packages during the install). In the installer:
   enroll the module signing key (`sudo mokutil --import /var/lib/dkms/mok.pub`)
   and confirm it in the blue MOK screen on the next boot.
 
-`setup.sh` enables the contrib/non-free components when it installs the NVIDIA
-driver, and adds Mozilla's, Mullvad's and NVIDIA's repositories itself.
+`setup.sh` adds Mozilla's, Mullvad's and NVIDIA's repositories itself. The NVIDIA
+driver comes from NVIDIA's repository (the current one, open kernel modules),
+not Debian's, which is too old for smooth gaming under Wayland.
 
 ### 1. Prerequisites and checkout
 
