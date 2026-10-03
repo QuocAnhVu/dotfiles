@@ -1,7 +1,7 @@
 # The workstation (this desktop): desktop.nix plus the desktop apps.
 { ... }:
 {
-  imports = [ ./desktop.nix ];
+  imports = [ ./desktop.nix ./gnome.nix ];
 
   # Desktop apps from Flathub, in the user installation (~/.local/share/flatpak).
   # Installed and updated by a systemd user service after `home-manager switch`;
