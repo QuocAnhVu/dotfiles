@@ -81,12 +81,15 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Diagnostic
 vim.lsp.config("rust_analyzer", {
     settings = { ["rust-analyzer"] = { check = { command = "clippy" } } },
 })
+vim.lsp.config("nixd", {
+    settings = { nixd = { formatting = { command = { "nixfmt" } } } },
+})
 vim.lsp.config("pyright", {
     settings = { python = { analysis = { typeCheckingMode = "standard" } } },
 })
 
 for _, name in ipairs({
-    "clangd", "cssls", "dockerls", "html", "jsonls", "lua_ls", "pyright", "ruff",
+    "clangd", "cssls", "dockerls", "html", "jsonls", "lua_ls", "nixd", "pyright", "ruff",
     "rust_analyzer", "svelte", "tailwindcss", "taplo", "tinymist", "ts_ls", "wgsl_analyzer",
 }) do
     local config = vim.lsp.config[name]

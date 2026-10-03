@@ -20,6 +20,7 @@ alias pn=pnpm
 # Prompt and toolchain manager (installed by home-manager)
 (( $+commands[starship] )) && eval "$(starship init zsh)"
 (( $+commands[mise] )) && eval "$(mise activate zsh)"
+(( $+commands[direnv] )) && eval "$(direnv hook zsh)" # per-project .envrc (Nix dev shells)
 
 # Secrets (API keys) for interactive shells only, so they stay out of the
 # desktop session: KEY=VALUE lines in an untracked file

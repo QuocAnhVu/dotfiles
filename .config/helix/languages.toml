@@ -54,3 +54,9 @@ command = "tinymist"
 [[language]]
 name = "typst"
 language-servers = ["tinymist"]
+
+# Nix (nixd and nixfmt come from home-manager)
+[[language]]
+name = "nix"
+language-servers = ["nixd"]
+formatter = { command = "nixfmt" }

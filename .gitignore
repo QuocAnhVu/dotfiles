@@ -1,3 +1,4 @@
 .config/localrc
 MIGRATE.md
 .zcompdump*
+.config/git/credentials

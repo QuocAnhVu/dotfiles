@@ -1,0 +1,9 @@
+**/.claude/settings.local.json
+
+# Ignore aider's dot files
+.aider*
+AGENTS.md
+GEMINI.md
+CLAUDE.md
+STATUS.md
+TODO.md

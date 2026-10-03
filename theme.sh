@@ -13,11 +13,12 @@ USER_THEME=user-theme@gnome-shell-extensions.gcampax.github.com
 
 # Per-theme settings. To add a theme, add a column here and its option lines in
 # the alacritty/helix/zellij configs.
-typeset -A ALACRITTY HELIX ZELLIJ NVIM GTK REPO TWEAK
+typeset -A ALACRITTY HELIX ZELLIJ NVIM DELTA GTK REPO TWEAK
 ALACRITTY=(nord nord               gruvbox gruvbox_dark                       everforest everforest_dark)
 HELIX=(    nord nord               gruvbox gruvbox_dark_soft                  everforest everforest_dark)
 ZELLIJ=(   nord nord               gruvbox gruvbox-dark                       everforest everforest-dark)
 NVIM=(     nord nord               gruvbox gruvbox                            everforest everforest)
+DELTA=(    nord Nord               gruvbox gruvbox-dark                       everforest ansi)
 GTK=(      nord Nordic             gruvbox Gruvbox-Dark-Soft                  everforest Everforest-Dark-Medium)
 REPO=(     nord EliverLara/Nordic  gruvbox Fausto-Korpsvart/Gruvbox-GTK-Theme everforest Fausto-Korpsvart/Everforest-GTK-Theme)
 TWEAK=(                            gruvbox soft                               everforest medium)
@@ -126,6 +127,7 @@ select_line $DOTFILES/.config/helix/config.toml '#' '^theme = "[^"]+"$' "theme =
 select_line $DOTFILES/.config/zellij/config.kdl '//' '^theme "[^"]+"$' "theme \"${ZELLIJ[$theme]}\""
 select_line $DOTFILES/.config/nvim/init.lua '--' '^pcall\(vim\.cmd\.colorscheme, "[^"]+"\)$' \
     "pcall(vim.cmd.colorscheme, \"${NVIM[$theme]}\")"
+select_line $DOTFILES/.config/git/config '#' '^syntax-theme = .+$' "syntax-theme = ${DELTA[$theme]}" # delta (no everforest theme: ansi uses terminal colours)
 
 if [[ -n $update || ! -d $THEMES_DIR/${GTK[$theme]} ]]; then
     context "Installing GTK/GNOME Shell theme ${GTK[$theme]}"

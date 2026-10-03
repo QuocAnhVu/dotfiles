@@ -1,0 +1,96 @@
+[user]
+	name = Quoc-Anh Vu
+	email = quoc.v.anh@gmail.com
+
+[init]
+	defaultBranch = main
+
+[alias]
+	st = status
+	co = checkout
+	ci = commit
+	br = branch
+	unstage = reset HEAD --
+	last = log -1 HEAD --stat
+	difft = difftool
+	tree = log --graph --decorate --pretty=oneline --abbrev-commit --all
+	lg = log --graph --pretty=format:\"%C(yellow)%h%C(reset) - %C(green)(%ar)%C(reset) - %s %C(red)%d%C(reset) %C(blue)<%an>%C(reset)\"
+	# git wt <feature>: new worktree ../<repo>-<feature> on branch feature/<feature> from main
+	wt = "!f(){ \
+	  if [ -z \"$1\" ]; then \
+	    echo \"usage: git wt <feature-name>\" >&2; return 1; \
+	  fi; \
+	  feature=\"$1\"; \
+	  root=\"$(git rev-parse --show-toplevel)\" || return 1; \
+	  repo=\"$(basename \"$root\")\"; \
+	  parent=\"$(dirname \"$root\")\"; \
+	  dir=\"$parent/$repo-$feature\"; \
+	  echo \"Creating worktree at $dir on branch feature/$feature from local main\"; \
+	  git worktree add \"$dir\" -b \"feature/$feature\" main; \
+	}; f"
+
+[core]
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[diff]
+	tool = difftastic
+	colorMoved = default
+	algorithm = histogram
+
+[difftool]
+	prompt = false
+
+[difftool "difftastic"]
+	cmd = difft "$LOCAL" "$REMOTE"
+
+[pager]
+	difftool = true
+
+[merge]
+	conflictstyle = diff3
+
+[delta]
+	navigate = true # n and N move between diff sections
+	features = arctic-fox
+
+# Based on arctic-fox by anthony-halim, with terminal colours instead of Nord's
+# hex colours so it follows the terminal theme.
+[delta "arctic-fox"]
+	dark = true
+	# Theme: switch with ./theme.sh in the dotfiles repo (or swap by hand)
+# syntax-theme = Nord
+# syntax-theme = gruvbox-dark
+syntax-theme = ansi
+	file-added-label = [+]
+	file-copied-label = [==]
+	file-modified-label = [*]
+	file-removed-label = [-]
+	file-renamed-label = [->]
+	file-style = omit
+	hunk-header-decoration-style = blue ul
+	hunk-header-file-style = blue ul bold
+	hunk-header-line-number-style = yellow box bold
+	hunk-header-style = file line-number syntax bold italic
+	plus-style = brightgreen
+	plus-emph-style = black green
+	minus-style = brightred
+	minus-emph-style = black red
+	line-numbers = true
+	line-numbers-minus-style = brightred
+	line-numbers-plus-style = brightgreen
+	line-numbers-left-style = blue
+	line-numbers-right-style = blue
+	line-numbers-zero-style = brightblack
+	zero-style = syntax
+	whitespace-error-style = black bold
+	blame-code-style = syntax
+	blame-format = "{author:<18} {commit:<6} {timestamp:<15}"
+	merge-conflict-begin-symbol = ~
+	merge-conflict-end-symbol = ~
+	merge-conflict-ours-diff-header-style = yellow bold
+	merge-conflict-ours-diff-header-decoration-style = blue box
+	merge-conflict-theirs-diff-header-style = yellow bold
+	merge-conflict-theirs-diff-header-decoration-style = blue box

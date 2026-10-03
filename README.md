@@ -22,7 +22,9 @@ flake.nix, flake.lock   home-manager profiles and pinned package versions
 home/                   the profiles: minimal.nix -> full.nix -> desktop.nix (see home/README.md)
 .config/                config files, linked into ~/.config by home-manager
   alacritty/            terminal (themes/ holds the colour schemes)
+  git/                  git config and global ignore (delta as pager, aliases)
   helix/                main editor
+  mise/                 global tool versions (Python, Node, Go, Lua)
   nvim/                 occasional editor (plugins come from home/full.nix)
   nushell/              interactive shell
   zsh/                  login shell: .zshenv (environment), .zshrc (interactive)
@@ -32,7 +34,7 @@ home/                   the profiles: minimal.nix -> full.nix -> desktop.nix (se
 bin/                    personal scripts, on PATH
 base.sh                 system setup: XDG directories, base packages, automatic updates
 home.sh                 installs Nix and applies a home-manager profile
-langs.sh                language toolchains through mise (Python, Node, Go) and rustup
+langs.sh                installs the mise tool versions, pnpm and the Rust toolchain
 harden.sh               SSH: client key, and optionally a hardened sshd
 theme.sh                switches the terminal, editor and GNOME theme
 _lib.sh                 helpers for the scripts above
@@ -88,7 +90,7 @@ you keep it elsewhere (I use `~/ws/dotfiles`), symlink it to that path.
 Open a new shell, then:
 
 ```shell
-./langs.sh                # Python, Node, Go (mise) and the Rust stable toolchain
+./langs.sh                # mise tools (.config/mise/config.toml), pnpm, Rust stable
 ./harden.sh               # SSH key; asks whether this machine should accept SSH
 ./theme.sh everforest     # desktops only: or gruvbox, nord
 ```
@@ -145,11 +147,20 @@ checkout, so most edits apply right away. The rest:
 | `~/.config/secrets.env`                  | open a new shell                                                |
 
 **Themes**: `./theme.sh everforest` (or `gruvbox`, `nord`) switches Alacritty,
-helix, zellij, Neovim, the GTK theme and the GNOME Shell theme. It installs a GTK theme
+helix, zellij, Neovim, delta (git diffs), the GTK theme and the GNOME Shell theme. It installs a GTK theme
 the first time; `./theme.sh -u <theme>` updates it.
 
-**Language versions**: mise manages Python, Node, Go and Lua (`mise use -g node@lts`,
-or a `mise.toml` per project); rustup manages Rust (`rustup default stable`).
+**Language versions**: mise manages Python, Node, Go and Lua. Global versions
+are in `.config/mise/config.toml` (`mise use -g node@lts` edits it in the repo;
+commit the change), per-project ones in a `mise.toml`. rustup manages Rust.
+
+**Per-project Nix dev shells (direnv)**: put `use flake` in a project's
+`.envrc` next to its `flake.nix`, run `direnv allow` once, and its dev shell
+loads whenever you `cd` in (zsh, bash and nushell; nix-direnv caches it).
+
+**Git**: `git lg` (graph log), `git wt <feature>` (new worktree on
+`feature/<feature>` next to the repo), `git difft` (difftastic); diffs page
+through delta, whose colours follow `theme.sh`.
 
 **Containers for other distros (distrobox)**: shares your home folder, user and
 display. Useful for software that wants an older or different distro, such as
@@ -211,7 +222,7 @@ one, add a column there and the option lines in `alacritty.toml` (plus a file in
 | GTK themes               | `./theme.sh -u <theme>`                                             |
 | System packages          | automatic (`base.sh` enables dnf-automatic / unattended-upgrades)   |
 | Nix itself               | `sudo -i nix upgrade-nix`; check first that it stays upstream Nix (the installer's `/etc/nix/nix.conf` points upgrades at a Determinate Systems URL) |
-| Toolchains               | `mise upgrade`, `rustup update`                                     |
+| Toolchains               | `mise upgrade` (commit `.config/mise/config.toml` if versions change), `rustup update` |
 
 Old home-manager generations older than 30 days are deleted weekly
 (`nix.gc` in `home/common.nix`); `nix-collect-garbage -d` frees space now.

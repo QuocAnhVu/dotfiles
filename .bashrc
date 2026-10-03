@@ -59,6 +59,7 @@ alias pn=pnpm
 # Prompt and toolchain manager (installed by home-manager)
 command -v starship > /dev/null && eval "$(starship init bash)"
 command -v mise > /dev/null && eval "$(mise activate bash)"
+command -v direnv > /dev/null && eval "$(direnv hook bash)" # per-project .envrc (Nix dev shells)
 
 # Secrets (API keys) for interactive shells only: KEY=VALUE lines, untracked
 if [ -r "$XDG_CONFIG_HOME/secrets.env" ]; then

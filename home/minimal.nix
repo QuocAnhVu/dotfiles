@@ -24,6 +24,9 @@
   xdg.configFile."zsh/.zshenv".source = link ".config/zsh/.zshenv";
   xdg.configFile."zsh/.zshrc".source = link ".config/zsh/.zshrc";
   xdg.configFile."helix".source = link ".config/helix";
+  # Directory links: `git config --global` and `mise use -g` replace the file
+  # rather than editing it, which would turn a file link into a plain file
+  xdg.configFile."git".source = link ".config/git";
 
   # Neovim without plugins here; full.nix adds them. init.lua skips plugin
   # setup when a plugin isn't installed.

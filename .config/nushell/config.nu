@@ -75,6 +75,14 @@ alias l = ls -al
 alias vi = nvim
 alias pn = pnpm
 
+# direnv: load a project's .envrc (e.g. a Nix dev shell) before each prompt
+$env.config.hooks.pre_prompt ++= [{||
+    if (which direnv | is-empty) { return }
+    direnv export json | from json | default {} | load-env
+    # direnv returns PATH as a string
+    if ($env.PATH | describe) == "string" { $env.PATH = ($env.PATH | split row (char esep)) }
+}]
+
 # mise.nu is generated in env.nu
 if (which mise | is-not-empty) {
     use ($nu.default-config-dir | path join mise.nu)
