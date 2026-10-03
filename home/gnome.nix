@@ -33,6 +33,13 @@
       "compose:rctrl"
     ];
 
+    # Mouse: no acceleration and the default speed, so pointer movement maps
+    # 1:1 to the mouse's DPI (set on the mouse itself)
+    "org/gnome/desktop/peripherals/mouse" = {
+      accel-profile = "flat";
+      speed = 0.0;
+    };
+
     # Tiling grid (Super+Enter)
     "org/gnome/shell/extensions/gtile" = {
       grid-sizes = "2x2,3x1";

@@ -1,5 +1,5 @@
 # The workstation (this desktop): desktop.nix plus the desktop apps.
-{ config, ... }:
+{ config, lib, ... }:
 let
   # The data drive: each machine's /etc/fstab mounts its drive here
   data = "/mnt/data";
@@ -43,6 +43,20 @@ in
     };
     Install.WantedBy = [ "timers.target" ];
   };
+
+  # nix-flatpak runs Nix's flatpak, which writes its NixOS path
+  # (/run/current-system/sw/bin/flatpak) into exported D-Bus service files, so
+  # D-Bus-activated apps (Flatseal) didn't open from GNOME. Use the system's.
+  nixpkgs.overlays = [
+    (final: prev: {
+      flatpak = final.writeShellScriptBin "flatpak" ''exec /usr/bin/flatpak "$@"'';
+    })
+  ];
+
+  # Flatpak installs run in the background: nix-flatpak's service is oneshot,
+  # so activation waited until every app was downloaded (minutes on a new
+  # machine) and failed
+  systemd.user.services.flatpak-managed-install.Service.Type = lib.mkForce "exec";
 
   # Desktop apps from Flathub, in the user installation (~/.local/share/flatpak).
   # Installed and updated by a systemd user service after `home-manager switch`;
