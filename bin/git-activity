@@ -1,0 +1,52 @@
+#! /usr/bin/zsh
+# Your commits and changed lines per day in this repository, merges excluded.
+# Runs as `git activity` too.
+#
+# Usage: git-activity [-d DAYS] [-a AUTHOR] [-- GIT_LOG_ARGS...]
+#   -d, --days N       how far back (default 30, today included)
+#   -a, --author TEXT  whose commits (default: git config user.email)
+#   GIT_LOG_ARGS       e.g. --all for every branch, or -- PATH for one directory
+setopt err_exit pipe_fail
+
+function usage() {
+    sed -n '/^# Usage/,/^[^#]/p' $SCRIPT | sed '$d; s/^# \{0,1\}//'
+    exit 1
+}
+
+SCRIPT=$0
+days=30 author= extra=()
+while (( $# )); do
+    case $1 in
+        -d | --days) days=$2; shift 2 ;;
+        -a | --author) author=$2; shift 2 ;;
+        -h | --help) usage ;;
+        --) shift; extra=($@); break ;;
+        *) usage ;;
+    esac
+done
+[[ $days == <1-> ]] || usage
+if [[ -z $author ]] && ! author=$(git config user.email); then
+    print 'No git user.email: pass --author.'
+    exit 1
+fi
+
+since=$(date -d "$(( days - 1 )) days ago" +%F)
+print "Commits by $author since $since"
+# One pass over the log: a "@date" line per commit, then its numstat lines
+# (binary files show "-" and are skipped)
+git log --no-merges --author=$author --since="$since 00:00" --date=short \
+    --format=@%ad --numstat $extra |
+    awk -v since=$since -v days=$days '
+        /^@/ { day = substr($0, 2); commits[day]++; next }
+        $1 ~ /^[0-9]+$/ { added[day] += $1 }
+        $2 ~ /^[0-9]+$/ { removed[day] += $2 }
+        END {
+            printf "%-10s  %7s  %9s  %9s\n", "Date", "Commits", "Added", "Removed"
+            for (i = days - 1; i >= 0; i--) {
+                cmd = "date -d \"" since " +" (days - 1 - i) " days\" +%F"
+                cmd | getline d; close(cmd)
+                printf "%-10s  %7d  %9d  %9d\n", d, commits[d], added[d], removed[d]
+                tc += commits[d]; ta += added[d]; tr += removed[d]
+            }
+            printf "%-10s  %7d  %9d  %9d\n", "Total", tc, ta, tr
+        }'

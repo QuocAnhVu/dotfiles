@@ -1,0 +1,57 @@
+#! /usr/bin/zsh
+# Rewrite the current branch's commits after BASE with your identity (git
+# config user.name/email) as author and committer, keeping their dates, and
+# optionally a fixed timezone. Commits merged in from elsewhere stay as they
+# are. Runs as `git fix-authorship` too.
+#
+# Usage: git-fix-authorship [--tz ZONE] BASE
+#   BASE       the last commit to keep as is (e.g. main, origin/main, HEAD~5)
+#   --tz ZONE  show the rewritten commits' dates in this timezone, e.g. -0800
+#              (same moment, so the clock time changes)
+#
+# The old commits stay at refs/original/ until you delete them:
+#   git update-ref -d refs/original/refs/heads/<branch>
+# Pushing rewritten commits that others have needs --force-with-lease.
+setopt err_exit pipe_fail
+
+function usage() {
+    sed -n '/^# Usage/,/^[^#]/p' $SCRIPT | sed '$d; s/^# \{0,1\}//'
+    exit 1
+}
+function message() { print -P "%F{yellow}git-fix-authorship:%f $*" }
+
+SCRIPT=$0
+tz= base=
+while (( $# )); do
+    case $1 in
+        --tz) tz=$2; shift 2 ;;
+        -h | --help) usage ;;
+        -*) usage ;;
+        *) [[ -z $base ]] || usage; base=$1; shift ;;
+    esac
+done
+[[ -n $base ]] || usage
+[[ -z $tz || $tz == [+-][0-9][0-9][0-9][0-9] ]] || { message "Not a timezone: $tz (e.g. -0800)"; exit 1 }
+
+commit=$(git rev-parse --verify --quiet "$base^{commit}") || { message "No such commit: $base"; exit 1 }
+base=$commit
+git diff --quiet HEAD || { message 'Commit or stash your changes first.'; exit 1 }
+count=$(git rev-list --count $base..HEAD)
+(( count )) || { message "Nothing after $base."; exit 0 }
+
+export NAME=$(git config user.name) EMAIL=$(git config user.email) TZ_FIX=$tz BASE=$base
+[[ -n $NAME && -n $EMAIL ]] || { message 'Set git config user.name and user.email first.'; exit 1 }
+message "Rewriting up to $count commits on $(git branch --show-current) as $NAME <$EMAIL>${tz:+, timezone $tz}"
+
+# The filter runs in sh for each commit, with the variables exported above.
+# Dates are "@<seconds> <zone>": --tz replaces the zone.
+FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --env-filter '
+    if git merge-base --is-ancestor "$BASE" "$GIT_COMMIT"; then
+        export GIT_AUTHOR_NAME="$NAME" GIT_AUTHOR_EMAIL="$EMAIL"
+        export GIT_COMMITTER_NAME="$NAME" GIT_COMMITTER_EMAIL="$EMAIL"
+        if [ -n "$TZ_FIX" ]; then
+            export GIT_AUTHOR_DATE="${GIT_AUTHOR_DATE% *} $TZ_FIX"
+            export GIT_COMMITTER_DATE="${GIT_COMMITTER_DATE% *} $TZ_FIX"
+        fi
+    fi
+' $base..HEAD

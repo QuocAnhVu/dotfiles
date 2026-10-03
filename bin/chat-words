@@ -1,0 +1,28 @@
+#!/usr/bin/env nu
+
+# Words written by you and by the AI in SillyTavern chats (.jsonl) over a
+# recent period.
+#
+# Usage: chat-words <period> [<pattern>]
+#   period   a duration: 1day, 7day, 4wk...
+#   pattern  chat files (default: every chat of the default user, in the
+#            current directory's SillyTavern data)
+#
+# Example: chat-words 7day '~/ws/1ab/SillyTavern/data/default-user/chats/**/*.jsonl'
+def main [period: duration, pattern: glob = "data/default-user/chats/**/*.jsonl"] {
+    let since = (date now) - $period
+    let files = (glob $pattern)
+    if ($files | is-empty) { error make --unspanned { msg: $"No chat files match ($pattern)" } }
+
+    let counts = $files | each {|file|
+        # The first line is the chat's metadata
+        open --raw $file | from json --objects | skip 1
+            | where {|m| try { ($m.send_date | into datetime) >= $since } catch { false } }
+            | each {|m| { user: ($m.is_user? | default ($m.name == "User")), words: ($m.mes | str stats | get words) } }
+    } | flatten
+
+    {
+        User: ($counts | where user | get words | append 0 | math sum)
+        AI: ($counts | where not user | get words | append 0 | math sum)
+    }
+}

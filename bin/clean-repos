@@ -1,0 +1,43 @@
+#! /usr/bin/zsh
+# Delete ignored files (build output, dependencies, caches: whatever .gitignore
+# lists) in every git repository under a directory, nested ones included.
+# Untracked files that aren't ignored stay. Lists what it would delete unless
+# --force: ignored files can be wanted too (.env, local data).
+#
+# Usage: clean-repos [-f] [-k GLOB]... [DIR]
+#   -f, --force          delete (default: only list)
+#   -k, --keep GLOB      keep files whose name matches, in any directory,
+#                        e.g. -k .env -k '*.sqlite'
+#   DIR                  where to look (default: the current directory)
+setopt err_exit pipe_fail
+
+function usage() {
+    sed -n '/^# Usage/,/^[^#]/p' $SCRIPT | sed '$d; s/^# \{0,1\}//'
+    exit 1
+}
+
+SCRIPT=$0
+force=0 keep=() dir=.
+while (( $# )); do
+    case $1 in
+        -f | --force) force=1; shift ;;
+        # Pathspec exclusions (git clean's -e adds ignore rules: it would delete them)
+        -k | --keep) keep+=(":(exclude,glob)**/$2"); shift 2 ;;
+        -h | --help) usage ;;
+        -*) usage ;;
+        *) dir=$1; shift ;;
+    esac
+done
+
+mode=(-n)
+(( force )) && mode=(-f)
+# Repositories: directories with a .git (a directory, or a file in worktrees
+# and submodules). Not inside other .git directories.
+for git in ${(f)"$(find $dir -name .git -prune -print | sort)"}; do
+    repo=${git:h}
+    out=$(git -C $repo clean -X -d $mode -- . $keep) || { print -P "%F{red}$repo: git clean failed%f"; continue }
+    [[ -n $out ]] || continue
+    print -P "%F{yellow}$repo%f"
+    print -rl -- '  '${^${(f)${${out//Would remove /}//Removing /}}}
+done
+(( force )) || print -P "%F{yellow}Nothing deleted: rerun with --force to delete these.%f"
