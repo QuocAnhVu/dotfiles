@@ -35,6 +35,7 @@ bin/                    personal scripts, on PATH
 base.sh                 system setup: XDG directories, base packages, automatic updates
 home.sh                 installs Nix and applies a home-manager profile
 langs.sh                installs the mise tool versions, pnpm and the Rust toolchain
+packages.sh             system packages: build tools, GUI apps that need the system, NVIDIA
 harden.sh               SSH: client key, and optionally a hardened sshd
 theme.sh                switches the terminal, editor and GNOME theme
 _lib.sh                 helpers for the scripts above
@@ -43,26 +44,32 @@ _lib.sh                 helpers for the scripts above
 
 ## Machine roles
 
-| Role               | OS            | home-manager profile | SSH server | Notes                                  |
-| ------------------ | ------------- | -------------------- | ---------- | -------------------------------------- |
-| This desktop       | Fedora/Debian | `desktop`            | off        | GNOME                                  |
-| Remote desktop     | Debian        | `desktop`            | on         | GNOME, RDP through an SSH tunnel       |
-| Headless dev box   | Debian        | `dev`                | on         | full toolset, no GUI                   |
-| Headless server    | Debian        | `server` (optional)  | on         | a few debugging tools; no checkout needed |
+| Role               | OS            | home-manager / `packages.sh` | SSH server | Notes                          |
+| ------------------ | ------------- | ---------------------------- | ---------- | ------------------------------ |
+| This workstation   | Fedora/Debian | `workstation`                | off        | GNOME, desktop apps, NVIDIA    |
+| Remote desktop     | Debian        | `desktop`                    | on         | GNOME, Firefox, terminal; RDP through an SSH tunnel |
+| Headless dev box   | Debian        | `dev`                        | on         | full toolset, no GUI           |
+| Headless server    | Debian        | `server` (optional)          | on         | a few debugging tools; no checkout needed |
 
-Each profile includes the one before it:
+Each role includes the one before it:
 
-| Profile   | Adds                                                                                 |
-| --------- | ------------------------------------------------------------------------------------ |
-| `server`  | zsh/bash and helix configs, starship, git, ripgrep, fd, bat, bottom, mosh…           |
-| `dev`     | CLI/TUI suite (zellij, nushell, eza…), mise, rustup, uv, language servers, cargo tools |
-| `desktop` | Alacritty config, JetBrainsMono Nerd Font, distrobox                                 |
+| Role          | home-manager adds                                                      | `packages.sh` adds                                   |
+| ------------- | ---------------------------------------------------------------------- | ---------------------------------------------------- |
+| `server`      | zsh/bash and helix configs, starship, git, ripgrep, fd, bat, mosh…      | nothing                                              |
+| `dev`         | CLI/TUI suite, mise, rustup, uv, language servers, cargo tools, direnv  | compilers, cmake, meson, clangd                      |
+| `desktop`     | Alacritty config, JetBrainsMono Nerd Font, distrobox                   | GNOME (if missing), RDP server, Firefox, Alacritty   |
+| `workstation` | Flatpak apps (`home/workstation.nix`)                                  | KeePassXC, virt-manager, nvtop, Performous, Mullvad, NVIDIA driver and container toolkit |
 
-What deliberately does **not** come from Nix: GUI apps (Alacritty, browsers,
-KeePassXC: Nix-built GUI apps can't use the system's GPU drivers on non-NixOS),
-compilers and `-dev` libraries, `cmake`/`meson`/`clangd` (Nix's versions don't
-search `/usr`, so they can't find apt/dnf libraries), CUDA and drivers. Install
-those with apt/dnf or Flatpak.
+Where everything else comes from:
+
+| What                                   | From                                   | Why not Nix                                  |
+| -------------------------------------- | -------------------------------------- | -------------------------------------------- |
+| Desktop apps (Steam, Discord, Blender…) | Flatpak, listed in `home/workstation.nix` | Nix-built GUI apps can't use the system GPU drivers on non-NixOS |
+| Firefox, KeePassXC, Alacritty, Mullvad, virt-manager, nvtop | `packages.sh` (apt/dnf, vendor repos; Alacritty via cargo on Debian) | need system integration (browser↔KeePassXC, VPN service, libvirt) |
+| Compilers, `cmake`, `meson`, `clangd`, `-dev` libraries | `packages.sh` / apt, dnf             | Nix's builds don't search `/usr`             |
+| NVIDIA driver, container toolkit       | `packages.sh` (RPM Fusion / Debian non-free, NVIDIA repo) | kernel module                     |
+| CUDA toolkit                           | the `cuda` distrobox (see below)       | needs an older GCC than Fedora's             |
+| VeraCrypt                              | manual download (veracrypt.io)         | not packaged                                 |
 
 ## Setting up a machine
 
@@ -84,15 +91,16 @@ you keep it elsewhere (I use `~/ws/dotfiles`), symlink it to that path.
 
 ```shell
 ./base.sh            # XDG directories, base packages, automatic updates
-./home.sh desktop    # or: dev, server. Installs Nix (asks for sudo) and applies the profile
+./home.sh workstation  # or: desktop, dev, server. Installs Nix (asks for sudo) and applies the profile
 ```
 
 Open a new shell, then:
 
 ```shell
 ./langs.sh                # mise tools (.config/mise/config.toml), pnpm, Rust stable
+./packages.sh workstation # or desktop, dev, server: system packages (see above)
 ./harden.sh               # SSH key; asks whether this machine should accept SSH
-./theme.sh everforest     # desktops only: or gruvbox, nord
+./theme.sh everforest     # workstation and desktops: or gruvbox, nord
 ```
 
 On desktops, log out and back in so GNOME picks up the environment.
@@ -122,7 +130,7 @@ Two files aren't in git (`base.sh` creates empty ones):
   ```shell
   nix run github:QuocAnhVu/dotfiles#home-manager -- switch --flake github:QuocAnhVu/dotfiles#quocanh@server
   ```
-- **Remote desktop**: answer yes in `harden.sh`. Turn on RDP in GNOME Settings →
+- **Remote desktop**: answer yes in `harden.sh`. `packages.sh desktop` installs the RDP server; turn on RDP in GNOME Settings →
   System → Remote Desktop (or with `grdctl`), but keep port 3389 closed and
   connect through SSH: `ssh -L 3389:localhost:3389 <host>`, then point the RDP
   client at `localhost`.
@@ -141,7 +149,7 @@ checkout, so most edits apply right away. The rest:
 | You changed                              | To apply                                                        |
 | ---------------------------------------- | --------------------------------------------------------------- |
 | A file under `.config/`                  | nothing (restart the program, or reload: `:config-reload` in helix) |
-| `home/*.nix` or `flake.lock`             | `home-manager switch --flake ~/.local/share/dotfiles#quocanh@desktop` |
+| `home/*.nix` or `flake.lock`             | `home-manager switch --flake ~/.local/share/dotfiles#quocanh@<role>` |
 | Shared variables in `home/*.nix`         | the switch above, then log out and back in                      |
 | `~/.config/environment.d/90-local.conf`  | log out and back in (new zsh/bash shells pick it up right away) |
 | `~/.config/secrets.env`                  | open a new shell                                                |
@@ -167,9 +175,8 @@ display. Useful for software that wants an older or different distro, such as
 CUDA (which needs an older GCC than Fedora's):
 
 ```shell
-distrobox create --name cuda --image docker.io/nvidia/cuda:12.9.1-devel-ubuntu24.04 \
-  --nvidia --volume /nix:/nix:ro   # /nix makes the Nix tools work inside
-distrobox enter cuda               # same home folder; `exit` to leave
+distrobox create --name cuda --image docker.io/nvidia/cuda:12.9.1-devel-ubuntu24.04 --nvidia
+distrobox enter cuda               # same home folder and Nix tools; `exit` to leave
 distrobox list | stop | rm cuda
 ```
 

@@ -16,29 +16,26 @@ run mkdir -p $XDG_STATE_HOME/zsh  # for zsh_history
 run mkdir -p $XDG_CONFIG_HOME/environment.d # machine-specific variables: 90-local.conf
 run "touch $XDG_CONFIG_HOME/secrets.env && chmod 600 $XDG_CONFIG_HOME/secrets.env"
 
-context 'Installing packages'
-if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
-    run sudo dnf update -y
-    run sudo dnf install -y curl git neovim fd-find
-elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
-    run sudo apt update
-    run sudo apt upgrade -y
-    run sudo apt install -y curl git neovim fd-find
-fi
-
-context 'Uninstalling cockpit'
-if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
-    sudo systemctl stop cockpit
-    sudo systemctl disable cockpit
-    sudo dnf remove cockpit
+context 'Installing packages (the rest comes from home-manager: ./home.sh)'
+if rg --quiet '^ID=fedora' /etc/os-release; then
+    run sudo dnf upgrade -y
+    run sudo dnf install -y curl git
+elif rg --quiet '^ID=debian' /etc/os-release; then
+    run sudo apt-get update
+    run sudo apt-get upgrade -y
+    run sudo apt-get install -y curl git
 fi
 
 context 'Enabling automatic updates'
-if rg --quiet 'Fedora|Red Hat' /etc/os-release; then
+if rg --quiet '^ID=fedora' /etc/os-release; then
+    # dnf5: defaults are in /usr/share/dnf5/dnf5-plugins/automatic.conf; override here
     run sudo dnf install -y dnf-automatic
-    run sudo sed -i \'s/apply_updates = no/apply_updates = yes/\' /etc/dnf/automatic.conf
-    run sudo systemctl enable --now dnf-automatic.timer
-elif rg --quiet 'Ubuntu|Debian' /etc/os-release; then
-    sudo apt install unattended-upgrades
-    sudo dpkg-reconfigure --priority=low unattended-upgrades
+    run_noeval "apply_updates = yes > /etc/dnf/dnf5-plugins/automatic.conf"
+    printf '[commands]\napply_updates = yes\n' | sudo tee /etc/dnf/dnf5-plugins/automatic.conf > /dev/null
+    run sudo systemctl enable --now dnf5-automatic.timer
+elif rg --quiet '^ID=debian' /etc/os-release; then
+    run sudo apt-get install -y unattended-upgrades
+    run_noeval "enable unattended-upgrades (debconf)"
+    echo 'unattended-upgrades unattended-upgrades/enable_auto_updates boolean true' | sudo debconf-set-selections
+    run sudo dpkg-reconfigure -f noninteractive unattended-upgrades
 fi
