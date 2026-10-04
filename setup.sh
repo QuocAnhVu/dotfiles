@@ -119,7 +119,8 @@ function step_base() {
 # What doesn't come from Nix (home-manager) or Flatpak (nix-flatpak):
 #   dev:         build tools, podman
 #   desktop:     podman, GNOME (if missing) with RDP, Firefox, Alacritty
-#   workstation: all of the above, KeePassXC, virt-manager, nvtop, Steam udev rules, Mullvad, NVIDIA
+#   workstation: all of the above, KeePassXC, virt-manager, nvtop, Steam udev rules,
+#                low-latency audio, Mullvad, NVIDIA
 
 # Adds an apt repository: name, key URL, "deb ..." line ({key} is replaced by the key path)
 function apt_repo() {
@@ -234,6 +235,23 @@ function step_packages() {
     if ! id -nG $USER | grep -qw libvirt; then
         run sudo usermod -a -G libvirt $USER
         notes+=("Log in again for the libvirt group to apply to $USER.")
+    fi
+
+    context 'Low-latency audio'
+    # PipeWire's group may use real-time priority (limits.d/25-pw-rlimits.conf):
+    # for DAWs like Bitwig; rtkit already covers PipeWire's own threads
+    if getent group pipewire > /dev/null && ! id -nG $USER | grep -qw pipewire; then
+        run sudo usermod -a -G pipewire $USER
+        notes+=("Log in again for the pipewire group to apply to $USER.")
+    fi
+    # Debian's kernel defaults to voluntary preemption, which can make audio wait
+    # (crackles at small buffers): full preempts as soon as audio needs the CPU
+    if [[ $distro == debian && ! -f /etc/default/grub.d/preempt.cfg ]]; then
+        run_noeval 'preempt=full > /etc/default/grub.d/preempt.cfg'
+        print -r -- 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT preempt=full"' \
+            | sudo tee /etc/default/grub.d/preempt.cfg > /dev/null
+        run sudo update-grub
+        notes+=('Reboot for full kernel preemption (preempt=full).')
     fi
 
     context 'Mullvad VPN'
