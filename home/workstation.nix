@@ -23,6 +23,10 @@ in
     templates = config.home.homeDirectory;
   };
 
+  # virsh as a user defaults to qemu:///session: use the system VMs, like
+  # virt-manager (setup.sh adds the user to the libvirt group)
+  home.sessionVariables.LIBVIRT_DEFAULT_URI = "qemu:///system";
+
   # ws stays on the system drive (builds write a lot; the drive's connection is
   # flaky): back it up to the data drive hourly, when it's connected
   systemd.user.services.ws-backup = {

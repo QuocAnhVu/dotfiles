@@ -222,6 +222,20 @@ function step_packages() {
     # can't install from inside its sandbox
     install flatpak keepassxc virt-manager nvtop steam-devices
 
+    context 'libvirt (virt-manager)'
+    # The daemon is socket-activated on both, but only Fedora autostarts the
+    # "default" NAT network that new VMs attach to
+    local virsh='sudo virsh -c qemu:///system' net
+    if net=$(eval $virsh net-info default 2> /dev/null); then
+        grep -q '^Autostart: *yes' <<< $net || run $virsh net-autostart default
+        grep -q '^Active: *yes' <<< $net || run $virsh net-start default
+    fi
+    # polkit lets the libvirt group manage system VMs without a password prompt
+    if ! id -nG $USER | grep -qw libvirt; then
+        run sudo usermod -a -G libvirt $USER
+        notes+=("Log in again for the libvirt group to apply to $USER.")
+    fi
+
     context 'Mullvad VPN'
     if [[ $distro == fedora ]]; then
         [[ -f /etc/yum.repos.d/mullvad.repo ]] ||
