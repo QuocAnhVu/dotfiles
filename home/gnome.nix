@@ -40,6 +40,18 @@
       speed = 0.0;
     };
 
+    # Alt+Tab switches windows, Super+Tab apps (GNOME: both apps); each only
+    # within the current workspace
+    "org/gnome/desktop/wm/keybindings" = {
+      switch-windows = [ "<Alt>Tab" ];
+      switch-applications = [ "<Super>Tab" ];
+    };
+    "org/gnome/shell/window-switcher".current-workspace-only = true;
+    "org/gnome/shell/app-switcher".current-workspace-only = true;
+
+    # No animations (Accessibility > Seeing > Animation Effects)
+    "org/gnome/desktop/interface".enable-animations = false;
+
     # Tiling grid (Super+Enter)
     "org/gnome/shell/extensions/gtile" = {
       grid-sizes = "2x2,3x1";
