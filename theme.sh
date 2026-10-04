@@ -26,8 +26,9 @@ DELTA=(    nord Nord               gruvbox gruvbox-dark                       ev
 GTK=(      nord Nordic             gruvbox Gruvbox-Dark-Soft                  everforest Everforest-Dark-Medium)
 REPO=(     nord EliverLara/Nordic  gruvbox Fausto-Korpsvart/Gruvbox-GTK-Theme everforest Fausto-Korpsvart/Everforest-GTK-Theme)
 TWEAK=(                            gruvbox soft                               everforest medium)
-# Tela-circle folder colour: one of its variants, or the theme's accent (hex)
-ICONS=(    nord nord               gruvbox 7c6f64                             everforest a7c080)
+# Tela-circle folder colour: one of its variants, or a hex code. Dark tones from
+# the background end of the palette look best; accents are too bright.
+ICONS=(    nord nord               gruvbox 504945                             everforest 56635F)
 
 # Icons and cursor: the same for every theme
 ICONS_REPO=vinceliuice/Tela-circle-icon-theme
