@@ -46,6 +46,16 @@ trap 'rm -f $filter' EXIT
         \( -type f -name pyvenv.cfg -printf '%h\n' \) -o \
         \( -type f -name CACHEDIR.TAG -printf '%h\n' \) \) 2> /dev/null |
         sed 's|^\./|/|; s|$|/|; s|^|- |' | sort -u
+    # Unreal projects (next to a .uproject): what the editor and builds
+    # regenerate, in the project and its plugins
+    find . -path ./3p -prune -o -name node_modules -prune -o \
+        -type f -name '*.uproject' -printf '%h\n' 2> /dev/null |
+        sed 's|^\.||' | sort -u | while read -r project; do
+            for sub in Binaries Intermediate Saved DerivedDataCache; do
+                print -r -- "- $project/$sub/"
+                print -r -- "- $project/Plugins/**/$sub/"
+            done
+        done
 } > $filter
 
 rc=0
