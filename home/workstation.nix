@@ -98,5 +98,27 @@ in
       "com.mattjakeman.ExtensionManager"
       "org.cryptomator.Cryptomator"
     ];
+    # Bitwig ships with filesystems=host, so its persistent dirs (.BitwigStudio,
+    # "Bitwig Studio") were created in ~ instead of ~/.var/app. Without host they
+    # live in ~/.var/app/com.bitwig.BitwigStudio; "Bitwig Studio/Projects" there
+    # is a link to ~/ws/music. Plugins run in Bitwig's sandbox, so they need their
+    # files too (u-he: presets and license in ~/.u-he, which Diva.clap links into).
+    overrides."com.bitwig.BitwigStudio".Context.filesystems = [
+      "!host"
+      "~/ws/music"
+      "~/.local/share/clap:ro"
+      "~/.local/share/vst3:ro"
+      "~/.local/share/vst:ro"
+      "~/.u-he"
+      "xdg-music" # samples and exports on the data drive
+      "xdg-download:ro"
+    ];
   };
+
+  # Hidden in Files: Unreal tools' folders in ~ (fixed paths: the trace store,
+  # UnrealBuildTool's Library/Logs)
+  home.file.".hidden".text = ''
+    Library
+    UnrealEngine
+  '';
 }
