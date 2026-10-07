@@ -49,8 +49,15 @@
     "org/gnome/shell/window-switcher".current-workspace-only = true;
     "org/gnome/shell/app-switcher".current-workspace-only = true;
 
-    # No animations (Accessibility > Seeing > Animation Effects)
-    "org/gnome/desktop/interface".enable-animations = false;
+    "org/gnome/desktop/interface" = {
+      # No animations (Accessibility > Seeing > Animation Effects)
+      enable-animations = false;
+      # Fonts (installed by setup.sh): Inter, which GNOME's Adwaita Sans is
+      # based on; JetBrains Mono like the terminal (there the Nerd Font version)
+      font-name = "Inter Variable 11";
+      document-font-name = "Inter Variable 11";
+      monospace-font-name = "JetBrains Mono 11";
+    };
 
     # Tiling grid (Super+Enter)
     "org/gnome/shell/extensions/gtile" = {

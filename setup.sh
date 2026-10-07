@@ -184,6 +184,15 @@ function step_packages() {
     if [[ $role == desktop ]]; then
         install gnome-remote-desktop # RDP; connect through an SSH tunnel (see README)
     fi
+    # Fonts: system packages, so Flatpak apps see them too (not Nix's).
+    # Interface Inter, monospace JetBrains Mono (gnome.nix). Noto for text in
+    # every other script: Fedora's desktop includes it; Debian's gnome-core
+    # covers little beyond Latin, Greek and Cyrillic.
+    if [[ $distro == fedora ]]; then
+        install rsms-inter-vf-fonts jetbrains-mono-fonts
+    else
+        install fonts-inter-variable fonts-jetbrains-mono fonts-noto-core fonts-noto-cjk
+    fi
 
     context 'Firefox'
     if [[ $distro == debian ]]; then
