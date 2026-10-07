@@ -57,7 +57,14 @@
       font-name = "Inter Variable 11";
       document-font-name = "Inter Variable 11";
       monospace-font-name = "JetBrains Mono 11";
+      # Top bar clock: 24-hour, with the weekday, date and seconds
+      clock-format = "24h";
+      clock-show-weekday = true;
+      clock-show-date = true;
+      clock-show-seconds = true;
     };
+    # Week numbers in the top bar's calendar
+    "org/gnome/desktop/calendar".show-weekdate = true;
 
     # Tiling grid (Super+Enter)
     "org/gnome/shell/extensions/gtile" = {
