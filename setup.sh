@@ -263,6 +263,17 @@ function step_packages() {
         notes+=('Reboot for full kernel preemption (preempt=full).')
     fi
 
+    context 'External SSD'
+    # The Ugreen NVMe enclosure's RTL9210 bridge (0bda:9210) hangs under UAS after
+    # resume, freezing apps and stalling boot: use the slower but steady usb-storage
+    if [[ $distro == debian && ! -f /etc/default/grub.d/usb-quirks.cfg ]]; then
+        run_noeval 'usb-storage.quirks=0bda:9210:u > /etc/default/grub.d/usb-quirks.cfg'
+        print -r -- 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT usb-storage.quirks=0bda:9210:u"' \
+            | sudo tee /etc/default/grub.d/usb-quirks.cfg > /dev/null
+        run sudo update-grub
+        notes+=('Reboot for the external SSD to skip UAS (usb-storage.quirks).')
+    fi
+
     context 'Mullvad VPN'
     if [[ $distro == fedora ]]; then
         [[ -f /etc/yum.repos.d/mullvad.repo ]] ||
