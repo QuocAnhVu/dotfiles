@@ -1,0 +1,20 @@
+#!/bin/sh
+# Private hook (core.hooksPath points here): checks for private words, then
+# runs the repository's own pre-push hook, from .githooks or .git/hooks.
+hooks="$(dirname "$0")"
+# Each ref being pushed: the commits the remote doesn't have yet.
+zero=0000000000000000000000000000000000000000
+input=$(cat)
+echo "$input" | while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "$local_sha" ] && continue
+  [ "$local_sha" = "$zero" ] && continue
+  if [ "$remote_sha" = "$zero" ]; then range="$local_sha --not --remotes=$1"; else range="$remote_sha..$local_sha"; fi
+  "$hooks/private-check" range "$range" || exit 1
+done || exit 1
+top="$(git rev-parse --show-toplevel)"
+gitdir="$(git rev-parse --git-common-dir)"
+for own in "$top/.githooks/pre-push" "$gitdir/hooks/pre-push"; do
+  if [ -x "$own" ]; then
+    echo "$input" | exec "$own" "$@"
+  fi
+done

@@ -1,0 +1,12 @@
+#!/bin/sh
+# Private hook (core.hooksPath points here): checks for private words, then
+# runs the repository's own pre-commit hook, from .githooks or .git/hooks.
+hooks="$(dirname "$0")"
+"$hooks/private-check" staged || exit 1
+top="$(git rev-parse --show-toplevel)"
+gitdir="$(git rev-parse --git-common-dir)"
+for own in "$top/.githooks/pre-commit" "$gitdir/hooks/pre-commit"; do
+  if [ -x "$own" ]; then
+    exec "$own"
+  fi
+done

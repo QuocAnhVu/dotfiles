@@ -2,3 +2,4 @@
 MIGRATE.md
 .zcompdump*
 .config/git/credentials
+.config/git/private-words

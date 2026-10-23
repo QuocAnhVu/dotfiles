@@ -1,0 +1,12 @@
+#!/bin/sh
+# Private hook (core.hooksPath points here): checks for private words, then
+# runs the repository's own commit-msg hook, from .githooks or .git/hooks.
+hooks="$(dirname "$0")"
+"$hooks/private-check" message "$1" || exit 1
+top="$(git rev-parse --show-toplevel)"
+gitdir="$(git rev-parse --git-common-dir)"
+for own in "$top/.githooks/commit-msg" "$gitdir/hooks/commit-msg"; do
+  if [ -x "$own" ]; then
+    exec "$own" "$@"
+  fi
+done

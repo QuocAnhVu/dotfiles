@@ -1,0 +1,41 @@
+#!/bin/sh
+# Shared by the private hooks: refuses anything that matches a pattern in
+# ~/.config/git/private-words. Kept outside every repository, so neither the
+# rule nor the words are ever committed or pushed.
+words="$HOME/.config/git/private-words"
+[ -f "$words" ] || exit 0
+# A repository published under the real name opts out in its own config:
+#   git config privatecheck.skip true
+[ "$(git config --bool privatecheck.skip)" = true ] && exit 0
+patterns=$(mktemp) || exit 1
+trap 'rm -f "$patterns"' EXIT
+grep -v '^[[:space:]]*\(#\|$\)' "$words" > "$patterns"
+[ -s "$patterns" ] || exit 0
+match() { grep -aiqEf "$patterns"; }
+refuse() { echo "private-check: $1 matches a private word; refused (see ~/.config/git/private-words)." >&2; exit 1; }
+
+case "$1" in
+  staged)
+    git var GIT_AUTHOR_IDENT | match && refuse "the author"
+    git var GIT_COMMITTER_IDENT | match && refuse "the committer"
+    git diff --cached --name-only -z | tr '\0' '\n' | match && refuse "a staged file's name"
+    git diff --cached --no-color --no-ext-diff -U0 | grep -a '^+' | match && refuse "a staged change"
+    # Binary files don't show in the diff: check their contents whole.
+    git diff --cached --numstat -z --diff-filter=AM | tr '\0' '\n' | awk -F'\t' '$1=="-"{print $3}' |
+      while IFS= read -r f; do if git cat-file blob ":$f" | match; then echo "$f"; exit 1; fi; done ||
+      refuse "a staged binary file"
+    ;;
+  message)
+    grep -v '^#' "$2" | match && refuse "the commit message"
+    ;;
+  range)
+    # Every commit in $2 (rev-list arguments): messages, authors, changes.
+    for c in $(git rev-list $2); do
+      git log -1 --format='%an %ae %cn %ce%n%B' "$c" | match && refuse "commit $c's message or author"
+      git show --no-color --no-ext-diff --format= --binary "$c" | grep -a '^[+]' | match &&
+        refuse "commit $c's changes"
+      git show --name-only --format= "$c" | match && refuse "a file name in commit $c"
+    done
+    ;;
+esac
+exit 0
