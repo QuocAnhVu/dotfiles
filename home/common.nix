@@ -77,6 +77,11 @@ in
       PARALLEL_HOME = "${configHome}/parallel";
       PYTHON_HISTORY = "${stateHome}/python_history";
     };
+    # gpg creates only its default home (~/.gnupg) and refuses a missing one.
+    # It must be private: gpg warns about unsafe permissions otherwise.
+    home.activation.gnupgHome = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      run install -d -m 700 ${lib.escapeShellArg config.home.sessionVariables.GNUPGHOME}
+    '';
     home.sessionPath = [ "${config.home.homeDirectory}/.local/bin" ]
       ++ lib.optional cfg.liveLinks "${cfg.path}/bin";
 
