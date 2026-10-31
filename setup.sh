@@ -113,6 +113,14 @@ function step_base() {
     (( $+commands[firewall-cmd] )) || install firewalld
     run sudo systemctl enable --now firewalld
     message "Zone $(sudo firewall-cmd --get-default-zone), allowing: $(sudo firewall-cmd --list-services)"
+
+    # Fedora's GRUB already uses the text console
+    context 'Boot menu in text mode'
+    if [[ $distro == debian && -x /usr/sbin/update-grub && ! -f /etc/default/grub.d/console.cfg ]]; then
+        run_noeval 'GRUB_TERMINAL_OUTPUT=console > /etc/default/grub.d/console.cfg'
+        print -r -- 'GRUB_TERMINAL_OUTPUT=console' | sudo tee /etc/default/grub.d/console.cfg > /dev/null
+        run sudo update-grub
+    fi
 }
 
 # --- packages ---------------------------------------------------------------
