@@ -1,10 +1,12 @@
 [user]
-	name = Quoc-Anh Vu
-	email = quoc.v.anh@gmail.com
-	# Commits are signed with this machine's own SSH key, made once with
-	#   ssh-keygen -t ed25519 -C <email> -f ~/.ssh/id_ed25519_sign
-	# and added to GitHub as a signing key and to allowed_signers (kept local).
-	signingkey = ~/.ssh/id_ed25519_sign.pub
+	# No default identity: each repository names who it commits as, and git
+	# refuses to commit where none is set. Set all three in a new clone:
+	#   git config user.name <name>
+	#   git config user.email <email>
+	#   git config user.signingkey <~/.ssh/key.pub>
+	# The signing key is that identity's SSH key, added to its account as a
+	# signing key and to allowed_signers (kept local).
+	useConfigOnly = true
 
 [commit]
 	gpgsign = true
