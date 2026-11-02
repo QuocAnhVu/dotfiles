@@ -1,6 +1,19 @@
 [user]
 	name = Quoc-Anh Vu
 	email = quoc.v.anh@gmail.com
+	# Commits are signed with this machine's own SSH key, made once with
+	#   ssh-keygen -t ed25519 -C <email> -f ~/.ssh/id_ed25519_sign
+	# and added to GitHub as a signing key and to allowed_signers (kept local).
+	signingkey = ~/.ssh/id_ed25519_sign.pub
+
+[commit]
+	gpgsign = true
+
+[gpg]
+	format = ssh
+
+[gpg "ssh"]
+	allowedSignersFile = ~/.config/git/allowed_signers
 
 [init]
 	defaultBranch = main
