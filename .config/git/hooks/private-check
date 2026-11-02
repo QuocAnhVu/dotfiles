@@ -1,18 +1,28 @@
 #!/bin/sh
-# Shared by the private hooks: refuses anything that matches a pattern in
-# ~/.config/git/private-words. Kept outside every repository, so neither the
-# rule nor the words are ever committed or pushed.
-words="$HOME/.config/git/private-words"
-[ -f "$words" ] || exit 0
-# A repository published under the real name opts out in its own config:
+# Shared by the private hooks: refuses anything that matches a word that must
+# never appear under the identity this repository commits as. The words live
+# in ~/.config/git/private-words/<user.email>, one extended regex per line,
+# outside every repository, so neither the rule nor the words are ever
+# committed or pushed. Each identity's file lists the other identities'
+# names, so a repository can't leak one identity into another.
+dir="$HOME/.config/git/private-words"
+# The lists used to be one file of the real name's words: say how to move it.
+[ -f "$dir" ] && { echo "private-check: $dir is a file; move it to $dir/<user.email>. Refused." >&2; exit 1; }
+[ -d "$dir" ] || exit 0
+# A repository that must skip the check says so in its own config:
 #   git config privatecheck.skip true
 [ "$(git config --bool privatecheck.skip)" = true ] && exit 0
+email="$(git config user.email)"
+words="$dir/$email"
+# An identity without a list is refused, so a new one can't slip through.
+[ -n "$email" ] && [ -f "$words" ] ||
+  { echo "private-check: no word list for '$email' in $dir; refused." >&2; exit 1; }
 patterns=$(mktemp) || exit 1
 trap 'rm -f "$patterns"' EXIT
 grep -v '^[[:space:]]*\(#\|$\)' "$words" > "$patterns"
 [ -s "$patterns" ] || exit 0
 match() { grep -aiqEf "$patterns"; }
-refuse() { echo "private-check: $1 matches a private word; refused (see ~/.config/git/private-words)." >&2; exit 1; }
+refuse() { echo "private-check: $1 matches a private word; refused (see $words)." >&2; exit 1; }
 
 case "$1" in
   staged)
@@ -24,6 +34,9 @@ case "$1" in
     git diff --cached --numstat -z --diff-filter=AM | tr '\0' '\n' | awk -F'\t' '$1=="-"{print $3}' |
       while IFS= read -r f; do if git cat-file blob ":$f" | match; then echo "$f"; exit 1; fi; done ||
       refuse "a staged binary file"
+    ;;
+  url)
+    printf '%s\n' "$2" | match && refuse "the remote's address"
     ;;
   message)
     grep -v '^#' "$2" | match && refuse "the commit message"

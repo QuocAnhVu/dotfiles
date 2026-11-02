@@ -2,6 +2,7 @@
 # Private hook (core.hooksPath points here): checks for private words, then
 # runs the repository's own pre-push hook, from .githooks or .git/hooks.
 hooks="$(dirname "$0")"
+"$hooks/private-check" url "$2" || exit 1
 # Each ref being pushed: the commits the remote doesn't have yet.
 zero=0000000000000000000000000000000000000000
 input=$(cat)
