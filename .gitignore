@@ -3,3 +3,4 @@ MIGRATE.md
 .zcompdump*
 .config/git/credentials
 .config/git/private-words
+.config/git/allowed_signers
