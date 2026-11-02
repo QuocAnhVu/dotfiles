@@ -79,7 +79,14 @@ section 'System packages' system_packages
 # --- User-level tools
 (( $+commands[flatpak] )) && section 'Flatpak apps' run flatpak update -y
 (( $+commands[cargo-install-update] )) && section 'cargo installs' run cargo install-update -a
-(( $+commands[mise] )) && section 'mise tools' run mise upgrade
+# corepack puts pnpm inside one Node install, so a new Node comes without it:
+# enable it again, and reshim so mise sees the binaries corepack added
+function mise_tools() {
+    run mise upgrade || return 1
+    run mise exec -- corepack enable pnpm || return 1
+    run mise reshim
+}
+(( $+commands[mise] )) && section 'mise tools' mise_tools
 (( $+commands[rustup] )) && section 'Rust' run rustup update
 
 # --- Nix packages: newer flake inputs, then switch (also applies home/*.nix changes)
