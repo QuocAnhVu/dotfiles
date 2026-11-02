@@ -55,14 +55,14 @@ _lib.sh                 helpers for the scripts above
 | `server`      | zsh/bash and helix configs, starship, git, ripgrep, fd, bat, mosh…      | nothing                                              |
 | `dev`         | `server` + CLI/TUI suite, zellij, nushell, mise, rustup, uv, language servers, cargo tools, direnv | compilers, cmake, meson, clangd, podman |
 | `desktop`     | `server` + zellij, nushell, Alacritty config, JetBrainsMono Nerd Font, distrobox, GNOME settings and extensions (`home/gnome.nix`) | podman, GNOME (if missing), RDP server, Firefox, Alacritty (Debian's) |
-| `workstation` | `dev` + `desktop` + Flatpak apps (`home/workstation.nix`) | KeePassXC, virt-manager, nvtop, Steam's udev rules, Mullvad, NVIDIA driver and container toolkit |
+| `workstation` | `dev` + `desktop` + Flatpak apps (`home/workstation.nix`) | KeePassXC, virt-manager, nvtop, Steam's udev rules, Mullvad, Google Chrome, NVIDIA driver and container toolkit |
 
 Where everything else comes from:
 
 | What                                   | From                                   | Why not Nix                                  |
 | -------------------------------------- | -------------------------------------- | -------------------------------------------- |
 | Desktop apps (Steam, Discord, Blender…) | Flatpak, listed in `home/workstation.nix` | Nix-built GUI apps can't use the system GPU drivers on non-NixOS |
-| Firefox, KeePassXC, Alacritty, Mullvad, virt-manager, nvtop | `setup.sh` (apt/dnf, vendor repos; Alacritty via cargo on the Debian workstation) | need system integration (browser↔KeePassXC, VPN service, libvirt) |
+| Firefox, Chrome, KeePassXC, Alacritty, Mullvad, virt-manager, nvtop | `setup.sh` (apt/dnf, vendor repos; Alacritty via cargo on the Debian workstation) | need system integration (browser↔KeePassXC, VPN service, libvirt) |
 | Compilers, `cmake`, `meson`, `clangd`, `-dev` libraries | `setup.sh` / apt, dnf                | Nix's builds don't search `/usr`             |
 | NVIDIA driver, container toolkit       | `setup.sh` (RPM Fusion / NVIDIA's Debian repo)          | kernel module                     |
 | GNOME extensions                       | extensions.gnome.org (`setup.sh`), enabled and configured in `home/gnome.nix` | match the running GNOME Shell version |

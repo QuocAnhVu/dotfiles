@@ -128,7 +128,7 @@ function step_base() {
 #   dev:         build tools, podman
 #   desktop:     podman, GNOME (if missing) with RDP, Firefox, Alacritty
 #   workstation: all of the above, KeePassXC, virt-manager, nvtop, Steam udev rules,
-#                low-latency audio, Mullvad, NVIDIA
+#                low-latency audio, Mullvad, Google Chrome, NVIDIA
 
 # Adds an apt repository: name, key URL, "deb ..." line ({key} is replaced by the key path)
 function apt_repo() {
@@ -291,6 +291,29 @@ function step_packages() {
             "deb [signed-by={key} arch=$(dpkg --print-architecture)] https://repository.mullvad.net/deb/stable stable main"
     fi
     install mullvad-vpn
+
+    context 'Google Chrome'
+    if [[ $distro == fedora ]]; then
+        # Fedora ships Google's repository, disabled
+        install fedora-workstation-repositories
+        grep -q '^enabled=1' /etc/yum.repos.d/google-chrome.repo ||
+            run sudo dnf config-manager setopt google-chrome.enabled=1
+    else
+        # Google's package replaces any list of its repository with its own
+        # (google-chrome.sources, with its key): install the package once and
+        # it adds the repository it updates from
+        if ! dpkg -s google-chrome-stable > /dev/null 2>&1; then
+            local deb=$(mktemp --suffix=.deb)
+            run curl -fsSLo $deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            run sudo apt-get install -y $deb
+            rm -f $deb
+        fi
+        # Security fixes through unattended-upgrades, like Firefox
+        run_noeval 'allow dl.google.com > /etc/apt/apt.conf.d/51unattended-upgrades-google-chrome'
+        print -r -- 'Unattended-Upgrade::Origins-Pattern { "site=dl.google.com"; };' \
+            | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-google-chrome > /dev/null
+    fi
+    install google-chrome-stable
 
     if lspci | grep -qiE 'vga.*nvidia|3d.*nvidia'; then
         context 'NVIDIA driver'
