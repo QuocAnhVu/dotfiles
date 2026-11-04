@@ -27,8 +27,8 @@ in
   # virt-manager (setup.sh adds the user to the libvirt group)
   home.sessionVariables.LIBVIRT_DEFAULT_URI = "qemu:///system";
 
-  # ws stays on the system drive (builds write a lot; the drive's connection is
-  # flaky): back it up to the data drive hourly, when it's connected
+  # ws stays on the system drive (builds write a lot): back it up to the data
+  # drive hourly, when it's unlocked
   systemd.user.services.ws-backup = {
     Unit.Description = "Back up ~/ws to ${data}/ws";
     Service = {
