@@ -150,25 +150,37 @@ Two files aren't in git (`setup.sh` creates empty ones):
 Bulky data lives on a separate drive mounted at `/mnt/data`; the system drive
 keeps programs, games and `~/ws`. `home/workstation.nix` points Documents,
 Pictures, Videos and Music there (Desktop and Downloads stay local; Public and
-Templates are off), and a timer backs up `~/ws` to it. Each machine's
-`/etc/fstab` decides which drive that is. With systemd's automount, a missing
-drive makes writes fail instead of landing on the system drive:
+Templates are off). Each machine's `/etc/fstab` decides which drive that is.
+With systemd's automount, a missing drive makes writes fail instead of landing
+on the system drive:
 
 ```
 /dev/mapper/<name> /mnt/data btrfs noatime,compress=zstd:1,nofail,x-systemd.automount,x-systemd.device-timeout=10s 0 0
 ```
 
 (plus its `/etc/crypttab` line if it's encrypted). Layout: `Documents/`, `Pictures/`,
-`Videos/`, `Music/`, `Models/`, `Datasets/`, `ws/` (backup), `ws-history/`.
+`Videos/`, `Music/`, `Models/`, `Datasets/`.
 
-**ws backup**: `bin/ws-backup` runs hourly (`systemctl --user list-timers
-ws-backup`) and skips quietly while the drive is disconnected. It leaves out
-build output, caches and 3p clones (it keeps `3p save`'s list), at most 50 MiB/s
-since the drive overheats. Files deleted or changed since the previous run stay
-in `/mnt/data/ws-history/<date_time>/` for 30 days. To leave out more, add
-rsync filter rules to a `.backupignore` file in that directory (`- /big-data/`).
-Restore with `rsync -a /mnt/data/ws/ ~/ws/`, then `3p restore --all` for the
-clones you want. Check the last run with `journalctl --user -u ws-backup`.
+**Backups** go to a [restic](https://restic.net) repository on a second drive
+mounted at `/mnt/hdd` (`/mnt/hdd/restic`, its password in
+`~/.config/restic/hdd`; keep a copy in a password manager), and skip quietly
+while either drive is missing. Create it once with
+`openssl rand -base64 33 > ~/.config/restic/hdd` (mode 600) and
+`restic -r /mnt/hdd/restic --password-file ~/.config/restic/hdd init`.
+
+- `bin/ws-backup`, every 15 minutes: `~/ws`, without build output, caches and
+  3p clones (it keeps `3p save`'s list). To leave out a folder, put a
+  `CACHEDIR.TAG` file in it.
+- `bin/data-backup`, daily: `/mnt/data`, without caches and the folders the
+  drive lists in its `.backup-exclude` (one per line, relative to the drive:
+  what can be downloaded or rebuilt again); it also prunes and spot-checks the
+  repository.
+
+Restore with `restic -r /mnt/hdd/restic --password-file ~/.config/restic/hdd
+restore latest --tag ws --target /` (or `--tag data`, or `--include <path>` for
+part of it), then `3p restore --all` for the clones you want; `... mount ~/mnt`
+browses every snapshot. Check the last runs with `systemctl --user list-timers`
+and `journalctl --user -u ws-backup -u data-backup`.
 
 ### Role-specific steps
 

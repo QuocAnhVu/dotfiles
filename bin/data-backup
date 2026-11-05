@@ -1,0 +1,43 @@
+#! /usr/bin/zsh
+# Back up the data drive (/mnt/data) to the restic repository on the HDD
+# (/mnt/hdd/restic, shared with ws-backup), without what can be downloaded or
+# rebuilt. Also prunes the repository for both. Run daily by a systemd user
+# timer (home/workstation.nix); fine to run by hand. Does nothing unless both
+# drives are mounted.
+#
+# The repository's password is in ~/.config/restic/hdd (and in KeePassXC:
+# without it the backup can't be read). To browse the snapshots:
+#   restic -r /mnt/hdd/restic --password-file ~/.config/restic/hdd mount ~/mnt
+setopt err_exit pipe_fail
+
+SRC=${DATA_BACKUP_SRC:-/mnt/data} # the variables are for testing
+DRIVE=${DATA_BACKUP_DRIVE:-/mnt/hdd}
+export RESTIC_REPOSITORY=$DRIVE/restic
+export RESTIC_PASSWORD_FILE=${RESTIC_PASSWORD_FILE:-$HOME/.config/restic/hdd}
+
+# Mounted, not just the automount point (listing it triggers the automount)
+for dir in $SRC $DRIVE; do
+    if ! timeout 20 ls $dir > /dev/null 2>&1 ||
+        ! findmnt -rn -o FSTYPE --mountpoint $dir | grep -qvx autofs; then
+        print "$dir is not mounted: skipping."
+        exit 0
+    fi
+done
+
+# Not backed up: ws-mirror's copy of ~/ws and its history (ws-backup has ~/ws),
+# the trash, caches marked with CACHEDIR.TAG (cargo's target/ among them), and
+# the folders the drive lists in .backup-exclude, one per line, relative to it:
+# what can be downloaded or rebuilt again, and live VM disks (a running VM's
+# disk can't be copied safely: back up snapshots taken with the VM off)
+excludes=(ws ws-history '.Trash-*')
+[[ -f $SRC/.backup-exclude ]] && excludes+=(${(f)"$(grep -v '^\s*\(#\|$\)' $SRC/.backup-exclude)"})
+rc=0
+restic backup --tag data --one-file-system --exclude-caches --pack-size 64 \
+    ${excludes/#/--exclude=$SRC/} $SRC || rc=$?
+(( rc == 0 || rc == 3 )) || exit $rc # 3: some files couldn't be read (named above)
+
+# Pruning and checking lock the repository: wait for a running ws-backup
+restic forget --tag data --retry-lock 1h --keep-daily 14 --keep-weekly 8 --keep-monthly 24
+restic prune --retry-lock 1h
+restic check --retry-lock 1h --read-data-subset=2% # a different 2% each day: bit rot on the HDD
+print "Backed up $SRC to $RESTIC_REPOSITORY."

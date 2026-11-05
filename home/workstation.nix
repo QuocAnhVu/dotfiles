@@ -1,5 +1,5 @@
 # The workstation (this desktop): desktop.nix, the dev suite and the desktop apps.
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   # The data drive: each machine's /etc/fstab mounts its drive here
   data = "/mnt/data";
@@ -27,23 +27,66 @@ in
   # virt-manager (setup.sh adds the user to the libvirt group)
   home.sessionVariables.LIBVIRT_DEFAULT_URI = "qemu:///system";
 
-  # ws stays on the system drive (builds write a lot): back it up to the data
-  # drive hourly, when it's unlocked
+  # Backups to the HDD with restic (encrypted, deduplicated snapshots): ws,
+  # which stays on the system drive (builds write a lot), every 15 minutes; the
+  # data drive daily
+  home.packages = [ pkgs.restic ];
   systemd.user.services.ws-backup = {
-    Unit.Description = "Back up ~/ws to ${data}/ws";
+    Unit.Description = "Back up ~/ws to the HDD";
     Service = {
       Type = "oneshot";
       ExecStart = "${config.dotfiles.path}/bin/ws-backup";
+      Environment = "PATH=${lib.makeBinPath [ pkgs.restic ]}:/usr/bin:/bin";
       Nice = 19;
       IOSchedulingClass = "idle";
     };
   };
   systemd.user.timers.ws-backup = {
-    Unit.Description = "Back up ~/ws hourly";
+    Unit.Description = "Back up ~/ws every 15 minutes";
+    Timer = {
+      OnCalendar = "*:0/15";
+      Persistent = true; # catch up after the machine was off
+      RandomizedDelaySec = "1m";
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
+  # Temporary, until 2026-11-12: the old rsync copy, kept until a restore from
+  # restic has been tested (see bin/ws-mirror)
+  systemd.user.services.ws-mirror = {
+    Unit.Description = "Copy ~/ws to ${data}/ws";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${config.dotfiles.path}/bin/ws-mirror";
+      Nice = 19;
+      IOSchedulingClass = "idle";
+    };
+  };
+  systemd.user.timers.ws-mirror = {
+    Unit.Description = "Copy ~/ws hourly";
     Timer = {
       OnCalendar = "hourly";
-      Persistent = true; # catch up after the machine was off
+      Persistent = true;
       RandomizedDelaySec = "5m";
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
+
+  systemd.user.services.data-backup = {
+    Unit.Description = "Back up ${data} to the HDD";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${config.dotfiles.path}/bin/data-backup";
+      Environment = "PATH=${lib.makeBinPath [ pkgs.restic ]}:/usr/bin:/bin";
+      Nice = 19;
+      IOSchedulingClass = "idle";
+    };
+  };
+  systemd.user.timers.data-backup = {
+    Unit.Description = "Back up ${data} to the HDD daily";
+    Timer = {
+      OnCalendar = "daily";
+      Persistent = true; # catch up after the machine was off
+      RandomizedDelaySec = "30m";
     };
     Install.WantedBy = [ "timers.target" ];
   };

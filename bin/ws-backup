@@ -1,20 +1,20 @@
 #! /usr/bin/zsh
-# Back up ~/ws to the data drive (/mnt/data/ws), without build output, caches or
-# 3p clones (only their list: see 3p). Run hourly by a systemd user timer
-# (home/workstation.nix); fine to run by hand. Does nothing when the drive
-# isn't mounted; after an interrupted run, the next one continues.
+# Back up ~/ws to the restic repository on the HDD (/mnt/hdd/restic, shared
+# with data-backup), without build output, caches or 3p clones (only their
+# list: see 3p). Run every 15 minutes by a systemd user timer
+# (home/workstation.nix); fine to run by hand. Does nothing when the HDD isn't
+# mounted. To leave a folder out, put a CACHEDIR.TAG file in it.
 #
-# Files deleted or changed since the previous run are moved to
-# /mnt/data/ws-history/<date_time>/ and kept for 30 days.
-# To exclude more, add rsync filter rules to a .backupignore file in any
-# directory of ws (e.g. `- /big-dataset/`, anchored to that directory).
+# Restore a file or folder from the latest snapshot:
+#   restic -r /mnt/hdd/restic --password-file ~/.config/restic/hdd \
+#       restore latest --tag ws --include ~/ws/<path> --target /tmp/restore
+# or browse every snapshot: ... mount ~/mnt
 setopt err_exit pipe_fail
 
-WS=$HOME/ws
-DRIVE=${WS_BACKUP_DRIVE:-/mnt/data} # the variable is for testing
-DEST=$DRIVE/ws
-HISTORY=$DRIVE/ws-history
-KEEP_DAYS=30
+WS=${WS_BACKUP_SRC:-$HOME/ws} # the variables are for testing
+DRIVE=${WS_BACKUP_DRIVE:-/mnt/hdd}
+export RESTIC_REPOSITORY=$DRIVE/restic
+export RESTIC_PASSWORD_FILE=${RESTIC_PASSWORD_FILE:-$HOME/.config/restic/hdd}
 
 # Mounted, not just the automount point (listing it triggers the automount)
 if ! timeout 20 ls $DRIVE > /dev/null 2>&1 ||
@@ -29,41 +29,39 @@ if [[ -d $WS/3p && -z $manifest ]]; then
     ${0:A:h}/3p save > /dev/null || print '3p save failed: backing up the old list.'
 fi
 
-# Build output found by content: cargo target/ (next to a Cargo.toml),
-# virtualenvs (have pyvenv.cfg), caches marked with CACHEDIR.TAG
-filter=$(mktemp)
-trap 'rm -f $filter' EXIT
+# Build output by name; caches that carry CACHEDIR.TAG, virtualenvs (have a
+# pyvenv.cfg); cargo's target/ by place (next to a Cargo.toml: cargo tags only
+# the target dirs it created itself)
+excludes=$(mktemp)
+trap 'rm -f $excludes' EXIT
 {
-    print -r -- '+ /3p/'
-    print -r -- '+ /3p/.manifest/***'
-    print -r -- '- /3p/*'
-    print -l -- '- node_modules/' '- __pycache__/' '- .mypy_cache/' '- .ruff_cache/' \
-        '- .pytest_cache/' '- .direnv/' '- .svelte-kit/' '- .next/' '- .turbo/' '- .pnpm-store/'
-    cd $WS
-    find . -path ./3p -prune -o -name node_modules -prune -o \( \
-        \( -type d -name target -execdir test -f Cargo.toml \; -print -prune \) -o \
-        \( -type f -name pyvenv.cfg -printf '%h\n' \) -o \
-        \( -type f -name CACHEDIR.TAG -printf '%h\n' \) \) 2> /dev/null |
-        sed 's|^\./|/|; s|$|/|; s|^|- |' | sort -u
+    print -r -- "$WS/3p/*"
+    print -r -- "!$WS/3p/.manifest"
+    print -l -- node_modules __pycache__ .mypy_cache .ruff_cache .pytest_cache \
+        .direnv .svelte-kit .next .turbo .pnpm-store
+    find $WS -path $WS/3p -prune -o -name node_modules -prune -o \
+        -type d -name target -execdir test -f Cargo.toml \; -print -prune 2> /dev/null
     # Unreal projects (next to a .uproject): what the editor and builds
     # regenerate, in the project and its plugins
-    find . -path ./3p -prune -o -name node_modules -prune -o \
+    find $WS -path $WS/3p -prune -o -name node_modules -prune -o \
         -type f -name '*.uproject' -printf '%h\n' 2> /dev/null |
-        sed 's|^\.||' | sort -u | while read -r project; do
+        sort -u | while read -r project; do
             for sub in Binaries Intermediate Saved DerivedDataCache; do
-                print -r -- "- $project/$sub/"
-                print -r -- "- $project/Plugins/**/$sub/"
+                print -r -- "$project/$sub"
+                print -r -- "$project/Plugins/**/$sub"
             done
         done
-} > $filter
+} > $excludes
 
+# The nightly prune (data-backup) locks the repository: wait for it
 rc=0
-rsync -aHAX --delete --backup --backup-dir=$HISTORY/$(date +%F_%H%M) \
-    --partial-dir=.rsync-partial --no-whole-file \
-    --filter=': .backupignore' --exclude-from=$filter \
-    --info=stats1 --human-readable $WS/ $DEST/ || rc=$?
-(( rc == 0 || rc == 24 )) || exit $rc # 24: files vanished during the copy (fine)
+restic backup --tag ws --retry-lock 2h --exclude-caches \
+    --exclude-if-present pyvenv.cfg --exclude-file $excludes $WS || rc=$?
+(( rc == 0 || rc == 3 )) || exit $rc # 3: some files couldn't be read (named above)
 
-timeout 600 sync -f $DEST
-find $HISTORY -mindepth 1 -maxdepth 1 -type d -mtime +$KEEP_DAYS -exec rm -rf {} + 2> /dev/null || true
-print "Backed up $WS to $DEST."
+# Thin out old snapshots; data-backup's nightly prune frees their space. Skipped
+# when another run holds the lock (the next one does it).
+restic forget --tag ws --retry-lock 5m --keep-last 8 --keep-hourly 48 \
+    --keep-daily 14 --keep-weekly 8 --keep-monthly 24 > /dev/null ||
+    print 'forget skipped: the repository is busy.'
+print "Backed up $WS."
