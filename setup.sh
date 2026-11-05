@@ -253,6 +253,14 @@ function step_packages() {
         run sudo usermod -a -G libvirt $USER
         notes+=("Log in again for the libvirt group to apply to $USER.")
     fi
+    # At shutdown libvirt-guests asks running VMs to shut down (ACPI) and waits
+    # for them, one at a time and up to 5 minutes by default: all at once, 30 s
+    local guests=/etc/default/libvirt-guests
+    [[ $distro == fedora ]] && guests=/etc/sysconfig/libvirt-guests
+    if [[ -f $guests ]] && ! grep -q '^SHUTDOWN_TIMEOUT=30$' $guests; then
+        run sudo sed -i -e "'s/^#\\?PARALLEL_SHUTDOWN=.*/PARALLEL_SHUTDOWN=10/'" \
+            -e "'s/^#\\?SHUTDOWN_TIMEOUT=.*/SHUTDOWN_TIMEOUT=30/'" $guests
+    fi
 
     context 'Low-latency audio'
     # PipeWire's group may use real-time priority (limits.d/25-pw-rlimits.conf):
