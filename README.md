@@ -134,7 +134,7 @@ are in the way with a `.pre-hm` suffix.
 
 ### 3. Machine-specific files
 
-Two files aren't in git (`setup.sh` creates empty ones):
+These files aren't in git (`setup.sh` creates the first two empty):
 
 - `~/.config/environment.d/90-local.conf`: variables for this machine only,
   such as SDK paths. systemd `environment.d` format, `${VAR}` expansion works:
@@ -144,6 +144,8 @@ Two files aren't in git (`setup.sh` creates empty ones):
   ```
 - `~/.config/secrets.env`: API keys, `KEY=VALUE` per line, literal values.
   Keep it `chmod 600`.
+- `~/.config/local.sh` (zsh and bash) and `~/.config/local.nu` (nushell):
+  aliases and functions for this machine only. Open a new shell after a change.
 
 ### Data drive (workstation)
 

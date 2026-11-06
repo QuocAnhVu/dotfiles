@@ -85,3 +85,9 @@ $env.config.hooks.pre_prompt ++= [{||
 
 # mise.nu is generated in env.nu (empty without mise)
 use ($nu.default-config-dir | path join mise.nu)
+
+# Aliases and commands for this machine only, in an untracked file
+# (~/.config/local.nu; zsh and bash read local.sh). source needs a path known
+# at parse time: null when the file is missing
+const local = ($nu.home-dir | path join .config local.nu)
+source (if ($local | path exists) { $local } else { null })

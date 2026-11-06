@@ -31,5 +31,9 @@ if [[ -r $XDG_CONFIG_HOME/secrets.env ]]; then
     unset key value
 fi
 
+# Aliases and functions for this machine only, in an untracked file (shared
+# with bash; nushell's are in local.nu)
+[[ ! -r $XDG_CONFIG_HOME/local.sh ]] || source $XDG_CONFIG_HOME/local.sh
+
 # Google Cloud SDK completion, if installed
 [[ ! -r $XDG_DATA_HOME/google-cloud-sdk/completion.zsh.inc ]] || source $XDG_DATA_HOME/google-cloud-sdk/completion.zsh.inc

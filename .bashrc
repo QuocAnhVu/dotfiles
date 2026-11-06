@@ -68,3 +68,7 @@ if [ -r "$XDG_CONFIG_HOME/secrets.env" ]; then
     done < "$XDG_CONFIG_HOME/secrets.env"
     unset key value
 fi
+
+# Aliases and functions for this machine only, in an untracked file (shared
+# with zsh; nushell's are in local.nu)
+[ ! -r "$XDG_CONFIG_HOME/local.sh" ] || . "$XDG_CONFIG_HOME/local.sh"
