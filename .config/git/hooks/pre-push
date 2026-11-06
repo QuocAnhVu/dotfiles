@@ -3,13 +3,16 @@
 # runs the repository's own pre-push hook, from .githooks or .git/hooks.
 hooks="$(dirname "$0")"
 "$hooks/private-check" url "$2" || exit 1
-# Each ref being pushed: the commits the remote doesn't have yet.
+# Each ref being pushed: the commits the remote doesn't have yet. A forced
+# update also skips what the remote already has: a rebase onto a newer
+# upstream would otherwise re-check every upstream commit in between
+# (126,613 for a GStreamer review ref, 2026-11-05, and GitHub dropped the push).
 zero=0000000000000000000000000000000000000000
 input=$(cat)
 echo "$input" | while read -r local_ref local_sha remote_ref remote_sha; do
   [ -z "$local_sha" ] && continue
   [ "$local_sha" = "$zero" ] && continue
-  if [ "$remote_sha" = "$zero" ]; then range="$local_sha --not --remotes=$1"; else range="$remote_sha..$local_sha"; fi
+  if [ "$remote_sha" = "$zero" ]; then range="$local_sha --not --remotes=$1"; else range="$local_sha --not $remote_sha --remotes=$1"; fi
   "$hooks/private-check" range "$range" || exit 1
 done || exit 1
 top="$(git rev-parse --show-toplevel)"
