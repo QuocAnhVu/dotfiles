@@ -12,6 +12,13 @@ HISTSIZE=65536
 SAVEHIST=65536
 setopt INC_APPEND_HISTORY # write each command as it runs, not on exit
 
+# Ctrl+arrows (bash gets them from /etc/inputrc; zsh has no binding, and types
+# the end of the key's sequence, ";5D"): word left and right, history up and down
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5A' up-line-or-history
+bindkey '^[[1;5B' down-line-or-history
+
 alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts"'
 alias vi=nvim
 alias l='ls -al'
