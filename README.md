@@ -146,12 +146,24 @@ These files aren't in git (`setup.sh` creates the first two empty):
   Keep it `chmod 600`.
 - `~/.config/local.sh` (zsh and bash) and `~/.config/local.nu` (nushell):
   aliases and functions for this machine only. Open a new shell after a change.
+- `~/.config/local.nix`: a home-manager module for this machine only, such as
+  its data drive and backups (below). It's outside the repo, so the switch
+  needs `--impure` (`setup.sh` and `bin/update` pass it). Switch after a change.
+  ```nix
+  { config, lib, pkgs, ... }:
+  {
+    dotfiles.dataDrive = true;
+    dotfiles.backup.ws.enable = true;
+    dotfiles.backup.data.enable = true;
+  }
+  ```
 
 ### Data drive (workstation)
 
 Bulky data lives on a separate drive mounted at `/mnt/data`; the system drive
-keeps programs, games and `~/ws`. `home/workstation.nix` points Documents,
-Pictures, Videos and Music there (Desktop and Downloads stay local; Public and
+keeps programs, games and `~/ws`. On a workstation with
+`dotfiles.dataDrive = true` in `~/.config/local.nix`, Documents, Pictures,
+Videos and Music point there (Desktop and Downloads stay local; Public and
 Templates are off). Each machine's `/etc/fstab` decides which drive that is.
 With systemd's automount, a missing drive makes writes fail instead of landing
 on the system drive:
@@ -163,7 +175,9 @@ on the system drive:
 (plus its `/etc/crypttab` line if it's encrypted). Layout: `Documents/`, `Pictures/`,
 `Videos/`, `Music/`, `Models/`, `Datasets/`.
 
-**Backups** go to a [restic](https://restic.net) repository on a second drive
+**Backups**, each turned on in `~/.config/local.nix`
+(`dotfiles.backup.ws.enable`, `dotfiles.backup.data.enable`), go to a
+[restic](https://restic.net) repository on a second drive
 mounted at `/mnt/hdd` (`/mnt/hdd/restic`, its password in
 `~/.config/restic/hdd`; keep a copy in a password manager), and skip quietly
 while either drive is missing. Create it once with
@@ -189,7 +203,7 @@ and `journalctl --user -u ws-backup -u data-backup`.
 - **Headless server without a checkout**: skip the clone and apply the profile
   straight from GitHub (needs Nix with flakes; uses what's pushed):
   ```shell
-  nix run github:QuocAnhVu/dotfiles#home-manager -- switch --flake github:QuocAnhVu/dotfiles#$USER@server
+  nix run github:QuocAnhVu/dotfiles#home-manager -- switch --impure --flake github:QuocAnhVu/dotfiles#$USER@server
   ```
 - **Remote desktop**: `setup.sh desktop` installs the RDP server and an SSH server; turn on RDP in GNOME Settings →
   System → Remote Desktop (or with `grdctl`), but keep port 3389 closed and
@@ -211,7 +225,7 @@ checkout, so most edits apply right away. The rest:
 | You changed                              | To apply                                                        |
 | ---------------------------------------- | --------------------------------------------------------------- |
 | A file under `.config/`                  | nothing (restart the program, or reload: `:config-reload` in helix) |
-| `home/*.nix` or `flake.lock`             | `home-manager switch --flake ~/.local/share/dotfiles#$USER@<role>` |
+| `home/*.nix` or `flake.lock`             | `home-manager switch --impure --flake ~/.local/share/dotfiles#$USER@<role>` |
 | Shared variables in `home/*.nix`         | the switch above, then log out and back in                      |
 | `~/.config/environment.d/90-local.conf`  | log out and back in (new zsh/bash shells pick it up right away) |
 | `~/.config/secrets.env`                  | open a new shell                                                |

@@ -98,7 +98,7 @@ function nix_packages() {
     local changed=1
     cmp -s $lock $backup && changed=0
     (( changed )) || message 'Flake inputs are current.'
-    if ! run home-manager switch --flake $DOTFILES#$USER@$role; then
+    if ! run home-manager switch --impure --flake $DOTFILES#$USER@$role; then
         (( changed )) && { cp $backup $lock; message 'The switch failed: flake.lock restored.' }
         rm $backup; return 1
     fi

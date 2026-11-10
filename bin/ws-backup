@@ -2,7 +2,7 @@
 # Back up ~/ws to the restic repository on the HDD (/mnt/hdd/restic, shared
 # with data-backup), without build output, caches or 3p clones (only their
 # list: see 3p). Run every 15 minutes by a systemd user timer
-# (home/workstation.nix); fine to run by hand. Does nothing when the HDD isn't
+# (home/backup.nix); fine to run by hand. Does nothing when the HDD isn't
 # mounted. To leave a folder out, put a CACHEDIR.TAG file in it.
 #
 # Restore a file or folder from the latest snapshot:

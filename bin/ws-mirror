@@ -5,7 +5,7 @@
 #
 # Copy ~/ws to the data drive (/mnt/data/ws), without build output, caches or
 # 3p clones (only their list: see 3p). Run hourly by a systemd user timer
-# (home/workstation.nix); fine to run by hand. Does nothing when the drive
+# (~/.config/local.nix); fine to run by hand. Does nothing when the drive
 # isn't mounted; after an interrupted run, the next one continues.
 #
 # Files deleted or changed since the previous run are moved to

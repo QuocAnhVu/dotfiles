@@ -2,7 +2,7 @@
 # Back up the data drive (/mnt/data) to the restic repository on the HDD
 # (/mnt/hdd/restic, shared with ws-backup), without what can be downloaded or
 # rebuilt. Also prunes the repository for both. Run daily by a systemd user
-# timer (home/workstation.nix); fine to run by hand. Does nothing unless both
+# timer (home/backup.nix); fine to run by hand. Does nothing unless both
 # drives are mounted.
 #
 # The repository's password is in ~/.config/restic/hdd (and in KeePassXC:

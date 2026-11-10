@@ -414,7 +414,7 @@ function step_home() {
 
     context "Applying home-manager profile $config"
     message 'Existing files in the way are renamed with a .pre-hm suffix.'
-    if ! run nix run $DOTFILES#home-manager -- switch -b pre-hm --flake $DOTFILES#$config; then
+    if ! run nix run $DOTFILES#home-manager -- switch -b pre-hm --impure --flake $DOTFILES#$config; then
         message 'home-manager failed: restoring the removed symlinks.'
         for f target in ${(kv)removed}; do
             [[ -e $f || -L $f ]] || ln -s $target $f

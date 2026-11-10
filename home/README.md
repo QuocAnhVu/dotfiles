@@ -9,7 +9,7 @@
 | `<user>@server`    | `minimal.nix` | `common.nix`                  |
 | `<user>@dev`       | `full.nix`    | `minimal.nix`, `terminal.nix` |
 | `<user>@desktop`   | `desktop.nix` | `minimal.nix`, `terminal.nix`, `gnome.nix` |
-| `<user>@workstation` | `workstation.nix` | `desktop.nix`, `full.nix` |
+| `<user>@workstation` | `workstation.nix` | `desktop.nix`, `full.nix`, `backup.nix` |
 
 - `common.nix`: XDG directories, environment variables (shells and the
   desktop session), the Nix profile location, garbage collection, `~/.zshenv`,
@@ -26,9 +26,9 @@
 
 1. Edit the module.
 2. New files must be known to git (`git add`): flakes only see tracked files.
-3. Check it builds without switching: `home-manager build --flake .#$USER@workstation`
+3. Check it builds without switching: `home-manager build --impure --flake .#$USER@workstation`
    (leaves a `result` link; delete it afterwards).
-4. Apply: `home-manager switch --flake .#$USER@<role>`.
+4. Apply: `home-manager switch --impure --flake .#$USER@<role>`.
 
 ## Packages
 

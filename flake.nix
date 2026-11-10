@@ -24,6 +24,14 @@
         # Store copies instead of links, so servers don't need a dotfiles checkout
         server = { profile = "minimal"; liveLinks = false; };
       };
+      # This machine's own settings, outside the repo (README: Machine-specific
+      # files). Reading them needs --impure; without it, a missing file and
+      # a forgotten flag would look the same, so it stops instead.
+      localModule = user:
+        let path = /. + "/home/${user}/.config/local.nix"; in
+        if !(builtins ? currentSystem)
+        then throw "Switch with --impure: the profile reads ~/.config/local.nix."
+        else nixpkgs.lib.optional (builtins.pathExists path) path;
       mkHome = user: { profile, liveLinks ? true }: home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.${system};
         modules = [
@@ -34,7 +42,7 @@
             home.homeDirectory = "/home/${user}";
             dotfiles.liveLinks = liveLinks;
           }
-        ];
+        ] ++ localModule user;
       };
     in
     {
