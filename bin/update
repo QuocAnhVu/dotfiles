@@ -1,7 +1,12 @@
 #! /usr/bin/zsh
 # Update everything that doesn't update itself: system packages, Flatpak apps,
-# cargo installs, mise tools, Rust, and the Nix packages (flake inputs). Shows
-# what changed in the Nix profile; committing flake.lock is left to you.
+# cargo installs, mise tools, Rust, the dotfiles themselves (git pull), and the
+# Nix packages (flake inputs). Shows what changed in the Nix profile.
+#
+# flake.lock: each run starts from the committed one (its own last update is
+# reset, so the pull can't conflict) and updates it. The machine whose
+# ~/.config/local.nix sets dotfiles.pushLock then commits and pushes it; on the
+# others it stays a local change.
 #
 # Usage: update [--drivers] [--role ROLE]
 #   --drivers    also update the graphics driver (NVIDIA's packages), which
@@ -89,10 +94,18 @@ function mise_tools() {
 (( $+commands[mise] )) && section 'mise tools' mise_tools
 (( $+commands[rustup] )) && section 'Rust' run rustup update
 
+# --- Dotfiles: this machine's last flake.lock update is reset (nix_packages
+# makes it again), then the new commits
+function dotfiles() {
+    run git -C $DOTFILES checkout flake.lock || return 1
+    run git -C $DOTFILES pull --ff-only
+}
+section 'Dotfiles' dotfiles
+
 # --- Nix packages: newer flake inputs, then switch (also applies home/*.nix changes)
 function nix_packages() {
     local lock=$DOTFILES/flake.lock backup=$(mktemp) profile=$STATE/nix/profiles/home-manager
-    local old=$(readlink -f $profile)
+    local old=$(readlink -f $profile) config=$DOTFILES#homeConfigurations.\"$USER@$role\"
     cp $lock $backup
     run nix flake update --flake $DOTFILES || { rm $backup; return 1 }
     local changed=1
@@ -103,10 +116,22 @@ function nix_packages() {
         rm $backup; return 1
     fi
     rm $backup
-    [[ $(readlink -f $profile) == $old ]] && return 0
-    run nix store diff-closures $old $(readlink -f $profile)
-    (( changed )) && message "If things work: git -C $DOTFILES commit flake.lock -m 'chore: Update flake inputs'"
-    message "If not: $old/activate${${changed:#0}:+, then git -C $DOTFILES checkout flake.lock}"
+    if [[ $(readlink -f $profile) != $old ]]; then
+        run nix store diff-closures $old $(readlink -f $profile)
+        message "If things don't work: $old/activate"
+    fi
+    (( changed )) || return 0
+    if [[ $(nix eval --impure $config.config.dotfiles.pushLock 2> /dev/null) != true ]]; then
+        message 'flake.lock stays a local change (dotfiles.pushLock is off here).'
+        return 0
+    fi
+    run git -C $DOTFILES commit -m 'chore: Update flake inputs' -- flake.lock || return 1
+    # Only this commit: other local commits wait for a push by hand
+    if [[ $(git -C $DOTFILES rev-list --count '@{u}..HEAD') != 1 ]]; then
+        message 'Committed flake.lock; not pushed, since other local commits would go with it.'
+        return 0
+    fi
+    run git -C $DOTFILES push
 }
 section "Nix packages ($USER@$role)" nix_packages
 

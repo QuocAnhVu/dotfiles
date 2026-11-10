@@ -147,8 +147,10 @@ These files aren't in git (`setup.sh` creates the first two empty):
 - `~/.config/local.sh` (zsh and bash) and `~/.config/local.nu` (nushell):
   aliases and functions for this machine only. Open a new shell after a change.
 - `~/.config/local.nix`: a home-manager module for this machine only, such as
-  its data drive and backups (below). It's outside the repo, so the switch
-  needs `--impure` (`setup.sh` and `bin/update` pass it). Switch after a change.
+  its data drive and backups (below), or `dotfiles.pushLock = true` on the one
+  machine whose `bin/update` commits and pushes `flake.lock`. It's outside the
+  repo, so the switch needs `--impure` (`setup.sh` and `bin/update` pass it).
+  Switch after a change.
   ```nix
   { config, lib, pkgs, ... }:
   {
@@ -235,7 +237,10 @@ helix, zellij, Neovim, delta (git diffs), the GTK theme, the GNOME Shell theme
 and the folder colour of the icons (Tela-circle). The cursor (Bibata Modern Ice)
 is the same for every theme. It installs what's missing the first time (into
 `~/.local/share/themes` and `~/.local/share/icons`, where Flatpak apps see them
-too); `./theme.sh -u <theme>` updates them.
+too); `./theme.sh -u <theme>` updates them. The choice is this machine's: it
+goes in files git ignores (`~/.local/state/dotfiles/theme` and a `current`
+theme file per program), so machines with different themes pull cleanly.
+Without them, the configs fall back to everforest.
 
 **Language versions**: mise manages Python, Node, Go and Lua. Global versions
 are in `.config/mise/config.toml` (`mise use -g node@lts` edits it in the repo;
@@ -312,12 +317,16 @@ machine won't have it.
 
 Run `update` (`bin/update`) now and then. It updates, in order: system
 packages, Flatpak apps, cargo installs (`cargo install-update -a`), mise tools,
-Rust, and the Nix packages (`nix flake update`, then a switch to the role
-`setup.sh` applied). Then it shows what changed and whether a reboot is needed.
-A failed step doesn't stop the rest. Afterwards:
+Rust, these dotfiles (`git pull --ff-only`), and the Nix packages
+(`nix flake update`, then a switch to the role `setup.sh` applied). Then it
+shows what changed and whether a reboot is needed. A failed step doesn't stop
+the rest. Afterwards:
 
-- If things work, commit `flake.lock`. If not, run the `activate` it prints
-  (the previous generation) and `git checkout flake.lock`.
+- `flake.lock`: each run first resets this machine's last update, so the pull
+  can't conflict, then updates it again. On the machine with
+  `dotfiles.pushLock` (in `~/.config/local.nix`) it's committed and pushed,
+  so the others start from those versions; elsewhere it stays a local change.
+- If things don't work, run the `activate` it prints (the previous generation).
 - The graphics driver stays at its version unless you pass `--drivers`: a new
   NVIDIA driver means a rebuilt kernel module and a reboot.
 
@@ -332,7 +341,7 @@ What updates on its own, and what waits for `update`:
 | Flatpak apps             | weekly (nix-flatpak)                                       | `update`                  |
 | GNOME extensions         | GNOME Shell                                                |                           |
 | Nix packages, mise tools, Rust, cargo installs | no                                   | `update`                  |
-| These dotfiles           | config files are live links: `git pull`                    | `update` switches for `home/*.nix` changes |
+| These dotfiles           | config files are live links: `git pull`                    | `update` pulls and switches |
 | GTK themes, icons, cursor | no                                                        | `./theme.sh -u <theme>`   |
 | Nix itself               | no                                                         | `sudo -i nix upgrade-nix`; check first that it stays upstream Nix (the installer's `/etc/nix/nix.conf` points upgrades at a Determinate Systems URL) |
 

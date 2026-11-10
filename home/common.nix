@@ -19,6 +19,11 @@ in
         place (and by theme.sh). When false, copy them into the Nix store.
       '';
     };
+    pushLock = lib.mkEnableOption ''
+      committing and pushing flake.lock after bin/update's switch, so other
+      machines start from these versions. One machine does this; the others
+      update on their own lock, which bin/update resets before each pull
+    '';
   };
 
   config = {
