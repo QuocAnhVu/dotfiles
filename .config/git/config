@@ -76,10 +76,9 @@
 # hex colours so it follows the terminal theme.
 [delta "arctic-fox"]
 	dark = true
-	# Theme: switch with ./theme.sh in the dotfiles repo (or swap by hand)
-# syntax-theme = Nord
-# syntax-theme = gruvbox-dark
-syntax-theme = ansi
+	# Theme: ansi (terminal colours) unless ./theme.sh set another for this
+	# machine in ~/.config/git/theme (included at the end)
+	syntax-theme = ansi
 	file-added-label = [+]
 	file-copied-label = [==]
 	file-modified-label = [*]
@@ -110,3 +109,8 @@ syntax-theme = ansi
 	merge-conflict-ours-diff-header-decoration-style = blue box
 	merge-conflict-theirs-diff-header-style = yellow bold
 	merge-conflict-theirs-diff-header-decoration-style = blue box
+
+# This machine's theme (delta's syntax theme), written by ./theme.sh; not in
+# git, and skipped while it's missing
+[include]
+	path = theme

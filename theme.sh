@@ -3,8 +3,9 @@
 # the icon theme's colour. Installs the GTK/GNOME Shell theme (into
 # $XDG_DATA_HOME/themes), the icons and the cursor (into $XDG_DATA_HOME/icons,
 # where Flatpak apps see them too) first if they are missing, or always with
-# --update. --current reapplies the theme the configs select (setup.sh uses it
-# on new machines).
+# --update. The choice is this machine's: it goes in files git ignores (see
+# .gitignore), so machines with different themes share one checkout state.
+# --current reapplies it (setup.sh uses it on new machines).
 source $(dirname $0)/_lib.sh
 setopt err_exit
 
@@ -14,6 +15,9 @@ THEMES_DIR=$XDG_DATA_HOME/themes
 ICONS_DIR=$XDG_DATA_HOME/icons
 SRC_DIR=$HOME/ws/3p
 USER_THEME=user-theme@gnome-shell-extensions.gcampax.github.com
+# This machine's theme name; Neovim reads it too
+THEME_FILE=${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/theme
+DEFAULT_THEME=everforest # what the configs fall back to without the files
 
 # Per-theme settings. To add a theme, add a column here and its option lines in
 # the alacritty/helix/zellij configs.
@@ -39,24 +43,18 @@ function usage() {
     local themes=(${(ko)GTK})
     echo "Usage: $SCRIPT [-u|--update] <${(j:|:)themes}|--current>"
     echo "  -u, --update  Pull and reinstall the GTK/GNOME Shell theme, icons and cursor"
-    echo "  --current     The theme the configs select now (the alacritty import)"
+    echo "  --current     This machine's theme again (default: $DEFAULT_THEME)"
     exit 1
 }
 
-# Uncomment the option line equal to `want` and comment out the other lines
-# matching `pattern` (an awk regex for the bare, uncommented line).
-function select_line() {
-    local file=$1 comment="$2 " pattern=$3 want=$4
-    grep --quiet --fixed-strings --line-regexp -e "$want" -e "$comment$want" $file \
-        || { message "No '$want' option line in $file"; exit 1 }
-    # Pass via ENVIRON: awk -v would treat the regex's backslashes as escapes
-    local out=$(c=$comment re=$pattern want=$want awk '{
-        c = ENVIRON["c"]; bare = index($0, c) == 1 ? substr($0, length(c) + 1) : $0
-        if (bare ~ ENVIRON["re"]) print (bare == ENVIRON["want"] ? bare : c bare); else print
-    }' $file)
-    # Write in place (not mv) so file watchers like alacritty's live reload see it
-    print -r -- "$out" > $file
-    run_noeval "$file: $want"
+# Write this machine's theme file in place (not mv), so file watchers like
+# alacritty's live reload see it
+function write_local() {
+    local file=$1 text=$2
+    print -r -- "$text" > $file
+    local first=${text%%$'\n'*}
+    [[ $first == $text ]] || first+=' ...'
+    run_noeval "$file: $first"
 }
 
 # Install sassc/git, gtk-update-icon-cache and the User Themes extension if
@@ -153,23 +151,25 @@ case $1 in
 esac
 theme=$1
 if [[ $theme == --current ]]; then
-    theme=
-    for t in ${(k)ALACRITTY}; do
-        if grep -qxF "import = [\"themes/${ALACRITTY[$t]}.toml\"]" $DOTFILES/.config/alacritty/alacritty.toml; then
-            theme=$t
-        fi
-    done
+    theme=$(< $THEME_FILE) 2> /dev/null || theme=$DEFAULT_THEME
 fi
 [[ -n $theme && -n ${GTK[$theme]} ]] || usage
 
 context "Terminal and editor: $theme"
-select_line $DOTFILES/.config/alacritty/alacritty.toml '#' '^import = \["themes/[^"]+\.toml"\]$' \
-    "import = [\"themes/${ALACRITTY[$theme]}.toml\"]"
-select_line $DOTFILES/.config/helix/config.toml '#' '^theme = "[^"]+"$' "theme = \"${HELIX[$theme]}\""
-select_line $DOTFILES/.config/zellij/config.kdl '//' '^theme "[^"]+"$' "theme \"${ZELLIJ[$theme]}\""
-select_line $DOTFILES/.config/nvim/init.lua '--' '^pcall\(vim\.cmd\.colorscheme, "[^"]+"\)$' \
-    "pcall(vim.cmd.colorscheme, \"${NVIM[$theme]}\")"
-select_line $DOTFILES/.config/git/config '#' '^syntax-theme = .+$' "syntax-theme = ${DELTA[$theme]}" # delta (no everforest theme: ansi uses terminal colours)
+run mkdir -p ${THEME_FILE:h} $DOTFILES/.config/helix/themes # git keeps no empty folder
+write_local $THEME_FILE $theme
+write_local $DOTFILES/.config/alacritty/themes/current.toml \
+    "[general]"$'\n'"import = [\"$DOTFILES/.config/alacritty/themes/${ALACRITTY[$theme]}.toml\"]"
+# Alacritty reloads when its main file changes, not an imported one: rewrite
+# it unchanged (git sees no difference)
+main=$DOTFILES/.config/alacritty/alacritty.toml
+print -r -- "$(< $main)" > $main
+write_local $DOTFILES/.config/helix/themes/current.toml "inherits = \"${HELIX[$theme]}\""
+# zellij's theme under the name current (the configs' theme "current")
+write_local $DOTFILES/.config/zellij/themes/current.kdl \
+    "$(sed '2s/^\( *\)[^ ]* {$/\1current {/' $DOTFILES/.config/zellij/themes/${ZELLIJ[$theme]}.kdl)"
+# delta (no everforest theme: ansi uses terminal colours)
+write_local $DOTFILES/.config/git/theme "[delta \"arctic-fox\"]"$'\n\t'"syntax-theme = ${DELTA[$theme]}"
 
 if [[ -n $update || ! -d $THEMES_DIR/${GTK[$theme]} ]]; then
     context "Installing GTK/GNOME Shell theme ${GTK[$theme]}"

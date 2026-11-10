@@ -128,15 +128,16 @@ local function plugin(name)
     return ok and mod or nil
 end
 
--- Theme: switch with ./theme.sh in the dotfiles repo (or swap by hand).
+-- Theme: the one ./theme.sh in the dotfiles repo chose for this machine
+-- (~/.local/state/dotfiles/theme, not in git: nord, gruvbox or everforest).
 vim.g.everforest_background = "medium"
 if plugin("gruvbox") then require("gruvbox").setup({ contrast = "soft" }) end
 vim.g.nord_contrast = true
 vim.g.nord_borders = true
 vim.g.nord_uniform_diff_background = true
--- pcall(vim.cmd.colorscheme, "nord")
--- pcall(vim.cmd.colorscheme, "gruvbox")
-pcall(vim.cmd.colorscheme, "everforest")
+local theme_file = (os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")) .. "/dotfiles/theme"
+local theme = (vim.fn.filereadable(theme_file) == 1 and vim.fn.readfile(theme_file)[1]) or "everforest"
+pcall(vim.cmd.colorscheme, theme)
 
 -- Treesitter: highlighting for every filetype with a parser (installed by home-manager)
 vim.api.nvim_create_autocmd("FileType", {

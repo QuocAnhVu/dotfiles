@@ -4,3 +4,8 @@ MIGRATE.md
 .config/git/credentials
 .config/git/private-words
 .config/git/allowed_signers
+# This machine's theme, written by theme.sh
+.config/alacritty/themes/current.toml
+.config/helix/themes/current.toml
+.config/zellij/themes/current.kdl
+.config/git/theme

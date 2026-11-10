@@ -1,7 +1,6 @@
-# Theme: switch with ./theme.sh in the dotfiles repo (or swap by hand; built-in themes)
-# theme = "nord"
-# theme = "gruvbox_dark_soft"
-theme = "everforest_dark"
+# Theme: themes/current.toml, which ./theme.sh in the dotfiles repo writes for
+# this machine (not in git): `inherits = "<a built-in theme>"`
+theme = "current"
 
 [editor]
 line-number = "relative"
